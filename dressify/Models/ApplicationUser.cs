@@ -11,5 +11,11 @@ namespace dressify.Models
         public string? Address { get; set; }
         public DateTime? DOB { get; set; }
         public int? Age { get; set; }
+
+        //Vendor props
+        public string? storeName { get; set; }
+        public int? nId  { get; set; }
+        public bool? isSuspended  { get; set; }
+
     }
 }
