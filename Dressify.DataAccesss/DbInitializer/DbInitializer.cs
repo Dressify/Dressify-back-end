@@ -52,7 +52,7 @@ namespace Dressify.DataAccess.DbInitializer
                     storeName="DressifyStore",
                 },"Admin123*").GetAwaiter().GetResult();
                 ApplicationUser user = _context.Users.FirstOrDefault(u => u.Email == "Dressify@gmail.com");
-                _userManager.AddToRoleAsync(user, SD.Role_Vendor).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(user, SD.Role_Sales).GetAwaiter().GetResult();
             }
             return;
         }
