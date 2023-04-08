@@ -21,4 +21,9 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Dressify.DataAccesss\Dressify.DataAccess.csproj" />
+    <ProjectReference Include="..\Dressify.Models\Dressify.Models.csproj" />
+  </ItemGroup>
+
 </Project>

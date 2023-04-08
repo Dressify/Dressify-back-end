@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-namespace dressify.Models
+namespace Dressify.Models
 {
     public class ApplicationUser: IdentityUser
     {

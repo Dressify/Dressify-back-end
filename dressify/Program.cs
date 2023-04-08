@@ -1,4 +1,5 @@
-using dressify.Models;
+using Dressify.DataAccess;
+using Dressify.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
