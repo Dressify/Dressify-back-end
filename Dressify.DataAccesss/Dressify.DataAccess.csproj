@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dressify.Models\Dressify.Models.csproj" />
+    <ProjectReference Include="..\Dressify.Utility\Dressify.Utility.csproj" />
   </ItemGroup>
 
 </Project>
