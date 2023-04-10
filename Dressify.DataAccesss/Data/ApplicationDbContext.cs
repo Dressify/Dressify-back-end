@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Dressify.DataAccess
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

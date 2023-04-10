@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DressifyWeb", "dressify\DressifyWeb.csproj", "{08B673FA-3801-440A-94CF-982EC8A31DC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dressify", "dressify\dressify.csproj", "{08B673FA-3801-440A-94CF-982EC8A31DC7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dressify.Models", "Dressify.Models\Dressify.Models.csproj", "{C83FF904-4B61-4620-A942-C00B14800FEB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dressify.Utility", "Dressify.Utility\Dressify.Utility.csproj", "{4F692208-5D69-4596-99C6-290A5356D279}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dressify.DataAccess", "Dressify.DataAccesss\Dressify.DataAccess.csproj", "{1F203F87-DDE6-48FA-884B-F15AAF724C3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dressify.DataAccess", "Dressify.DataAccesss\Dressify.DataAccess.csproj", "{1F203F87-DDE6-48FA-884B-F15AAF724C3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
