@@ -1,5 +1,7 @@
 using Dressify.DataAccess;
 using Dressify.DataAccess.DbInitializer;
+using Dressify.DataAccess.Repository;
+using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +18,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
