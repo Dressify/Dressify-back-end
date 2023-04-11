@@ -8,20 +8,13 @@ using System.Threading.Tasks;
 
 namespace Dressify.DataAccess.Repository
 {
-    public class UnitOfWork : IUnitOfWork
+    public class ApplicationUserRepository : Repository<ApplicationUser>, IApplicationUserRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public UnitOfWork(ApplicationDbContext context)
+        public ApplicationUserRepository(ApplicationDbContext context):base(context) 
         {
             _context = context;
-            ApplicationUser = new ApplicationUserRepository(_context);
-        }
-        public IApplicationUserRepository ApplicationUser { get; private set; }
-
-        public int Save()
-        {
-            return _context.SaveChanges();
         }
     }
 }

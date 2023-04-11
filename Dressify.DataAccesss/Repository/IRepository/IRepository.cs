@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dressify.DataAccess.Repository.IRepository
 {
-    internal interface IRepository<T> where T : class
+    public interface IRepository<T> where T : class
     {
         T GetById(int id);
         Task<T> GetByIdAsync(int id);
