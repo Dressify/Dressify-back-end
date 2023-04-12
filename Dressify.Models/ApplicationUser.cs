@@ -11,6 +11,8 @@ namespace Dressify.Models
         public string? Address { get; set; }
         public DateTime? DOB { get; set; }
         public int? Age { get; set; }
+        public string FName { get; set; }
+        public string LName { get; set; }
 
         //Vendor props
         public string? storeName { get; set; }
