@@ -26,9 +26,15 @@ namespace Dressify.DataAccess.Repository
             _roleManager = roleManager;
             ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager);
             Product = new ProductRepository (_context);
+            WishList = new WishListRepository(_context);
+
+
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IProductRepository Product { get; private set; }
+        public IWishListRepository WishList { get; private set; }
+
+
 
         public int Save()
         {

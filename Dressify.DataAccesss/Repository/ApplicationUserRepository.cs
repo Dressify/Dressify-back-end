@@ -101,6 +101,10 @@ namespace Dressify.DataAccess.Repository
             return authModel;
         }
 
+        public async Task<ApplicationUser> GetUserAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
         private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -132,6 +136,8 @@ namespace Dressify.DataAccess.Repository
 
             return jwtSecurityToken;
         }
+
+
 
 
     }
