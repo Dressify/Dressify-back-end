@@ -18,6 +18,5 @@ namespace Dressify.Models
         public string? storeName { get; set; }
         public int? nId  { get; set; }
         public bool? isSuspended  { get; set; }
-
     }
 }

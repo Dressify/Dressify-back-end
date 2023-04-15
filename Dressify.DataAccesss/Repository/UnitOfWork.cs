@@ -1,5 +1,8 @@
-﻿using Dressify.DataAccess.Repository.IRepository;
+﻿using Dressify.DataAccess.Helpers;
+using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +14,17 @@ namespace Dressify.DataAccess.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly JWT _jwt;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UnitOfWork(ApplicationDbContext context)
+        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
-            ApplicationUser = new ApplicationUserRepository(_context);
+            _userManager = userManager;
+            _jwt = jwt.Value;
+            _roleManager = roleManager;
+            ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager);
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
 
