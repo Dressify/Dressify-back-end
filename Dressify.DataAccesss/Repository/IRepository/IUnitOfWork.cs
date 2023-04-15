@@ -10,7 +10,6 @@ namespace Dressify.DataAccess.Repository.IRepository
     {
         public IApplicationUserRepository ApplicationUser { get; }
         public IProductRepository Product { get; }
-
         public IWishListRepository WishList { get; }
 
         int Save();

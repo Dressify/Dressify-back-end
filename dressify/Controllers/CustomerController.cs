@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Dressify.DataAccess.Dtos;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using Dressify.Models;
 
 namespace dressify.Controllers
 {
@@ -20,7 +21,6 @@ namespace dressify.Controllers
         }
 
         [HttpPost("addToWishList")]
-        [Authorize(Roles =SD.Role_Customer)]
         public async Task<IActionResult> AddToWishList(WishListDto obj)
         {
             var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
@@ -33,6 +33,13 @@ namespace dressify.Controllers
             {
                 return BadRequest("product does not exist");
             }
+            var item = new WishList
+            {
+                CustomerId = obj.CustomerId,
+                ProductId = obj.ProductId,
+            };
+            await _unitOfWork.WishList.AddAsync(item);
+            _unitOfWork.Save();
             return Ok(obj);
         }
     }
