@@ -1,6 +1,8 @@
 ﻿using Dressify.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Xml;
 
 
 namespace Dressify.DataAccess
@@ -11,16 +13,21 @@ namespace Dressify.DataAccess
         {
         }
 
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            
 
-        //    modelBuilder.Entity<Product>()
-        //        .Property(b=>b.Suspended)
-        //        .HasDefaultValue(false);
-        //}
+            modelBuilder.Entity<Product>()
+                .Property(b => b.Suspended)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<WishList>()
+            .HasKey(e => new { e.CustomerId, e.ProductId });
+        }
 
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-
+        public DbSet<WishList> WishesLists { get; set; }
     }
 }

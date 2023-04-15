@@ -13,6 +13,8 @@ namespace Dressify.Models
         public int? Age { get; set; }
         public string FName { get; set; }
         public string LName { get; set; }
+        public List<WishList>? WishesLists { get; set; }
+
 
         //Vendor props
         public string? storeName { get; set; }

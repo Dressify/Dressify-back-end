@@ -22,7 +22,7 @@ namespace Dressify.Models
         public float Sale { get; set; }
         public int Purchases { get; set; }
         public bool Rentable { get; set; }
-        public bool Suspended { get; set; } = false;
+        public bool Suspended { get; set; }
         public string Color { get; set; }
         public string Category { get; set; }
         public string SubCategory { get; set; }
