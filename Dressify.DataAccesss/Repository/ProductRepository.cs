@@ -1,11 +1,12 @@
-﻿using Dressify.Models;
+﻿using Dressify.DataAccess.Repository.IRepository;
+using Dressify.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dressify.DataAccess.Repository.IRepository
+namespace Dressify.DataAccess.Repository
 {
     internal class ProductRepository : Repository<Product>, IProductRepository
     {
@@ -13,11 +14,6 @@ namespace Dressify.DataAccess.Repository.IRepository
         public ProductRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
-        }
-
-        void IProductRepository.Update(Product obj)
-        {
-            _context.Products.Update(obj);
         }
     }
 }
