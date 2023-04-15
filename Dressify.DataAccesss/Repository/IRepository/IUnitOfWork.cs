@@ -9,6 +9,7 @@ namespace Dressify.DataAccess.Repository.IRepository
     public interface IUnitOfWork
     {
         public IApplicationUserRepository ApplicationUser { get; }
+        public IProductRepository Product { get; }
         int Save();
     }
 }

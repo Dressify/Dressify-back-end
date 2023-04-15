@@ -10,5 +10,17 @@ namespace Dressify.DataAccess
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+
+        //    modelBuilder.Entity<Product>()
+        //        .Property(b=>b.Suspended)
+        //        .HasDefaultValue(false);
+        //}
+
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
+
     }
 }
