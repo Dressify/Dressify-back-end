@@ -14,6 +14,7 @@ namespace Dressify.Models
         [Key]
         public int ImageID { get; set; }
         public int ProductId { get; set; }
+        public string? PublicId { get; set; }
         public string? ImageUrl { get; set; }
         public string? ImageExtension { get; set; }
         [ForeignKey("ProductId")]

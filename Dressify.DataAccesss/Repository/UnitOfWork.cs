@@ -17,14 +17,16 @@ namespace Dressify.DataAccess.Repository
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JWT _jwt;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
 
-        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager)
+        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary)
         {
             _context = context;
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
-            ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager);
+            _cloudinaryConfig =cloudinary;
+            ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager,cloudinary);
             Product = new ProductRepository(_context);
             WishList = new WishListRepository(_context);
             ProductQuestion = new ProductQuestionRepository(_context);

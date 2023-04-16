@@ -4,6 +4,7 @@ using Dressify.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace dressify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230416211035_addPublicIdToProductImages")]
+    partial class addPublicIdToProductImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,7 +149,8 @@ namespace dressify.Migrations
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Purchases")
                         .HasColumnType("int");
@@ -174,14 +177,7 @@ namespace dressify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("VendorId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.HasKey("ProductId");
-
-                    b.HasIndex("VendorId");
 
                     b.ToTable("Products");
                 });
@@ -211,47 +207,6 @@ namespace dressify.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductImages");
-                });
-
-            modelBuilder.Entity("Dressify.Models.ProductQuestion", b =>
-                {
-                    b.Property<int>("QuestionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuestionID"), 1L, 1);
-
-                    b.Property<string>("Answear")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Question")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("QuestionDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("VendorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("QuestionID");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("VendorId");
-
-                    b.ToTable("ProductsQuestions");
                 });
 
             modelBuilder.Entity("Dressify.Models.ProductRate", b =>
@@ -431,17 +386,6 @@ namespace dressify.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Dressify.Models.Product", b =>
-                {
-                    b.HasOne("Dressify.Models.ApplicationUser", "Vendor")
-                        .WithMany("Products")
-                        .HasForeignKey("VendorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vendor");
-                });
-
             modelBuilder.Entity("Dressify.Models.ProductImage", b =>
                 {
                     b.HasOne("Dressify.Models.Product", "Product")
@@ -451,31 +395,6 @@ namespace dressify.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Dressify.Models.ProductQuestion", b =>
-                {
-                    b.HasOne("Dressify.Models.ApplicationUser", "Customer")
-                        .WithMany("QuestionsAsked")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dressify.Models.Product", "Product")
-                        .WithMany("Questions")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dressify.Models.ApplicationUser", "Vendor")
-                        .WithMany("QuestionsAnswered")
-                        .HasForeignKey("VendorId");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Dressify.Models.ProductRate", b =>
@@ -569,20 +488,12 @@ namespace dressify.Migrations
 
             modelBuilder.Entity("Dressify.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("Products");
-
-                    b.Navigation("QuestionsAnswered");
-
-                    b.Navigation("QuestionsAsked");
-
                     b.Navigation("WishesLists");
                 });
 
             modelBuilder.Entity("Dressify.Models.Product", b =>
                 {
                     b.Navigation("ProductImages");
-
-                    b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
         }
