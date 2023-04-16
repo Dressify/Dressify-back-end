@@ -26,9 +26,15 @@ namespace Dressify.DataAccess.Repository
             return _context.Set<T>().ToList();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(string[]? includes=null)
         {
-            return await _context.Set<T>().ToListAsync();
+            IQueryable<T> query = _context.Set<T>();
+
+            if (includes != null)
+                foreach (var incluse in includes)
+                    query = query.Include(incluse);
+
+            return await query.ToListAsync();
         }
 
         //Get specific element using ID

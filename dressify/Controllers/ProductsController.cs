@@ -18,7 +18,7 @@ namespace dressify.Controllers
         [HttpGet("listAllProducts")] 
         public async Task<IActionResult> GetAllProducts()
         {
-            var products = await _unitOfWork.Product.GetAllAsync();
+            var products = await _unitOfWork.Product.GetAllAsync(new[] {"ProductImages"});
             return Ok(products);
         }
     }
