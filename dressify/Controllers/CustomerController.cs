@@ -24,7 +24,7 @@ namespace dressify.Controllers
         public async Task<IActionResult> AddToWishList(WishListDto obj)
         {
             var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
-            var product = _unitOfWork.Product.GetById(obj.ProductId);
+            var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
             if (user == null)
             {
                 return BadRequest("user does not exist");
@@ -89,7 +89,7 @@ namespace dressify.Controllers
         public async Task<IActionResult> AskQuestion(QuestionDto obj)
         {
             var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
-            var product = _unitOfWork.Product.GetById(obj.ProductId);
+            var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
             if (user == null)
             {
                 return BadRequest("user does not exist");
