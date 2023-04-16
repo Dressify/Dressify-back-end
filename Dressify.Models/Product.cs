@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,9 @@ namespace Dressify.Models
         [Key]
         public int ProductId { get; set; }
         [DisplayName("Product Name"),MaxLength(50)]
+        public string VendorId { get; set; }
+        [ForeignKey("VendorId")]
+        public ApplicationUser Vendor { get; set; }
         public string ProductName { get; set; }
         public string Description { get; set; }
         public float Price { get; set; }
@@ -28,5 +32,7 @@ namespace Dressify.Models
         public string SubCategory { get; set; }
         public string Type { get; set; }
         public List<ProductImage>? ProductImages { get; set; }
+        public List<ProductQuestion>? Questions { get; set; }
+
     }
 }

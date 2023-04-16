@@ -15,10 +15,17 @@ namespace Dressify.Models
         public string LName { get; set; }
         public List<WishList>? WishesLists { get; set; }
 
+        public List<ProductQuestion>? QuestionsAsked { get; set; }
+
 
         //Vendor props
         public string? storeName { get; set; }
         public int? nId  { get; set; }
         public bool? isSuspended  { get; set; }
+
+        public List<Product>? Products { get; set; }
+        public List<ProductQuestion>? QuestionsAnswered { get; set; }
+
     }
 }
+    
