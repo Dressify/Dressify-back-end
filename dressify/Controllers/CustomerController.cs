@@ -80,10 +80,36 @@ namespace dressify.Controllers
                 await _unitOfWork.ProductRate.AddAsync(item);
                 _unitOfWork.Save();
 
+            } 
+            return Ok(obj);
+        }
+
+
+        [HttpPost("AskQuestion")]
+        public async Task<IActionResult> AskQuestion(QuestionDto obj)
+        {
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
+            var product = _unitOfWork.Product.GetById(obj.ProductId);
+            if (user == null)
+            {
+                return BadRequest("user does not exist");
             }
-
-
-            
+            if (product == null)
+            {
+                return BadRequest("product does not exist");
+            }
+            if (obj.Question == null||obj.Question=="")
+            {
+                return BadRequest("What's your Question?!");
+            }
+            var item = new ProductQuestion
+            {
+                Question = obj.Question,
+                CustomerId = obj.CustomerId,
+                ProductId = obj.ProductId,
+            };
+            await _unitOfWork.ProductQuestion.AddAsync(item);
+            _unitOfWork.Save();
             return Ok(obj);
         }
     }

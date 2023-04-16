@@ -27,11 +27,13 @@ namespace Dressify.DataAccess.Repository
             ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager);
             Product = new ProductRepository(_context);
             WishList = new WishListRepository(_context);
-            ProductRate =new ProductRateRepository(_context);
+            ProductQuestion = new ProductQuestionRepository(_context);
+            ProductRate = new ProductRateRepository(_context);
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IProductRepository Product { get; private set; }
         public IWishListRepository WishList { get; private set; }
+        public IProductQuestionRepository ProductQuestion { get; private set; }
         public IProductRateRepository ProductRate { get; private set; }
 
 
