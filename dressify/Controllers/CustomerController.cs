@@ -43,6 +43,28 @@ namespace dressify.Controllers
             return Ok(obj);
         }
 
+        [HttpDelete("DeleteFromWishList")]
+        public async Task<IActionResult> DeleteFromWishList(WishListDto obj)
+        {
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
+            var product = _unitOfWork.Product.GetById(obj.ProductId);
+            if (user == null)
+            {
+                return BadRequest("user does not exist");
+            }
+            if (product == null)
+            {
+                return BadRequest("product does not exist");
+            }
+            var result = await _unitOfWork.WishList.FindAsync(w => w.ProductId == obj.ProductId && w.CustomerId == obj.CustomerId);
+            if (result == null)
+                return BadRequest("This user does not have this product on Wish list");
+            _unitOfWork.WishList.Delete(result);
+            _unitOfWork.Save();
+            return Ok(obj);
+        }
+
+
         [HttpPost("CustomerRate")]
         public async Task<IActionResult> CustomerRateProduct(RateDto obj)
         {
