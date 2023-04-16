@@ -20,14 +20,21 @@ namespace Dressify.DataAccess
 
             modelBuilder.Entity<Product>()
                 .Property(b => b.Suspended)
+                .HasDefaultValue(false); 
+
+            modelBuilder.Entity<ProductRate>()
+                .Property(b => b.IsPurchased)
                 .HasDefaultValue(false);
 
             modelBuilder.Entity<WishList>()
+            .HasKey(e => new { e.CustomerId, e.ProductId });
+            modelBuilder.Entity<ProductRate>()
             .HasKey(e => new { e.CustomerId, e.ProductId });
         }
 
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<WishList> WishesLists { get; set; }
+        public DbSet<ProductRate> ProductsRates { get; set; }
     }
 }

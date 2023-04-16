@@ -18,21 +18,21 @@ namespace Dressify.DataAccess.Repository
         private readonly JWT _jwt;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager)
+        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IProductRateRepository productRate)
         {
             _context = context;
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
             ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager);
-            Product = new ProductRepository (_context);
+            Product = new ProductRepository(_context);
             WishList = new WishListRepository(_context);
-
-
+            ProductRate =new ProductRateRepository(_context);
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IProductRepository Product { get; private set; }
         public IWishListRepository WishList { get; private set; }
+        public IProductRateRepository ProductRate { get; private set; }
 
 
 
