@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dressify.DataAccess.Helpers
 {
-    public class Cloudinary
+    public class CloudinarySettings
     {
         public string CloudName { get; set; }
         public string Key { get; set; }

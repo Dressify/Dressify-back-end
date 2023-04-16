@@ -23,12 +23,6 @@ namespace Dressify.Models
         public bool IsPurchased { get; set; }
         public DateTime? Date { get; set; }
 
-        //        -rate:int[0..5]
-        //-rateComment:String
-        //-customerId:int
-        //-productId:int
-        //-isPurchased:boolean
-        //-date:Date
 
     }
 }

@@ -1,8 +1,11 @@
-﻿using Dressify.DataAccess.Dtos;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Helpers;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Dressify.Utility;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -19,18 +22,24 @@ using System.Threading.Tasks;
 namespace Dressify.DataAccess.Repository
 {
     public class ApplicationUserRepository : Repository<ApplicationUser>, IApplicationUserRepository
-    {
+    {   
+        private Cloudinary _cloudinary;
+        private UserManager<ApplicationUser> userManager;
+        private IOptions<JWT> jwt;
+        private RoleManager<IdentityRole> roleManager;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JWT _jwt;
+        private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ApplicationUserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager) : base(context)
+        public ApplicationUserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary) : base(context)
         {
             _context = context;
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
+            _cloudinaryConfig = cloudinary;
         }
 
         public async Task<AuthDto> RegisterAsync(RegisterDto dto)
@@ -136,8 +145,32 @@ namespace Dressify.DataAccess.Repository
 
             return jwtSecurityToken;
         }
-
-
+        //Add Photo To Cloudinary 
+        public async Task<CreatePhotoDto> AddPhoto(IFormFile file)
+        {
+            Account acc =new Account(
+                _cloudinaryConfig.Value.CloudName,
+                _cloudinaryConfig.Value.Key,
+                _cloudinaryConfig.Value.Secret
+                );
+            _cloudinary=new Cloudinary(acc);
+            var uploadResult = new ImageUploadResult();
+            if (file.Length > 0)
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(file.Name, stream)
+                    };
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                }
+            }
+            CreatePhotoDto CreatedPhoto=new CreatePhotoDto();
+            CreatedPhoto.Url =uploadResult.Url.ToString();
+            CreatedPhoto.PublictId = uploadResult.PublicId;
+            return CreatedPhoto;
+        }
 
 
     }

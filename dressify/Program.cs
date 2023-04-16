@@ -20,7 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
-builder.Services.Configure<Cloudinary>(builder.Configuration.GetSection("Cloudinary"));
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
