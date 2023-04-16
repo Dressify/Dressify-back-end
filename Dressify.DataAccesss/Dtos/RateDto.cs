@@ -14,4 +14,4 @@ namespace Dressify.DataAccess.Dtos
         public string? RateComment { get; set; }
     }
 }
-}
+

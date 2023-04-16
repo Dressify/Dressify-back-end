@@ -18,7 +18,7 @@ namespace Dressify.DataAccess.Repository
         private readonly JWT _jwt;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IProductRateRepository productRate)
+        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
