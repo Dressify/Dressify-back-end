@@ -10,7 +10,7 @@ namespace Dressify.DataAccess.Dtos
     public class CreatePhotoDto
     {
         public string Url { get; set; }
-        public string PublictId { get; set; }
+        public string PublicId { get; set; }
     }
 }
 
