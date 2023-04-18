@@ -15,6 +15,8 @@ namespace Dressify.DataAccess.Repository.IRepository
         public IProductQuestionRepository ProductQuestion { get; }
         public IProductImageRepository ProductImage{ get; }
         public ISuperAdminRepository   SuperAdmin { get; }
+        public IAdminRepository Admin { get; }
+
 
 
         int Save();

@@ -65,5 +65,6 @@ namespace Dressify.DataAccess
         public DbSet<ProductRate> ProductsRates { get; set; }
         public DbSet<ProductQuestion> ProductsQuestions { get; set; }
         public DbSet<SuperAdmin> SuperAdmins { get; set; }
+        public DbSet<Admin> Admins { get; set; }
     }
 }
