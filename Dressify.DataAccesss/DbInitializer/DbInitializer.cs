@@ -1,4 +1,7 @@
-﻿using Dressify.Models;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Repository;
+using Dressify.DataAccess.Repository.IRepository;
+using Dressify.Models;
 using Dressify.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +19,16 @@ namespace Dressify.DataAccess.DbInitializer
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ApplicationDbContext _context;
-        public DbInitializer(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public DbInitializer(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context , IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
+            _unitOfWork = unitOfWork;
         }
-        public void Initialize()
+        public async void Initialize()
         {
 
             //migrations if they are not applied
@@ -54,6 +60,15 @@ namespace Dressify.DataAccess.DbInitializer
                 },"Admin123*").GetAwaiter().GetResult();
                 ApplicationUser user = _context.Users.FirstOrDefault(u => u.Email == "Dressify@gmail.com");
                 _userManager.AddToRoleAsync(user, SD.Role_Sales).GetAwaiter().GetResult();
+            }
+            var SuperAdmin=new SuperAdmin
+            {
+                UserName= "SuperAdmin"
+            };
+            var SAdmin= _context.SuperAdmins.FirstOrDefault(s =>s.UserName == SuperAdmin.UserName);
+            if (SAdmin == null)
+            {
+                await _unitOfWork.SuperAdmin.AddSuperAdminAsync(SuperAdmin, "12345678");
             }
             return;
         }

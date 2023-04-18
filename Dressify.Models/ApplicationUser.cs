@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Dressify.Models
 {
-    public class ApplicationUser: IdentityUser
+    public class ApplicationUser: IdentityUser 
     {
 
         public string? ProfilePic { get; set; }

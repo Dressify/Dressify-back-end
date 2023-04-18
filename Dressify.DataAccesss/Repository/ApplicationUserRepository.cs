@@ -38,7 +38,6 @@ namespace Dressify.DataAccess.Repository
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
-
         }
 
         public async Task<AuthDto> RegisterAsync(RegisterDto dto)
