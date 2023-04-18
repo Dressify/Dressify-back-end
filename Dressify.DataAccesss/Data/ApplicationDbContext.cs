@@ -17,27 +17,30 @@ namespace Dressify.DataAccess
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
 
-            modelBuilder.Entity<Product>()
-                .Property(b => b.Suspended)
-                .HasDefaultValue(false); 
-
-            modelBuilder.Entity<ProductRate>()
-                .Property(b => b.IsPurchased)
-                .HasDefaultValue(false);
-
-            modelBuilder.Entity<WishList>()
-            .HasKey(e => new { e.CustomerId, e.ProductId });
-            modelBuilder.Entity<ProductRate>()
-            .HasKey(e => new { e.CustomerId, e.ProductId });
-
-            ////////////////////////////////
+            //Product
             modelBuilder.Entity<Product>()
                .HasOne(p => p.Vendor)
                .WithMany(v => v.Products)
                .HasForeignKey(p => p.VendorId);
 
+            modelBuilder.Entity<Product>()
+                .Property(b => b.Suspended)
+                .HasDefaultValue(false); 
+
+            //product rate
+            modelBuilder.Entity<ProductRate>()
+                .Property(b => b.IsPurchased)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<ProductRate>()
+            .HasKey(e => new { e.CustomerId, e.ProductId });
+
+            //wishList
+            modelBuilder.Entity<WishList>()
+           .HasKey(e => new { e.CustomerId, e.ProductId });
+
+            // Product Question
             modelBuilder.Entity<ProductQuestion>()
                 .HasOne(pq => pq.Product)
                 .WithMany(p => p.Questions)
@@ -57,6 +60,27 @@ namespace Dressify.DataAccess
             .Property(pq => pq.QuestionDate)
             .HasDefaultValueSql("GETUTCDATE()");
 
+            //ProductReport
+            modelBuilder.Entity<ProductReport>()
+                .HasOne(pq => pq.Product)
+                .WithMany(p => p.Reports)
+                .HasForeignKey(pq => pq.ProductId);
+
+            modelBuilder.Entity<ProductReport>()
+                .HasOne(pq => pq.Customer)
+                .WithMany(c => c.Reports)
+                .HasForeignKey(pq => pq.CustomerId);
+
+            modelBuilder.Entity<ProductReport>()
+                .HasOne(pq => pq.Admin)
+                .WithMany(v => v.Reports)
+                .HasForeignKey(pq => pq.AdminId);
+
+            modelBuilder.Entity<ProductReport>()
+            .Property(pq => pq.Date)
+            .HasDefaultValueSql("GETUTCDATE()");
+
+
         }
 
         public DbSet<Product> Products { get; set; }
@@ -65,5 +89,7 @@ namespace Dressify.DataAccess
         public DbSet<ProductRate> ProductsRates { get; set; }
         public DbSet<ProductQuestion> ProductsQuestions { get; set; }
         public DbSet<SuperAdmin> SuperAdmins { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<ProductReport> ProductsReports { get; set; }
     }
 }

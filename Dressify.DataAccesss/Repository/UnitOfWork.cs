@@ -31,7 +31,10 @@ namespace Dressify.DataAccess.Repository
             WishList = new WishListRepository(_context);
             ProductQuestion = new ProductQuestionRepository(_context);
             ProductRate = new ProductRateRepository(_context);
+            productReport = new ProductReportRepository(_context);
             SuperAdmin = new SuperAdminRepository(_context);
+            Admin = new AdminRepository(_context);
+
             ProductImage = new ProductImageRepository(_context, cloudinary);
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
@@ -39,8 +42,12 @@ namespace Dressify.DataAccess.Repository
         public IWishListRepository WishList { get; private set; }
         public IProductQuestionRepository ProductQuestion { get; private set; }
         public IProductRateRepository ProductRate { get; private set; }
+        public IProductReportRepository productReport { get; private set; }
+
         public IProductImageRepository ProductImage { get; private set; }
         public ISuperAdminRepository   SuperAdmin { get; private set; }
+        public IAdminRepository Admin { get; private set; }
+
 
 
 
