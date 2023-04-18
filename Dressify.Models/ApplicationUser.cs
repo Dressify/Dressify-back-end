@@ -25,6 +25,8 @@ namespace Dressify.Models
 
         public List<Product>? Products { get; set; }
         public List<ProductQuestion>? QuestionsAnswered { get; set; }
+        public List<ProductReport>? Reports { get; set; }
+
 
     }
 }

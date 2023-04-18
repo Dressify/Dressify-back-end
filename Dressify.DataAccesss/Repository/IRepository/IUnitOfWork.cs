@@ -13,6 +13,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         public IWishListRepository WishList { get; }
         public IProductRateRepository ProductRate { get; }
         public IProductQuestionRepository ProductQuestion { get; }
+        public IProductReportRepository productReport { get; }
         public IProductImageRepository ProductImage{ get; }
         public ISuperAdminRepository   SuperAdmin { get; }
         public IAdminRepository Admin { get; }

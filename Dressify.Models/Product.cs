@@ -33,6 +33,8 @@ namespace Dressify.Models
         public string Type { get; set; }
         public List<ProductImage>? ProductImages { get; set; }
         public List<ProductQuestion>? Questions { get; set; }
+        public List<ProductReport>? Reports { get; set; }
+
 
     }
 }
