@@ -30,6 +30,8 @@ namespace Dressify.DataAccess
             modelBuilder.Entity<WishList>()
             .HasKey(e => new { e.CustomerId, e.ProductId });
             modelBuilder.Entity<ProductRate>()
+            .HasKey(e => new { e.CustomerId, e.ProductId }); 
+            modelBuilder.Entity<ShoppingCart>()
             .HasKey(e => new { e.CustomerId, e.ProductId });
 
             ////////////////////////////////
@@ -65,5 +67,6 @@ namespace Dressify.DataAccess
         public DbSet<ProductRate> ProductsRates { get; set; }
         public DbSet<ProductQuestion> ProductsQuestions { get; set; }
         public DbSet<SuperAdmin> SuperAdmins { get; set; }
+        public DbSet<ShoppingCart> shoppingCarts { get; set; }
     }
 }

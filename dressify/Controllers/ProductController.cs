@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Repository.IRepository;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,7 +29,12 @@ namespace dressify.Controllers
             var product = await _unitOfWork.Product.FindAsync(p=> p.ProductId == id , new[] { "Vendor", "ProductImages", "Questions" }
 );              if(product == null)
                     return NotFound();
-            return Ok(product);
+            var Details = new ProductDetailsDto
+            {
+                Product = product,
+                quantity = 1,
+            };
+            return Ok(Details);
         }
     }
 }

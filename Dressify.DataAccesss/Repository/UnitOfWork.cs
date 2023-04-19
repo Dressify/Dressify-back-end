@@ -33,6 +33,7 @@ namespace Dressify.DataAccess.Repository
             ProductRate = new ProductRateRepository(_context);
             SuperAdmin = new SuperAdminRepository(_context);
             ProductImage = new ProductImageRepository(_context, cloudinary);
+            ShoppingCart = new ShoppingCartRepository(_context);
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IProductRepository Product { get; private set; }
@@ -41,6 +42,7 @@ namespace Dressify.DataAccess.Repository
         public IProductRateRepository ProductRate { get; private set; }
         public IProductImageRepository ProductImage { get; private set; }
         public ISuperAdminRepository   SuperAdmin { get; private set; }
+        public IShoppingCartRepository ShoppingCart { get; private set; }
 
 
 
