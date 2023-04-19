@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Dressify.DataAccess.Dtos;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Dressify.Models;
+using System.Security.Claims;
 
 namespace dressify.Controllers
 {
@@ -18,50 +19,6 @@ namespace dressify.Controllers
         public CustomerController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-        }
-
-        [HttpPost("addToWishList")]
-        public async Task<IActionResult> AddToWishList(WishListDto obj)
-        {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
-            var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
-            if (user == null)
-            {
-                return BadRequest("user does not exist");
-            }
-            if (product == null)
-            {
-                return BadRequest("product does not exist");
-            }
-            var item = new WishList
-            {
-                CustomerId = obj.CustomerId,
-                ProductId = obj.ProductId,
-            };
-            await _unitOfWork.WishList.AddAsync(item);
-            _unitOfWork.Save();
-            return Ok(obj);
-        }
-
-        [HttpDelete("DeleteFromWishList")]
-        public async Task<IActionResult> DeleteFromWishList(WishListDto obj)
-        {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
-            var product = _unitOfWork.Product.GetById(obj.ProductId);
-            if (user == null)
-            {
-                return BadRequest("user does not exist");
-            }
-            if (product == null)
-            {
-                return BadRequest("product does not exist");
-            }
-            var result = await _unitOfWork.WishList.FindAsync(w => w.ProductId == obj.ProductId && w.CustomerId == obj.CustomerId);
-            if (result == null)
-                return BadRequest("This user does not have this product on Wish list");
-            _unitOfWork.WishList.Delete(result);
-            _unitOfWork.Save();
-            return Ok(obj);
         }
 
 
@@ -133,6 +90,37 @@ namespace dressify.Controllers
             await _unitOfWork.ProductQuestion.AddAsync(item);
             _unitOfWork.Save();
             return Ok(obj);
+        }
+        [HttpPost("addToCart")]
+        [Authorize]
+        public async Task<IActionResult> AddToCartAsync(AddToCartDto shoppingCart)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            var results = await _unitOfWork.ApplicationUser.FindAsync(u => u.UserName == claims.Value);
+
+            shoppingCart.CustomerId = results.Id;
+
+            ShoppingCart cartFromDb = await _unitOfWork.ShoppingCart.FindAsync(x => x.CustomerId == results.Id && x.ProductId == shoppingCart.ProductId);
+            var cart = new ShoppingCart
+            {
+                CustomerId = shoppingCart.CustomerId,
+                ProductId = shoppingCart.ProductId,
+                IsRent=shoppingCart.IsRent,
+                quantity=shoppingCart.quantity
+            };
+            if (cartFromDb == null)
+            {
+                _unitOfWork.ShoppingCart.Add(cart);
+            }
+            else
+            {
+                _unitOfWork.ShoppingCart.IncrementCount(cartFromDb, cart.quantity);
+                _unitOfWork.ShoppingCart.Update(cartFromDb);
+            }
+            _unitOfWork.Save();
+            return  Ok();
         }
     }
 }

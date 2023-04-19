@@ -4,6 +4,7 @@ using Dressify.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace dressify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230418224526_addShoppingCartToDB")]
+    partial class addShoppingCartToDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,34 +23,6 @@ namespace dressify.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("Dressify.Models.Admin", b =>
-                {
-                    b.Property<string>("AdminId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("AdminName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("PasswordHash")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ProfilePic")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AdminId");
-
-                    b.ToTable("Admins");
-                });
 
             modelBuilder.Entity("Dressify.Models.ApplicationUser", b =>
                 {
@@ -311,51 +285,6 @@ namespace dressify.Migrations
                     b.ToTable("ProductsRates");
                 });
 
-            modelBuilder.Entity("Dressify.Models.ProductReport", b =>
-                {
-                    b.Property<int>("ReportId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReportId"), 1L, 1);
-
-                    b.Property<string>("Action")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdminId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("Date")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("ReportStatus")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("VendorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ReportId");
-
-                    b.HasIndex("AdminId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductsReports");
             modelBuilder.Entity("Dressify.Models.ShoppingCart", b =>
                 {
                     b.Property<string>("CustomerId")
@@ -613,14 +542,6 @@ namespace dressify.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Dressify.Models.ProductReport", b =>
-                {
-                    b.HasOne("Dressify.Models.Admin", "Admin")
-                        .WithMany("Reports")
-                        .HasForeignKey("AdminId");
-
-                    b.HasOne("Dressify.Models.ApplicationUser", "Customer")
-                        .WithMany("Reports")
             modelBuilder.Entity("Dressify.Models.ShoppingCart", b =>
                 {
                     b.HasOne("Dressify.Models.ApplicationUser", "ApplicationUser")
@@ -630,15 +551,11 @@ namespace dressify.Migrations
                         .IsRequired();
 
                     b.HasOne("Dressify.Models.Product", "Product")
-                        .WithMany("Reports")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Admin");
-
-                    b.Navigation("Customer");
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Product");
@@ -714,11 +631,6 @@ namespace dressify.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Dressify.Models.Admin", b =>
-                {
-                    b.Navigation("Reports");
-                });
-
             modelBuilder.Entity("Dressify.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Products");
@@ -726,8 +638,6 @@ namespace dressify.Migrations
                     b.Navigation("QuestionsAnswered");
 
                     b.Navigation("QuestionsAsked");
-
-                    b.Navigation("Reports");
 
                     b.Navigation("WishesLists");
                 });
@@ -737,8 +647,6 @@ namespace dressify.Migrations
                     b.Navigation("ProductImages");
 
                     b.Navigation("Questions");
-
-                    b.Navigation("Reports");
                 });
 #pragma warning restore 612, 618
         }

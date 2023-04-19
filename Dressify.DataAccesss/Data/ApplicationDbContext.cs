@@ -20,6 +20,22 @@ namespace Dressify.DataAccess
 
             //Product
             modelBuilder.Entity<Product>()
+                .Property(b => b.Suspended)
+                .HasDefaultValue(false); 
+
+            modelBuilder.Entity<ProductRate>()
+                .Property(b => b.IsPurchased)
+                .HasDefaultValue(false);
+
+            modelBuilder.Entity<WishList>()
+            .HasKey(e => new { e.CustomerId, e.ProductId });
+            modelBuilder.Entity<ProductRate>()
+            .HasKey(e => new { e.CustomerId, e.ProductId }); 
+            modelBuilder.Entity<ShoppingCart>()
+            .HasKey(e => new { e.CustomerId, e.ProductId });
+
+            ////////////////////////////////
+            modelBuilder.Entity<Product>()
                .HasOne(p => p.Vendor)
                .WithMany(v => v.Products)
                .HasForeignKey(p => p.VendorId);
@@ -91,5 +107,6 @@ namespace Dressify.DataAccess
         public DbSet<SuperAdmin> SuperAdmins { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<ProductReport> ProductsReports { get; set; }
+        public DbSet<ShoppingCart> shoppingCarts { get; set; }
     }
 }

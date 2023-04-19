@@ -18,6 +18,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         public ISuperAdminRepository   SuperAdmin { get; }
         public IAdminRepository Admin { get; }
 
+        public IShoppingCartRepository  ShoppingCart { get; }
 
 
         int Save();
