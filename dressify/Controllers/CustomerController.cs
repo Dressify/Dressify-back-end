@@ -96,8 +96,6 @@ namespace dressify.Controllers
         [Authorize]
         public async Task<IActionResult> AddToCartAsync(AddToCartDto shoppingCart)
         {
-            //var claimsIdentity = (ClaimsIdentity)User.Identity;
-            //var uId = claimsIdentity.FindFirst("uid").Value;
             var uId = _unitOfWork.getUID();
             shoppingCart.CustomerId = uId;
             ShoppingCart cartFromDb = await _unitOfWork.ShoppingCart.FindAsync(x => x.CustomerId == uId && x.ProductId == shoppingCart.ProductId);
