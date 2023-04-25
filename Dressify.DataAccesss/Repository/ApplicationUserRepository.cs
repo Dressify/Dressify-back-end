@@ -79,6 +79,7 @@ namespace Dressify.DataAccess.Repository
                 Role = dto.Role,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 Username = user.UserName,
+                ImgUrl=user.ProfilePic,
             };
 
         }
@@ -103,8 +104,7 @@ namespace Dressify.DataAccess.Repository
             authModel.Username = user.UserName;
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.Role = rolesList.ToList().FirstOrDefault();
-            
-
+            authModel.ImgUrl = user.ProfilePic;
             return authModel;
         }
 
