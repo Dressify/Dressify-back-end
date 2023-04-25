@@ -23,11 +23,8 @@ namespace dressify.Controllers
         [HttpGet("GetCustomerCart")]
         public async Task<IActionResult> GetAsync()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.UserName == claims.Value);
-
-            var result = await _unitOfWork.ShoppingCart.FindAllAsync(C => C.CustomerId == user.Id);
+            var uId = _unitOfWork.getUID();
+            var result = await _unitOfWork.ShoppingCart.FindAllAsync(C => C.CustomerId == uId);
             if (result.Count() == 0)
                 return BadRequest("There are no products in the Cart ");
 

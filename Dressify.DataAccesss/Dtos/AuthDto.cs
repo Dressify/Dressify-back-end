@@ -15,6 +15,7 @@ namespace Dressify.DataAccess.Dtos
         public string? Email { get; set; }
         public string? Role { get; set; }
         public string? Token { get; set; }
+        public string? ImgUrl { get; set; }
         public DateTime ExpiresOn { get; set; }
 
 

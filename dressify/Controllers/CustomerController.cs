@@ -7,6 +7,7 @@ using Dressify.DataAccess.Dtos;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Dressify.Models;
 using System.Security.Claims;
+using System.Security.Principal;
 
 namespace dressify.Controllers
 {
@@ -35,7 +36,7 @@ namespace dressify.Controllers
             {
                 return BadRequest("product does not exist");
             }
-            if(obj.rate <1 && obj.rate > 5) 
+            if(obj.rate <1 || obj.rate > 5) 
             {
                 return BadRequest("Rating should be between 1 to 5 ");
             }
@@ -95,14 +96,9 @@ namespace dressify.Controllers
         [Authorize]
         public async Task<IActionResult> AddToCartAsync(AddToCartDto shoppingCart)
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-
-            var results = await _unitOfWork.ApplicationUser.FindAsync(u => u.UserName == claims.Value);
-
-            shoppingCart.CustomerId = results.Id;
-
-            ShoppingCart cartFromDb = await _unitOfWork.ShoppingCart.FindAsync(x => x.CustomerId == results.Id && x.ProductId == shoppingCart.ProductId);
+            var uId = _unitOfWork.getUID();
+            shoppingCart.CustomerId = uId;
+            ShoppingCart cartFromDb = await _unitOfWork.ShoppingCart.FindAsync(x => x.CustomerId == uId && x.ProductId == shoppingCart.ProductId);
             var cart = new ShoppingCart
             {
                 CustomerId = shoppingCart.CustomerId,
@@ -116,11 +112,13 @@ namespace dressify.Controllers
             }
             else
             {
-                _unitOfWork.ShoppingCart.IncrementCount(cartFromDb, cart.quantity);
-                _unitOfWork.ShoppingCart.Update(cartFromDb);
+                return BadRequest("Product already exist in Cart");
+                //_unitOfWork.ShoppingCart.IncrementCount(cartFromDb, cart.quantity);
+                //_unitOfWork.ShoppingCart.Update(cartFromDb);
             }
             _unitOfWork.Save();
             return  Ok();
         }
     }
+
 }
