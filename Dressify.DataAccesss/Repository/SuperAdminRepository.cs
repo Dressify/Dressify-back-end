@@ -12,6 +12,7 @@ namespace Dressify.DataAccess.Repository
     public class SuperAdminRepository : Repository<SuperAdmin>, ISuperAdminRepository
     {
         private readonly ApplicationDbContext _context;
+
         public SuperAdminRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
@@ -33,6 +34,23 @@ namespace Dressify.DataAccess.Repository
             _context.SaveChanges();
             return suberAdmin;
         }
+        
+        public async Task<Admin> CreateAdminAsync(AddAdminDto adminDto)
+        {
+            byte[] passwordHash, passwordSalt;
+            CreatePasswordHash(adminDto.Password, out passwordHash, out passwordSalt);
+            var admin = new Admin
+            {
+                AdminName = adminDto.AdminName,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                Email=adminDto.Email,
+            };
+            await _context.Admins.AddAsync(admin);
+            await _context.SaveChangesAsync();
+            return admin;
+        }
+
         private void CreatePasswordHash(string password,out byte[] passwordHash, out byte[] passwordSalt)
         {
             using(var hmac = new System.Security.Cryptography.HMACSHA512())

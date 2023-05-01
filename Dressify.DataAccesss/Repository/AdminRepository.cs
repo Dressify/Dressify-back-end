@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Repository.IRepository;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace Dressify.DataAccess.Repository
         {
             _context = context;
         }
+
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Dressify.Models;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,7 @@ namespace Dressify.DataAccess.Repository.IRepository
 {
     public interface IAdminRepository : IRepository<Admin>
     {
+
+
     }
 }
