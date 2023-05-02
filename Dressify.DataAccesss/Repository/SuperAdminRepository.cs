@@ -35,21 +35,6 @@ namespace Dressify.DataAccess.Repository
             return suberAdmin;
         }
         
-        public async Task<Admin> CreateAdminAsync(AddAdminDto adminDto)
-        {
-            byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(adminDto.Password, out passwordHash, out passwordSalt);
-            var admin = new Admin
-            {
-                AdminName = adminDto.AdminName,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-                Email=adminDto.Email,
-            };
-            await _context.Admins.AddAsync(admin);
-            await _context.SaveChangesAsync();
-            return admin;
-        }
 
         private void CreatePasswordHash(string password,out byte[] passwordHash, out byte[] passwordSalt)
         {

@@ -19,7 +19,9 @@ namespace dressify.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            var result = await _unitOfWork.SuperAdmin.CreateAdminAsync(dto);
+            var result = await _unitOfWork.Admin.CreateAdminAsync(dto);
+            if (result.Message!="")
+                return BadRequest(result.Message);
             return Ok(result);
         }
     }

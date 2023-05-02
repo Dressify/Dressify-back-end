@@ -10,6 +10,7 @@ namespace Dressify.DataAccess.Repository.IRepository
 {
     public interface IAdminRepository : IRepository<Admin>
     {
+        Task<AuthDto> CreateAdminAsync(AddAdminDto adminDto);
 
 
     }

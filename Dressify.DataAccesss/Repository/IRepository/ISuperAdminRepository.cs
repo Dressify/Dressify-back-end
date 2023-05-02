@@ -11,7 +11,6 @@ namespace Dressify.DataAccess.Repository.IRepository
     public interface ISuperAdminRepository : IRepository<SuperAdmin>
     {
         Task<SuperAdmin> AddSuperAdminAsync(SuperAdmin sAdmin, string password);
-        Task<Admin> CreateAdminAsync(AddAdminDto adminDto);
     }
 }
     
