@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Dressify.DataAccess.Dtos;
+using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,5 +25,6 @@ namespace Dressify.DataAccess.Repository.IRepository
         //Functions
         int Save();
         string getUID();
+        Task<JwtSecurityToken> CreateJwtToken(SAdminTokenRequestDto model);
     }
 }

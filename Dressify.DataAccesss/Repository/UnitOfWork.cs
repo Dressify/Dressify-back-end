@@ -10,6 +10,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Dressify.DataAccess.Dtos;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -35,7 +38,7 @@ namespace Dressify.DataAccess.Repository
             ProductQuestion = new ProductQuestionRepository(_context);
             ProductRate = new ProductRateRepository(_context);
             productReport = new ProductReportRepository(_context);
-            SuperAdmin = new SuperAdminRepository(_context);
+            SuperAdmin = new SuperAdminRepository(_context, jwt, _httpContextAccessor);
             Admin = new AdminRepository(_context);
 
             ProductImage = new ProductImageRepository(_context, cloudinary);
@@ -66,6 +69,28 @@ namespace Dressify.DataAccess.Repository
             var claimsIdentity = (ClaimsIdentity)_httpContextAccessor.HttpContext.User.Identity;
             var uId = claimsIdentity.FindFirst("uid").Value;
             return uId;
+        }
+
+
+        public async Task<JwtSecurityToken> CreateJwtToken(SAdminTokenRequestDto model)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, model.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("uid", model.ID)
+            };
+            var identity = new ClaimsIdentity(claims, "MyApplication");
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
+
+            var jwtSecurityToken = new JwtSecurityToken(
+            issuer: _jwt.Issuer,
+            audience: _jwt.Audience,
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(_jwt.DurationInMinutes),
+            signingCredentials: signingCredentials);
+            return jwtSecurityToken;
         }
     }
 }

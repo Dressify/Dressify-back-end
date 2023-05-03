@@ -1,4 +1,5 @@
-﻿using Dressify.Utility;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,5 +36,6 @@ namespace Dressify.DataAccess.Repository.IRepository
         Task<int> CountAsync(Expression<Func<T, bool>> criteria);
 
         void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
+        bool ValidatePassword(ValidatePasswordDto model);
     }
 }

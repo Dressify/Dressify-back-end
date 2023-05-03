@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Repository.IRepository;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Utility;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -211,5 +212,22 @@ namespace Dressify.DataAccess.Repository
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
+
+        //Admins And Super Admins Are
+        //validate Password
+        public bool ValidatePassword(ValidatePasswordDto model)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(model.PasswordSalt))
+            {
+                var computeHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(model.Password));
+                for (int i = 0; i < computeHash.Length; i++)
+                {
+                    if (computeHash[i] != model.PasswordHash[i])
+                        return false;
+                }
+            }
+            return true;
+        }
+
     }
 }
