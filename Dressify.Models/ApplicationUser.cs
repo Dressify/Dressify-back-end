@@ -11,11 +11,12 @@ namespace Dressify.Models
         public string? Address { get; set; }
         public DateTime? DOB { get; set; }
         public int? Age { get; set; }
-        public string FName { get; set; }
-        public string LName { get; set; }
+        public string? FName { get; set; }
+        public string? LName { get; set; }
         public List<WishList>? WishesLists { get; set; }
 
         public List<ProductQuestion>? QuestionsAsked { get; set; }
+        public List<ShoppingCart>? Carts { get; set; }
 
 
         //Vendor props
@@ -26,6 +27,7 @@ namespace Dressify.Models
         public List<Product>? Products { get; set; }
         public List<ProductQuestion>? QuestionsAnswered { get; set; }
         public List<ProductReport>? Reports { get; set; }
+
 
 
     }

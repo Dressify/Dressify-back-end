@@ -33,5 +33,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         int Count(Expression<Func<T, bool>> criteria);
         Task<int> CountAsync();
         Task<int> CountAsync(Expression<Func<T, bool>> criteria);
+
+        void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
     }
 }

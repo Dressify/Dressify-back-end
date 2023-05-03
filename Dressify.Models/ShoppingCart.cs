@@ -17,7 +17,7 @@ namespace Dressify.Models
         public int ProductId { get; set; }
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
-        public int? quantity { get; set; }
+        public int? Quantity { get; set; }
         public bool IsRent { get; set; }
     }
 }

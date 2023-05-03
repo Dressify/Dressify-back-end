@@ -32,11 +32,11 @@ namespace dressify.Controllers
             foreach (var item in result)
             {
                 var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId, new[] { "ProductImages" });
-                CartDto obj = new CartDto
+                var obj = new CartDto
                 {
                     Product = product,
                     IsRent  = item.IsRent,
-                    quantity=item.quantity,
+                    quantity=item.Quantity,
                 };
                 cart.Add(obj);
             }

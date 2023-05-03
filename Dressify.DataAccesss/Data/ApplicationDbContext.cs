@@ -30,7 +30,7 @@ namespace Dressify.DataAccess
             modelBuilder.Entity<WishList>()
             .HasKey(e => new { e.CustomerId, e.ProductId });
             modelBuilder.Entity<ProductRate>()
-            .HasKey(e => new { e.CustomerId, e.ProductId }); 
+            .HasKey(e => new { e.CustomerId, e.ProductId });
             modelBuilder.Entity<ShoppingCart>()
             .HasKey(e => new { e.CustomerId, e.ProductId });
 
@@ -55,6 +55,18 @@ namespace Dressify.DataAccess
             //wishList
             modelBuilder.Entity<WishList>()
            .HasKey(e => new { e.CustomerId, e.ProductId });
+
+
+            // ShoppingCart
+            modelBuilder.Entity<ShoppingCart>()
+                .HasOne(pq => pq.ApplicationUser)
+                .WithMany(p => p.Carts)
+                .HasForeignKey(pq => pq.CustomerId);
+
+            modelBuilder.Entity<ShoppingCart>()
+                .HasOne(pq => pq.Product)
+                .WithMany(c => c.Carts)
+                .HasForeignKey(pq => pq.ProductId);
 
             // Product Question
             modelBuilder.Entity<ProductQuestion>()
@@ -107,6 +119,6 @@ namespace Dressify.DataAccess
         public DbSet<SuperAdmin> SuperAdmins { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<ProductReport> ProductsReports { get; set; }
-        public DbSet<ShoppingCart> shoppingCarts { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     }
 }

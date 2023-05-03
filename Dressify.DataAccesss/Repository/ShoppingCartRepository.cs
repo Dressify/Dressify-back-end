@@ -17,14 +17,14 @@ namespace Dressify.DataAccess.Repository
         }
         public int? DecrementCount(ShoppingCart cart, int? count)
         {
-            cart.quantity -= count;
-            return cart.quantity;
+            cart.Quantity -= count;
+            return cart.Quantity;
         }
 
         public int? IncrementCount(ShoppingCart cart, int? count)
         {
-            cart.quantity += count;
-            return cart.quantity;
+            cart.Quantity += count;
+            return cart.Quantity;
         }
 
 

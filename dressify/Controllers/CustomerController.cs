@@ -104,7 +104,7 @@ namespace dressify.Controllers
                 CustomerId = shoppingCart.CustomerId,
                 ProductId = shoppingCart.ProductId,
                 IsRent=shoppingCart.IsRent,
-                quantity=shoppingCart.quantity
+                Quantity=shoppingCart.quantity
             };
             if (cartFromDb == null)
             {

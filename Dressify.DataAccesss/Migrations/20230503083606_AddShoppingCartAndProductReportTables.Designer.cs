@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace dressify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230418224706_CreatignProductReportTable")]
-    partial class CreatignProductReportTable
+    [Migration("20230503083606_AddShoppingCartAndProductReportTables")]
+    partial class AddShoppingCartAndProductReportTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -360,6 +360,27 @@ namespace dressify.Migrations
                     b.ToTable("ProductsReports");
                 });
 
+            modelBuilder.Entity("Dressify.Models.ShoppingCart", b =>
+                {
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRent")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("CustomerId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ShoppingCarts");
+                });
+
             modelBuilder.Entity("Dressify.Models.SuperAdmin", b =>
                 {
                     b.Property<int>("SuperAdminId")
@@ -621,6 +642,25 @@ namespace dressify.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Dressify.Models.ShoppingCart", b =>
+                {
+                    b.HasOne("Dressify.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Carts")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dressify.Models.Product", "Product")
+                        .WithMany("Carts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Dressify.Models.WishList", b =>
                 {
                     b.HasOne("Dressify.Models.ApplicationUser", "ApplicationUser")
@@ -698,6 +738,8 @@ namespace dressify.Migrations
 
             modelBuilder.Entity("Dressify.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("Carts");
+
                     b.Navigation("Products");
 
                     b.Navigation("QuestionsAnswered");
@@ -711,6 +753,8 @@ namespace dressify.Migrations
 
             modelBuilder.Entity("Dressify.Models.Product", b =>
                 {
+                    b.Navigation("Carts");
+
                     b.Navigation("ProductImages");
 
                     b.Navigation("Questions");
