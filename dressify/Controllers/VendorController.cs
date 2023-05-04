@@ -80,7 +80,7 @@ namespace dressify.Controllers
                 SubCategory = dto.SubCategory,
                 Type = dto.Type,
             };
-            _unitOfWork.Product.AddAsync(product);
+            await _unitOfWork.Product.AddAsync(product);
             _unitOfWork.Save();
             foreach (var img in dto.Photos)
             {

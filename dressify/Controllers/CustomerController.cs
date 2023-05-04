@@ -92,6 +92,7 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok(obj);
         }
+
         [HttpPost("addToCart")]
         [Authorize]
         public async Task<IActionResult> AddToCartAsync(AddToCartDto shoppingCart)
@@ -119,6 +120,30 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return  Ok();
         }
+
+        [HttpPost("ReportProduct")]
+        [Authorize(Roles =SD.Role_Customer)]
+        public async Task<IActionResult> ReportProduct([FromHeader]int productId)
+        {
+            var uId = _unitOfWork.getUID();
+            var prodcut=await _unitOfWork.Product.FindAsync(x => x.ProductId == productId);
+            if(prodcut == null)
+            {
+                return NotFound();
+            }
+
+            var productReport = new ProductReport
+            {
+                CustomerId= uId,
+                ProductId = productId,
+                VendorId= prodcut.VendorId,
+            };
+
+            await _unitOfWork.productReport.AddAsync(productReport);
+            _unitOfWork.Save();
+            return Ok();
+        }
+
     }
 
 }
