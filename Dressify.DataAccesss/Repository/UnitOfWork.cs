@@ -38,7 +38,7 @@ namespace Dressify.DataAccess.Repository
             ProductQuestion = new ProductQuestionRepository(_context);
             ProductRate = new ProductRateRepository(_context);
             productReport = new ProductReportRepository(_context);
-            SuperAdmin = new SuperAdminRepository(_context, jwt, _httpContextAccessor);
+            SuperAdmin = new SuperAdminRepository(_context);
             Admin = new AdminRepository(_context);
 
             ProductImage = new ProductImageRepository(_context, cloudinary);
@@ -72,8 +72,9 @@ namespace Dressify.DataAccess.Repository
         }
 
 
-        public async Task<JwtSecurityToken> CreateJwtToken(SAdminTokenRequestDto model)
+        public async Task<AuthDto> CreateJwtToken(AdminTokenRequestDto model)
         {
+            var authModel = new AuthDto();
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, model.UserName),
@@ -90,7 +91,14 @@ namespace Dressify.DataAccess.Repository
             claims: claims,
             expires: DateTime.Now.AddMinutes(_jwt.DurationInMinutes),
             signingCredentials: signingCredentials);
-            return jwtSecurityToken;
+
+
+            authModel.IsAuthenticated = true;
+            authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            authModel.Username = model.UserName;
+            authModel.ExpiresOn = jwtSecurityToken.ValidTo;
+            return authModel;
+
         }
     }
 }

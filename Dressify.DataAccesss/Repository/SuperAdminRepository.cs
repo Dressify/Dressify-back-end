@@ -15,14 +15,10 @@ namespace Dressify.DataAccess.Repository
     public class SuperAdminRepository : Repository<SuperAdmin>, ISuperAdminRepository
     {
         private readonly ApplicationDbContext _context;
-        private JWT _jwt;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public SuperAdminRepository(ApplicationDbContext context, IOptions<JWT> jwt, IHttpContextAccessor httpContextAccessor) : base(context)
+        public SuperAdminRepository(ApplicationDbContext context) : base(context)
         {
             _context = context;
-            _jwt = jwt.Value;
-            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<SuperAdmin> AddSuperAdminAsync(SuperAdmin sAdmin, string password)
         {

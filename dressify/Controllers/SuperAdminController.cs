@@ -44,30 +44,7 @@ namespace dressify.Controllers
         }
 
 
-        [HttpPost("Login")]
-        public async Task<IActionResult> SALogin([FromBody] SAdminTokenRequestDto model)
-        {
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            var SA = _unitOfWork.SuperAdmin.Find(U => U.UserName == model.UserName);
-            if (SA == null)
-            {
-                return NotFound();
-            }
-            var validatePass = new ValidatePasswordDto
-            {
-                Password = model.Password,
-                PasswordHash = SA.PasswordHash,
-                PasswordSalt = SA.PasswordSalt,
-            };
-            var result = _unitOfWork.SuperAdmin.ValidatePassword(validatePass);
-            if (!result)
-                return BadRequest("User Name or Password Wrong");
-            model.ID = SA.SuperAdminId;
-            var Token = new JwtSecurityTokenHandler().WriteToken(await _unitOfWork.CreateJwtToken(model));
-            return Ok(Token);
-        }
+        
 
         [Authorize]
         [HttpGet("TestSUPerAdmin")]

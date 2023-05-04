@@ -11,6 +11,9 @@ namespace Dressify.Utility
         public const string Role_Customer = "Customer";
         public const string Role_Vendor = "Vendor";
         public const string Role_Sales = "Sales";
+        public const string Role_Admin = "Admin";
+        public const string Role_SuperAdmin = "SuperAdmin";
+
 
         //order by
         public const string Ascending = "ASC";
