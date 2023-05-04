@@ -16,6 +16,7 @@ namespace Dressify.Models
         public List<WishList>? WishesLists { get; set; }
 
         public List<ProductQuestion>? QuestionsAsked { get; set; }
+        public List<ProductReport>? Reports { get; set; }
         public List<ShoppingCart>? Carts { get; set; }
 
 
@@ -26,7 +27,8 @@ namespace Dressify.Models
 
         public List<Product>? Products { get; set; }
         public List<ProductQuestion>? QuestionsAnswered { get; set; }
-        public List<ProductReport>? Reports { get; set; }
+        public List<Penalty>? Penalties { get; set; }
+
 
 
 

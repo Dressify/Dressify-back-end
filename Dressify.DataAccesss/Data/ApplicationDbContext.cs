@@ -108,6 +108,20 @@ namespace Dressify.DataAccess
             .Property(pq => pq.Date)
             .HasDefaultValueSql("GETUTCDATE()");
 
+            // ShoppingCart
+            modelBuilder.Entity<Penalty>()
+            .HasKey(e => new { e.AdminId, e.VendorId });
+
+            modelBuilder.Entity<Penalty>()
+                .HasOne(pq => pq.Admin)
+                .WithMany(p => p.Penalties)
+                .HasForeignKey(pq => pq.AdminId);
+
+            modelBuilder.Entity<Penalty>()
+                .HasOne(pq => pq.Vendor)
+                .WithMany(c => c.Penalties)
+                .HasForeignKey(pq => pq.VendorId);
+
 
         }
 
@@ -120,5 +134,6 @@ namespace Dressify.DataAccess
         public DbSet<Admin> Admins { get; set; }
         public DbSet<ProductReport> ProductsReports { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<Penalty> Penalties { get; set; }
     }
 }
