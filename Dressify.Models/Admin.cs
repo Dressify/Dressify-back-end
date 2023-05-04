@@ -18,6 +18,8 @@ namespace Dressify.Models
         public string ProfilePic { get; set; }
         public List<ProductReport>? Reports { get; set; }
         public List<Penalty>? Penalties { get; set; }
+        public List<ProdcutAction>? ProdcutsActions { get; set; }
+
 
 
 
