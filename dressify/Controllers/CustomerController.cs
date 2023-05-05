@@ -167,10 +167,10 @@ namespace dressify.Controllers
 
         [HttpPost("ReportProduct")]
         [Authorize(Roles =SD.Role_Customer)]
-        public async Task<IActionResult> ReportProduct([FromHeader]int productId)
+        public async Task<IActionResult> ReportProduct([FromBody]CustomerReportDto report)
         {
             var uId = _unitOfWork.getUID();
-            var prodcut=await _unitOfWork.Product.FindAsync(x => x.ProductId == productId);
+            var prodcut=await _unitOfWork.Product.FindAsync(x => x.ProductId == report.ProductId);
             if(prodcut == null)
             {
                 return NotFound();
@@ -179,8 +179,9 @@ namespace dressify.Controllers
             var productReport = new ProductReport
             {
                 CustomerId= uId,
-                ProductId = productId,
+                ProductId = report.ProductId,
                 VendorId= prodcut.VendorId,
+                Description= report.Description,
             };
 
             await _unitOfWork.productReport.AddAsync(productReport);
