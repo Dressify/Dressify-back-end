@@ -10,11 +10,11 @@ namespace dressify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CartController : ControllerBase
+    public class CartsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CartController(IUnitOfWork unitOfWork)
+        public CartsController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

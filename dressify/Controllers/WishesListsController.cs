@@ -8,12 +8,12 @@ namespace dressify.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WishListController : ControllerBase
+    public class WishesListsController : ControllerBase
     {
 
         private readonly IUnitOfWork _unitOfWork;
 
-        public WishListController(IUnitOfWork unitOfWork)
+        public WishesListsController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
