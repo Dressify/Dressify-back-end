@@ -56,7 +56,7 @@ namespace Dressify.DataAccess.DbInitializer
                     UserName="Dressify",
                     Email="Dressify@gmail.com",
                     PhoneNumber="011",
-                    storeName="DressifyStore",
+                    StoreName="DressifyStore",
                 },"Admin123*").GetAwaiter().GetResult();
                 ApplicationUser user = _context.Users.FirstOrDefault(u => u.Email == "Dressify@gmail.com");
                 _userManager.AddToRoleAsync(user, SD.Role_Sales).GetAwaiter().GetResult();

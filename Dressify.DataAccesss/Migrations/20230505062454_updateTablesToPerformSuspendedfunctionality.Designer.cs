@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace dressify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230416212612_VendorIdNullable")]
-    partial class VendorIdNullable
+    [Migration("20230505062454_updateTablesToPerformSuspendedfunctionality")]
+    partial class updateTablesToPerformSuspendedfunctionality
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,34 @@ namespace dressify.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("Dressify.Models.Admin", b =>
+                {
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AdminName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ProfilePic")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AdminId");
+
+                    b.ToTable("Admins");
+                });
 
             modelBuilder.Entity("Dressify.Models.ApplicationUser", b =>
                 {
@@ -53,14 +81,17 @@ namespace dressify.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsSuspended")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("LName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -68,6 +99,9 @@ namespace dressify.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("NId")
+                        .HasColumnType("int");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -92,21 +126,18 @@ namespace dressify.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("StoreName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SuspendedUntil")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool?>("IsSuspended")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("NId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StoreName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -121,6 +152,60 @@ namespace dressify.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Dressify.Models.Penalty", b =>
+                {
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("VendorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reasson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SuspendedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AdminId", "VendorId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("Penalties");
+                });
+
+            modelBuilder.Entity("Dressify.Models.ProdcutAction", b =>
+                {
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SuspendedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VendorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("action")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AdminId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("ProdcutsActions");
+                });
+
             modelBuilder.Entity("Dressify.Models.Product", b =>
                 {
                     b.Property<int>("ProductId")
@@ -130,16 +215,18 @@ namespace dressify.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"), 1L, 1);
 
                     b.Property<string>("Category")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Color")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsSuspended")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("NumberOfSales")
                         .HasColumnType("int");
@@ -164,16 +251,12 @@ namespace dressify.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("SubCategory")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsSuspended")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                    b.Property<DateTime?>("SuspendedUntil")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VendorId")
@@ -204,6 +287,9 @@ namespace dressify.Migrations
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
+
+                    b.Property<string>("PublicId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ImageID");
 
@@ -269,17 +355,104 @@ namespace dressify.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
-                    b.Property<string>("RateComment")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("Rate")
                         .HasColumnType("int");
+
+                    b.Property<string>("RateComment")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CustomerId", "ProductId");
 
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductsRates");
+                });
+
+            modelBuilder.Entity("Dressify.Models.ProductReport", b =>
+                {
+                    b.Property<int>("ReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReportId"), 1L, 1);
+
+                    b.Property<string>("Action")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Date")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ReportStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("VendorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ReportId");
+
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductsReports");
+                });
+
+            modelBuilder.Entity("Dressify.Models.ShoppingCart", b =>
+                {
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRent")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("CustomerId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ShoppingCarts");
+                });
+
+            modelBuilder.Entity("Dressify.Models.SuperAdmin", b =>
+                {
+                    b.Property<string>("SuperAdminId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SuperAdminId");
+
+                    b.ToTable("SuperAdmins");
                 });
 
             modelBuilder.Entity("Dressify.Models.WishList", b =>
@@ -430,6 +603,52 @@ namespace dressify.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Dressify.Models.Penalty", b =>
+                {
+                    b.HasOne("Dressify.Models.Admin", "Admin")
+                        .WithMany("Penalties")
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dressify.Models.ApplicationUser", "Vendor")
+                        .WithMany("Penalties")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("Dressify.Models.ProdcutAction", b =>
+                {
+                    b.HasOne("Dressify.Models.Admin", "Admin")
+                        .WithMany("ProdcutsActions")
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dressify.Models.Product", "Product")
+                        .WithMany("ProdcutsActions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dressify.Models.ApplicationUser", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Vendor");
+                });
+
             modelBuilder.Entity("Dressify.Models.Product", b =>
                 {
                     b.HasOne("Dressify.Models.ApplicationUser", "Vendor")
@@ -487,6 +706,50 @@ namespace dressify.Migrations
 
                     b.HasOne("Dressify.Models.Product", "Product")
                         .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Dressify.Models.ProductReport", b =>
+                {
+                    b.HasOne("Dressify.Models.Admin", "Admin")
+                        .WithMany("Reports")
+                        .HasForeignKey("AdminId");
+
+                    b.HasOne("Dressify.Models.ApplicationUser", "Customer")
+                        .WithMany("Reports")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dressify.Models.Product", "Product")
+                        .WithMany("Reports")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Admin");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Dressify.Models.ShoppingCart", b =>
+                {
+                    b.HasOne("Dressify.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Carts")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dressify.Models.Product", "Product")
+                        .WithMany("Carts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -566,22 +829,43 @@ namespace dressify.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Dressify.Models.Admin", b =>
+                {
+                    b.Navigation("Penalties");
+
+                    b.Navigation("ProdcutsActions");
+
+                    b.Navigation("Reports");
+                });
+
             modelBuilder.Entity("Dressify.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("Carts");
+
+                    b.Navigation("Penalties");
+
                     b.Navigation("Products");
 
                     b.Navigation("QuestionsAnswered");
 
                     b.Navigation("QuestionsAsked");
 
+                    b.Navigation("Reports");
+
                     b.Navigation("WishesLists");
                 });
 
             modelBuilder.Entity("Dressify.Models.Product", b =>
                 {
+                    b.Navigation("Carts");
+
+                    b.Navigation("ProdcutsActions");
+
                     b.Navigation("ProductImages");
 
                     b.Navigation("Questions");
+
+                    b.Navigation("Reports");
                 });
 #pragma warning restore 612, 618
         }

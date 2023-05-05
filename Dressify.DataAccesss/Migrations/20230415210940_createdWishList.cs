@@ -9,7 +9,7 @@ namespace dressify.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<bool>(
-                name: "Suspended",
+                name: "IsSuspended",
                 table: "Products",
                 type: "bit",
                 nullable: false,
@@ -53,7 +53,7 @@ namespace dressify.Migrations
                 name: "WishesLists");
 
             migrationBuilder.AlterColumn<bool>(
-                name: "Suspended",
+                name: "IsSuspended",
                 table: "Products",
                 type: "bit",
                 nullable: false,

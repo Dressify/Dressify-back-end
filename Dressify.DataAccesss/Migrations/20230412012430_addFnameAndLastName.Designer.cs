@@ -99,13 +99,13 @@ namespace dressify.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<bool?>("isSuspended")
+                    b.Property<bool?>("IsSuspended")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("nId")
+                    b.Property<int?>("NId")
                         .HasColumnType("int");
 
-                    b.Property<string>("storeName")
+                    b.Property<string>("StoreName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

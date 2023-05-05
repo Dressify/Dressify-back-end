@@ -84,6 +84,11 @@ namespace dressify.Migrations
                     b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsSuspended")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("LName")
                         .HasColumnType("nvarchar(max)");
 
@@ -92,6 +97,9 @@ namespace dressify.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("NId")
+                        .HasColumnType("int");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -116,21 +124,18 @@ namespace dressify.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("StoreName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SuspendedUntil")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool?>("isSuspended")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("nId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("storeName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -208,16 +213,18 @@ namespace dressify.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"), 1L, 1);
 
                     b.Property<string>("Category")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Color")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsSuspended")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("NumberOfSales")
                         .HasColumnType("int");
@@ -242,16 +249,12 @@ namespace dressify.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("SubCategory")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Suspended")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                    b.Property<DateTime?>("SuspendedUntil")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Type")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VendorId")
@@ -350,11 +353,11 @@ namespace dressify.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<int?>("Rate")
+                        .HasColumnType("int");
+
                     b.Property<string>("RateComment")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("rate")
-                        .HasColumnType("int");
 
                     b.HasKey("CustomerId", "ProductId");
 

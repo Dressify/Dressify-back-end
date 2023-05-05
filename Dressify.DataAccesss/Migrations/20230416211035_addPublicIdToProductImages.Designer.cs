@@ -99,13 +99,13 @@ namespace dressify.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<bool?>("isSuspended")
+                    b.Property<bool?>("IsSuspended")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("nId")
+                    b.Property<int?>("NId")
                         .HasColumnType("int");
 
-                    b.Property<string>("storeName")
+                    b.Property<string>("StoreName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -168,7 +168,7 @@ namespace dressify.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Suspended")
+                    b.Property<bool>("IsSuspended")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
@@ -228,7 +228,7 @@ namespace dressify.Migrations
                     b.Property<string>("RateComment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("rate")
+                    b.Property<int?>("Rate")
                         .HasColumnType("int");
 
                     b.HasKey("CustomerId", "ProductId");

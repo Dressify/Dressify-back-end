@@ -17,7 +17,7 @@ namespace Dressify.Models
         public ApplicationUser ApplicationUser { get; set; }
         [ForeignKey("ProductId")]
         public Product Product { get; set; }
-        public int? rate { get; set; }
+        public int? Rate { get; set; }
         public string? RateComment { get; set; }
         public bool IsPurchased { get; set; }
         public DateTime? Date { get; set; }

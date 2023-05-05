@@ -9,19 +9,19 @@ namespace dressify.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
-                name: "isSuspended",
+                name: "IsSuspended",
                 table: "AspNetUsers",
                 type: "bit",
                 nullable: true);
 
             migrationBuilder.AddColumn<int>(
-                name: "nId",
+                name: "NId",
                 table: "AspNetUsers",
                 type: "int",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "storeName",
+                name: "StoreName",
                 table: "AspNetUsers",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -30,15 +30,15 @@ namespace dressify.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "isSuspended",
+                name: "IsSuspended",
                 table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
-                name: "nId",
+                name: "NId",
                 table: "AspNetUsers");
 
             migrationBuilder.DropColumn(
-                name: "storeName",
+                name: "StoreName",
                 table: "AspNetUsers");
         }
     }

@@ -52,7 +52,7 @@ namespace dressify.Controllers
                 {
                     CustomerId = obj.CustomerId,
                     ProductId = obj.ProductId,
-                    rate =obj.rate,
+                    Rate =obj.rate,
                     RateComment = obj.RateComment,
                     //include isPurchased after adding Order 
                     Date=DateTime.Now,

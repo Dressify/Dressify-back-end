@@ -18,39 +18,32 @@ namespace Dressify.DataAccess
         {
             base.OnModelCreating(modelBuilder);
 
-            //Product
-            modelBuilder.Entity<Product>()
-                .Property(b => b.Suspended)
-                .HasDefaultValue(false); 
 
-            modelBuilder.Entity<ProductRate>()
-                .Property(b => b.IsPurchased)
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(b => b.IsSuspended)
                 .HasDefaultValue(false);
 
-            modelBuilder.Entity<WishList>()
-            .HasKey(e => new { e.CustomerId, e.ProductId });
-            modelBuilder.Entity<ProductRate>()
-            .HasKey(e => new { e.CustomerId, e.ProductId });
-            modelBuilder.Entity<ShoppingCart>()
-            .HasKey(e => new { e.CustomerId, e.ProductId });
-
             ////////////////////////////////
+            /// //Product
+            modelBuilder.Entity<Product>()
+                .Property(b => b.IsSuspended)
+                .HasDefaultValue(false);
             modelBuilder.Entity<Product>()
                .HasOne(p => p.Vendor)
                .WithMany(v => v.Products)
                .HasForeignKey(p => p.VendorId);
 
             modelBuilder.Entity<Product>()
-                .Property(b => b.Suspended)
-                .HasDefaultValue(false); 
+                .Property(b => b.IsSuspended)
+                .HasDefaultValue(false);
 
-            //product rate
+            //product Rate
+            modelBuilder.Entity<ProductRate>()
+            .HasKey(e => new { e.CustomerId, e.ProductId });
+
             modelBuilder.Entity<ProductRate>()
                 .Property(b => b.IsPurchased)
                 .HasDefaultValue(false);
-
-            modelBuilder.Entity<ProductRate>()
-            .HasKey(e => new { e.CustomerId, e.ProductId });
 
             //wishList
             modelBuilder.Entity<WishList>()
@@ -58,6 +51,9 @@ namespace Dressify.DataAccess
 
 
             // ShoppingCart
+            modelBuilder.Entity<ShoppingCart>()
+            .HasKey(e => new { e.CustomerId, e.ProductId });
+
             modelBuilder.Entity<ShoppingCart>()
                 .HasOne(pq => pq.ApplicationUser)
                 .WithMany(p => p.Carts)
