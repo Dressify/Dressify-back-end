@@ -4,6 +4,7 @@ using Dressify.DataAccess.Helpers;
 using Dressify.DataAccess.Repository;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Dressify.Utility;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddAuthentication(options =>
 {
