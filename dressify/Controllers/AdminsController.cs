@@ -27,14 +27,14 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
-            var report=await _unitOfWork.productReport.FindAsync(u => u.ReportId == reportId);
+            var report=await _unitOfWork.ProductReport.FindAsync(u => u.ReportId == reportId);
             if (report == null)
             {
                 return NotFound();
             }
             report.ReportStatus = true;
             report.AdminId = uId;
-            _unitOfWork.productReport.Update(report);
+            _unitOfWork.ProductReport.Update(report);
             _unitOfWork.Save();
             return Ok();
         }
@@ -48,7 +48,7 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
-            var report = await _unitOfWork.productReport.FindAsync(u => u.ReportId == reportDto.ReportId);
+            var report = await _unitOfWork.ProductReport.FindAsync(u => u.ReportId == reportDto.ReportId);
             if (report == null)
             {
                 return NotFound();
@@ -56,7 +56,7 @@ namespace dressify.Controllers
             report.ReportStatus = true;
             report.AdminId = uId;
             report.Action = reportDto.Action;
-            _unitOfWork.productReport.Update(report);
+            _unitOfWork.ProductReport.Update(report);
             _unitOfWork.Save();
             return Ok();
         }

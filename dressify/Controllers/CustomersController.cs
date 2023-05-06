@@ -184,7 +184,7 @@ namespace dressify.Controllers
                 Description= report.Description,
             };
 
-            await _unitOfWork.productReport.AddAsync(productReport);
+            await _unitOfWork.ProductReport.AddAsync(productReport);
             _unitOfWork.Save();
             return Ok();
         }
