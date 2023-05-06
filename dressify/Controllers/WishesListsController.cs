@@ -20,9 +20,9 @@ namespace dressify.Controllers
 
 
         [HttpGet("GetCustomerWishList")]
-        public async Task<IActionResult> GetAsync(string customerId)
+        public async Task<IActionResult> GetAsync()
         {
-            var result = await _unitOfWork.WishList.FindAllAsync(C=> C.CustomerId == customerId);
+            var result = await _unitOfWork.WishList.FindAllAsync(C=> C.CustomerId == _unitOfWork.getUID());
             if(result.Count()==0)
                 return Ok("There are no products in the whish list ");
 

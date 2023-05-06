@@ -8,7 +8,6 @@ namespace Dressify.DataAccess.Dtos
 {
     public class WishListDto
     {
-        public string CustomerId { get; set; }
         public int ProductId { get; set; }
     }
 }

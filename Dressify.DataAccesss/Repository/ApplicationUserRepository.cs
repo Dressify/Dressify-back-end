@@ -112,6 +112,12 @@ namespace Dressify.DataAccess.Repository
         {
             return await _userManager.FindByIdAsync(userId);
         }
+        public async Task<string> GetRoleAsync(ApplicationUser user)
+        {
+            var roleList= await _userManager.GetRolesAsync(user);
+
+            return roleList.FirstOrDefault();
+        }
         private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);

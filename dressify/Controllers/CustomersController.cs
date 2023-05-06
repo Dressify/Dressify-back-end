@@ -26,7 +26,7 @@ namespace dressify.Controllers
         [HttpPost("RateProduct")]
         public async Task<IActionResult> RateProduct(RateDto obj)
         {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = _unitOfWork.Product.GetById(obj.ProductId);
             if (user == null)
             {
@@ -40,7 +40,7 @@ namespace dressify.Controllers
             {
                 return BadRequest("Rating should be between 1 to 5 ");
             }
-            var result = _unitOfWork.ProductRate.Find(r => r.ProductId==obj.ProductId && r.CustomerId==obj.CustomerId);
+            var result = _unitOfWork.ProductRate.Find(r => r.ProductId==obj.ProductId && r.CustomerId==user.Id);
 
             if (result is not null )
             {
@@ -50,7 +50,7 @@ namespace dressify.Controllers
             {
                 var item = new ProductRate
                 {
-                    CustomerId = obj.CustomerId,
+                    CustomerId = user.Id,
                     ProductId = obj.ProductId,
                     Rate =obj.rate,
                     RateComment = obj.RateComment,
@@ -67,7 +67,7 @@ namespace dressify.Controllers
         [HttpPost("addToWishList")]
         public async Task<IActionResult> AddToWishList(WishListDto obj)
         {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
             if (user == null)
             {
@@ -79,7 +79,7 @@ namespace dressify.Controllers
             }
             var item = new WishList
             {
-                CustomerId = obj.CustomerId,
+                CustomerId = user.Id,
                 ProductId = obj.ProductId,
             };
             await _unitOfWork.WishList.AddAsync(item);
@@ -90,7 +90,7 @@ namespace dressify.Controllers
         [HttpDelete("DeleteFromWishList")]
         public async Task<IActionResult> DeleteFromWishList(WishListDto obj)
         {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = _unitOfWork.Product.GetById(obj.ProductId);
             if (user == null)
             {
@@ -100,7 +100,7 @@ namespace dressify.Controllers
             {
                 return BadRequest("product does not exist");
             }
-            var result = await _unitOfWork.WishList.FindAsync(w => w.ProductId == obj.ProductId && w.CustomerId == obj.CustomerId);
+            var result = await _unitOfWork.WishList.FindAsync(w => w.ProductId == obj.ProductId && w.CustomerId == user.Id);
             if (result == null)
                 return BadRequest("This user does not have this product on Wish list");
             _unitOfWork.WishList.Delete(result);
@@ -112,7 +112,7 @@ namespace dressify.Controllers
         [HttpPost("AskQuestion")]
         public async Task<IActionResult> AskQuestion(QuestionDto obj)
         {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.CustomerId);
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
             if (user == null)
             {
@@ -129,7 +129,7 @@ namespace dressify.Controllers
             var item = new ProductQuestion
             {
                 Question = obj.Question,
-                CustomerId = obj.CustomerId,
+                CustomerId = user.Id,
                 ProductId = obj.ProductId,
             };
             await _unitOfWork.ProductQuestion.AddAsync(item);

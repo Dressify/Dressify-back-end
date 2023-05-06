@@ -9,7 +9,6 @@ namespace Dressify.DataAccess.Dtos
     public class AnswearDto
     {
         public int QuestionId { get; set; }
-        public string VendorId { get; set; }
         public int ProductId { get; set; }
         public string? Answear { get; set; }
 

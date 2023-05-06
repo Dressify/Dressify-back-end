@@ -1,6 +1,8 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Dressify.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,21 +21,27 @@ namespace dressify.Controllers
         }
 
         [HttpGet("GetAllQuestions")]
-        public async Task<ActionResult<IEnumerable<ProductQuestion>>> GetAllQuestions(string vendorId)
+        [Authorize(Roles = SD.Role_Vendor)]
+        public async Task<ActionResult<IEnumerable<ProductQuestion>>> GetAllQuestions()
         {
-            var vendor = await _unitOfWork.ApplicationUser.GetUserAsync(vendorId);
+            var uId = _unitOfWork.getUID();
+            var vendor = await _unitOfWork.ApplicationUser.GetUserAsync(uId);
             if (vendor == null)
             {
-                return BadRequest("vendor does not exist");
+                return NotFound("vendor does not exist");
             }
-            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u=>u.VendorId == vendorId);
+            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId, new[] {"Product"});
+            if (questions.Any())
+            {
+                return NoContent();
+            }
             return Ok(questions);
         }
 
         [HttpPut("AnswearQuestion")]
         public async Task<IActionResult> AnswearQuestion(AnswearDto obj)
         {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(obj.VendorId);
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
             var question = await _unitOfWork.ProductQuestion.GetByIdAsync(obj.QuestionId);
 
@@ -55,7 +63,7 @@ namespace dressify.Controllers
             }
 
             question.Answear=obj.Answear;
-            question.VendorId=obj.VendorId;
+            question.VendorId=user.Id;
 
             _unitOfWork.ProductQuestion.Update(question);
             _unitOfWork.Save();
@@ -68,7 +76,7 @@ namespace dressify.Controllers
                 return BadRequest("product Data Not Valid");
             var product = new Product
             {
-                VendorId = dto.VendorId,
+                VendorId = _unitOfWork.getUID(),
                 ProductName = dto.ProductName,
                 Description = dto.Description,
                 Price = dto.Price,

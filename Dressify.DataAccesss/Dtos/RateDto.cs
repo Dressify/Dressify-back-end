@@ -8,7 +8,6 @@ namespace Dressify.DataAccess.Dtos
 {
     public class RateDto
     {
-        public string CustomerId { get; set; }
         public int ProductId { get; set; }
         public int? rate { get; set; }
         public string? RateComment { get; set; }

@@ -13,7 +13,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         Task<AuthDto> RegisterAsync(RegisterDto dto);
         Task<AuthDto> GetTokenAsync(TokenRequestDto dto);
         Task<ApplicationUser> GetUserAsync(string userId);
-
+        Task<string> GetRoleAsync(ApplicationUser user);
 
     }
 }
