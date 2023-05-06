@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Dtos;
+﻿using CloudinaryDotNet.Actions;
+using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Dressify.Utility;
@@ -66,6 +67,7 @@ namespace dressify.Controllers
             }
             return Ok(Summary);
         }
+
         [HttpPost("Payment")]
         public async Task<IActionResult> payment(SummaryDto Summary)
         {
@@ -73,24 +75,23 @@ namespace dressify.Controllers
             Summary.ListCart = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
             Summary.Order.CustomerId = uId;
 
-
-            _unitOfWork.Order.Add(Summary.Order);
-            _unitOfWork.Save();
-
             foreach (var cart in Summary.ListCart)
             {
+               var product =await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId); 
                 OrderDetails orderDetail = new()
                 {
                     ProductId = cart.ProductId,
                     Price = cart.Price,
                     OrderId = Summary.Order.OrderId,
                     Quantity = cart.Quantity,
+                    VendorId = product.VendorId,
                 };
                 _unitOfWork.OrderDetails.Add(orderDetail);
                 _unitOfWork.Save();
             }
             if (Summary.Order.payementMethod == SD.PaymentMethod_Credit)
             {
+                Summary.Order.payementMethod = SD.PaymentMethod_Credit;
                 // Stripe
                 var paymentIntentService = new PaymentIntentService();
                 var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
@@ -104,16 +105,27 @@ namespace dressify.Controllers
                 });
                 var clientSecret = paymentIntent.ClientSecret;
 
-
+                var bill = new PayBill()
+                {
+                    PaymentIntentId = paymentIntent.Id,
+                    Status = paymentIntent.Status,
+                };
+                _unitOfWork.Order.Add(Summary.Order);
+                _unitOfWork.PayBill.Add(bill);
+                _unitOfWork.Save();
                 return Ok(clientSecret);
             }
             Summary.Order.PaymentDate = DateTime.Now;
+            Summary.Order.payementMethod = SD.PaymentMethod_Cash;
+            Summary.Order.OrderStatus = SD.Status_Confirmed;
+            _unitOfWork.Order.Add(Summary.Order);
             _unitOfWork.Save();
+
             return Ok();
         }
 
 
-        [HttpPost("IncrementQuantity")]
+        [HttpPut("IncrementQuantity")]
         public async Task<IActionResult> Plus(int productId)
         {
             var uId = _unitOfWork.getUID();
@@ -123,7 +135,7 @@ namespace dressify.Controllers
             return Ok();
         }
 
-        [HttpPost("DecrementQuantity")]
+        [HttpPut("DecrementQuantity")]
         public async Task<IActionResult> Minus(int productId)
         {
             var uId = _unitOfWork.getUID();
@@ -140,7 +152,8 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
-        [HttpPost("RemoveFromCart")]
+
+        [HttpDelete("RemoveFromCart")]
         public async Task<IActionResult> Remove(int productId)
         {
             var uId = _unitOfWork.getUID();
@@ -150,7 +163,56 @@ namespace dressify.Controllers
             return Ok();
         }
 
+        [HttpPut("CancelOrder")]
+        public async Task<IActionResult> CancelOrder(int orderId)
+        {
+            var uId = _unitOfWork.getUID();
+            var  order = _unitOfWork.Order.GetById(orderId);
+            if (order == null)
+                return BadRequest("Order Does not exist");
+            if (order.OrderStatus == SD.Status_Pending && order.payementMethod == SD.PaymentMethod_Cash  )
+            {
+                order.OrderStatus = SD.Status_Cancelled;
+                _unitOfWork.Order.Update(order);
+                _unitOfWork.Save();
+                return Ok();
+            }
+            else if (order.OrderStatus == SD.Status_Pending &&  order.payementMethod == SD.PaymentMethod_Credit )
+            {
+                var payBill = await _unitOfWork.PayBill.FindAsync(p => p.OrderId == order.OrderId);
+                if (payBill.Status == SD.PaymentStatus_Succeded)
+                {
+                    var options = new RefundCreateOptions
+                    {
+                        Reason = RefundReasons.RequestedByCustomer,
+                        PaymentIntent = payBill.PaymentIntentId,
+                    };
+                    var service = new RefundService();
+                    Refund refund = service.Create(options);
+                    order.OrderStatus = SD.Status_Cancelled;
+                    _unitOfWork.Order.Update(order);
+                    _unitOfWork.Save();
+                    return Ok();
+                }
+                else return BadRequest("Customer Did not pay for Order");
+            }
+            else return BadRequest("Order Can not be Canceled");
+        }
 
+        //[HttpPut("OrderConfirmation")]
+        //public async Task<IActionResult> OrderConfirmation(int orderId , string orderStatus)
+        //{
+        //    var payBill = await _unitOfWork.PayBill.FindAsync(p => p.OrderId == orderId);
+        //    if (payBill == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    if(payBill.Status == null || payBill.Status == SD.PaymentStatus_Failed)
+        //    {
+
+        //    }
+            
+        //}
 
         [HttpPost("testPay")]
         public async Task<IActionResult> TestPay()
