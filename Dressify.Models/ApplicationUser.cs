@@ -18,7 +18,7 @@ namespace Dressify.Models
         public List<ProductQuestion>? QuestionsAsked { get; set; }
         public List<ProductReport>? Reports { get; set; }
         public List<ShoppingCart>? Carts { get; set; }
-
+        public List<Order>? Orders { get; set; }
 
         //Vendor props
         public string? StoreName { get; set; }

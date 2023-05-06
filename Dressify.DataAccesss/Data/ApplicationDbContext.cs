@@ -128,6 +128,24 @@ namespace Dressify.DataAccess
                 .WithMany(c => c.ProdcutsActions)
                 .HasForeignKey(pq => pq.ProductId);
 
+            //Order
+            modelBuilder.Entity<Order>()
+                .HasOne(pq => pq.Customer)
+                .WithMany(o => o.Orders)
+                .HasForeignKey(pq => pq.CustomerId);
+
+            //OrderDetails
+            modelBuilder.Entity<OrderDetails>()
+                .HasKey(k => new { k.OrderId, k.ProductId });
+            modelBuilder.Entity<OrderDetails>()
+                .HasOne(pq => pq.Order)
+                .WithMany(od => od.OrdersDetails)
+                .HasForeignKey(pq => pq.OrderId);
+            modelBuilder.Entity<OrderDetails>()
+                .HasOne(pq => pq.Product)
+                .WithMany(od => od.OrdersDetails)
+                .HasForeignKey(pq => pq.ProductId);
+
 
         }
 
@@ -142,5 +160,8 @@ namespace Dressify.DataAccess
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<Penalty> Penalties { get; set; }
         public DbSet<ProductAction> ProdcutsActions { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetails> OrdersDetails { get; set; }
+        public DbSet<PayBill> PayBills { get; set; }
     }
 }

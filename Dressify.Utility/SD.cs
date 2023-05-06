@@ -19,7 +19,17 @@ namespace Dressify.Utility
         public const string Ascending = "ASC";
         public const string Descending = "DESC";
 
+        //Order  and Order Details Status
+        public const string Status_Pending = "Pending";
+        public const string Status_Approved = "Approved";
+        public const string Status_Delivered = "Delivered";
+        public const string Status_Refunded = "Rejected";
+        //only for Order 
+        public const string Status_Cancelled = "Cancelled";
 
+        //Payment Methods 
+        public const string PaymentMethod_Cash = "Cash";
+        public const string PaymentMethod_Credit = "Credit";
 
     }
 }
