@@ -122,5 +122,50 @@ namespace dressify.Controllers
             return Ok(vendors);
         }
 
+        [HttpGet("GetPendingOrders")]
+        public async Task<IActionResult> GetPendingOrders()
+        {
+            var uId = _unitOfWork.getUID();
+            var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
+            if (vendor.IsSuspended == true)
+                return BadRequest("Vendor is Suspended");
+            var PendingOrders = _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId );
+            return Ok(PendingOrders);
+        }
+        [HttpPut("ConfirmtPendingOrders")]
+        public async Task<IActionResult> ConfirmtPendingOrders(int orderId , int productId)
+        {
+            var uId = _unitOfWork.getUID();
+            var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
+            if (vendor.IsSuspended == true)
+                return BadRequest("Vendor is Suspended");
+
+            var orderDetails =await  _unitOfWork.OrderDetails.FindAsync(od => od.OrderId == orderId && od.ProductId == productId);
+            if (orderDetails.Status != SD.Status_Pending)
+                return BadRequest("order not pended ");
+            orderDetails.Status = SD.Status_Confirmed;
+            _unitOfWork.OrderDetails.Update(orderDetails);
+            _unitOfWork.Save();
+            var orders = await _unitOfWork.OrderDetails.FindAllAsync(o => o.OrderId == orderId);
+            foreach (var item in orders)
+            {
+                if (item.Status != SD.Status_Confirmed)
+                {
+                    break;
+                }
+                else
+                {
+                    var order = await _unitOfWork.Order.FindAsync(o=> o.OrderId == orderId);
+                    order.OrderStatus = SD.Status_Confirmed;
+                    _unitOfWork.Order.Update(order);
+                    _unitOfWork.Save();
+                }
+            }
+            return Ok();
+        }
+
+
+
+
     }
 }
