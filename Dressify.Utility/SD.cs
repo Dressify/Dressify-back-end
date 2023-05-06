@@ -21,9 +21,8 @@ namespace Dressify.Utility
 
         //Order  and Order Details Status
         public const string Status_Pending = "Pending";
-        public const string Status_Approved = "Approved";
+        public const string Status_Confirmed = "Confirmed";
         public const string Status_Delivered = "Delivered";
-        public const string Status_Refunded = "Rejected";
         //only for Order 
         public const string Status_Cancelled = "Cancelled";
 
@@ -31,5 +30,8 @@ namespace Dressify.Utility
         public const string PaymentMethod_Cash = "Cash";
         public const string PaymentMethod_Credit = "Credit";
 
+        //Payment Status
+        public const string PaymentStatus_Succeded = "succeeded";
+        public const string PaymentStatus_Failed = "failed";
     }
 }
