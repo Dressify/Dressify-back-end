@@ -1,5 +1,6 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
+using Dressify.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -60,5 +61,37 @@ namespace dressify.Controllers
             return Ok();
         }
 
+        //[HttpPost("SusppendProduct")]
+        //[Authorize]
+        //public async Task<IActionResult> SusppendProduct(ProductActionDto actionDto)
+        //{
+        //    var uId = _unitOfWork.getUID();
+        //    if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
+        //    {
+        //        return Unauthorized();
+        //    }
+        //    var Product=await _unitOfWork.Product.FindAsync(u=>u.ProductId == actionDto.ProductId);
+        //    if (Product == null)
+        //    {
+        //        return NotFound(actionDto.ProductId);
+        //    }
+        //    Product.IsSuspended = true;
+        //    Product.SuspendedUntil= actionDto.SuspendedUntil;
+
+        //    var productAction = new ProductAction
+        //    {
+        //        AdminId = uId,
+        //        ProductId = actionDto.ProductId,
+        //        VendorId= Product.VendorId,
+        //        Action = actionDto.Action,
+        //        Date=DateTime.UtcNow,
+        //    };
+
+        //    _unitOfWork.Product.Update(Product);
+        //    _unitOfWork.ProductAction.AddAsync(productAction);
+        //    _unitOfWork.Save();
+        //    return Ok(productAction);
+
+        //}
     }
 }
