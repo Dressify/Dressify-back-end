@@ -42,18 +42,6 @@ namespace dressify.Controllers
             return Ok(Details);
         }
 
-        [HttpGet("GetSuspendedProducts")]
-        [Authorize]
-        public async  Task<IActionResult> GetSuspendedProducts()
-        {
-            var uId = _unitOfWork.getUID();
-            if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
-            {
-                return Unauthorized();
-            }
-            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == true);
-            return Ok(products);
-        }
     }
 }
 

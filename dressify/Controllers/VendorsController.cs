@@ -108,5 +108,19 @@ namespace dressify.Controllers
             return Ok();
         }
 
+
+        [HttpGet("GetSuspendedVendor")]
+        [Authorize]
+        public async Task<IActionResult> GetSuspendedVendor()
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true);
+            return Ok(vendors);
+        }
+
     }
 }
