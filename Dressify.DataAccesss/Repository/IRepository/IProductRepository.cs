@@ -10,5 +10,6 @@ namespace Dressify.DataAccess.Repository.IRepository
 {
     public interface IProductRepository : IRepository<Product>
     {
+        Task<List<Product>> GetProductsAsync(int? reportCountThreshold);
     }
 }
