@@ -33,10 +33,6 @@ namespace Dressify.DataAccess
                .WithMany(v => v.Products)
                .HasForeignKey(p => p.VendorId);
 
-            modelBuilder.Entity<Product>()
-                .Property(b => b.IsSuspended)
-                .HasDefaultValue(false);
-
             //product Rate
             modelBuilder.Entity<ProductRate>()
             .HasKey(e => new { e.CustomerId, e.ProductId });

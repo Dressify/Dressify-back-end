@@ -22,7 +22,7 @@ namespace dressify.Migrations
                     Sale = table.Column<float>(type: "real", nullable: false),
                     Purchases = table.Column<int>(type: "int", nullable: false),
                     Rentable = table.Column<bool>(type: "bit", nullable: false),
-                    Suspended = table.Column<bool>(type: "bit", nullable: false),
+                    IsSuspended = table.Column<bool>(type: "bit", nullable: false),
                     Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SubCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
