@@ -145,6 +145,10 @@ namespace Dressify.DataAccess
                 .HasOne(pq => pq.Product)
                 .WithMany(od => od.OrdersDetails)
                 .HasForeignKey(pq => pq.ProductId);
+            modelBuilder.Entity<OrderDetails>()
+               .HasOne(pq => pq.Vendor)
+               .WithMany(od => od.OrdersDetails)
+               .HasForeignKey(pq => pq.VendorId);
 
 
         }

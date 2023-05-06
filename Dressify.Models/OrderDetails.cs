@@ -28,5 +28,8 @@ namespace Dressify.Models
         [DefaultValue(SD.Status_Pending)]
         public string Status { get; set; }
         public string? ProductName { get; set; }
+        public string? VendorId{ get; set;}
+        [ForeignKey("VendorId")]
+        public ApplicationUser Vendor { get; set; }
     }
 }
