@@ -18,7 +18,7 @@ namespace Dressify.DataAccess.Dtos
         [Required, StringLength(128)]
         public string Email { get; set; }
 
-        [Required, StringLength(8)]
+        [Required, StringLength(16)]
         public string Password { get; set; }
         [Required]
         public string Role { get; set; }

@@ -44,6 +44,10 @@ namespace Dressify.DataAccess.Repository
 
             ProductImage = new ProductImageRepository(_context, cloudinary);
             ShoppingCart = new ShoppingCartRepository(_context);
+            Order = new OrderRepository(_context);
+            OrderDetails = new OrderDetailsRepository(_context);
+            PayBill = new PayBillRepository(_context);
+
             _httpContextAccessor = httpContextAccessor;
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
@@ -58,6 +62,10 @@ namespace Dressify.DataAccess.Repository
         public IAdminRepository Admin { get; private set; }
 
         public IShoppingCartRepository ShoppingCart { get; private set; }
+        public IOrderRepository Order { get; private set; }
+        public IOrderDetailsRepository OrderDetails { get; private set; }
+        public IPayBillRepository PayBill { get; private set; }
+
 
 
 

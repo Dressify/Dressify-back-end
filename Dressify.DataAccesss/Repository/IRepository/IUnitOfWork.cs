@@ -22,6 +22,10 @@ namespace Dressify.DataAccess.Repository.IRepository
         public IAdminRepository Admin { get; }
 
         public IShoppingCartRepository  ShoppingCart { get; }
+        public IOrderRepository Order { get; }
+        public IOrderDetailsRepository OrderDetails { get; }
+        public IPayBillRepository PayBill { get; }
+
 
         //Functions
         int Save();
