@@ -152,5 +152,32 @@ namespace dressify.Controllers
 
 
 
+        [HttpPost("testPay")]
+        public async Task<IActionResult> TestPay()
+        {
+            var paymentIntentService = new PaymentIntentService();
+            var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
+            {
+                Amount = (long?)(50000 * 100),
+                Currency = "usd",
+                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                {
+                    Enabled = true,
+                },
+            });
+            var clientSecret = paymentIntent.ClientSecret;
+            return Ok(clientSecret);
+        }
+        //[HttpPost("TestRefund")]
+        //public async Task<IActionResult> TestRefund() 
+        //{
+        //    var options = new RefundCreateOptions
+        //    {
+        //        Reason = RefundReasons.RequestedByCustomer,
+        //        PaymentIntent = ,
+        //    };
+        //    var service = new RefundService();
+        //    Refund refund = service.Create(options);
+        //}
     }
 }
