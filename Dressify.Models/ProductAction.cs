@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dressify.Models
 {
-    public class ProdcutAction
+    public class ProductAction
     {
         public string AdminId { get; set; }
         [ForeignKey("AdminId")]
@@ -18,7 +18,7 @@ namespace Dressify.Models
         public string VendorId { get; set; }
         [ForeignKey("VendorId")]
         public ApplicationUser Vendor { get; set; }
-        public string? action { get; set; }
+        public string? Action { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
         public DateTime SuspendedUntil { get; set; }
     }

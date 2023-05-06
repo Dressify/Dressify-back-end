@@ -114,16 +114,16 @@ namespace Dressify.DataAccess
                 .WithMany(c => c.Penalties)
                 .HasForeignKey(pq => pq.VendorId);
 
-            // ProdcutAction
-            modelBuilder.Entity<ProdcutAction>()
+            // ProductAction
+            modelBuilder.Entity<ProductAction>()
             .HasKey(e => new { e.AdminId, e.ProductId });
 
-            modelBuilder.Entity<ProdcutAction>()
+            modelBuilder.Entity<ProductAction>()
                 .HasOne(pq => pq.Admin)
                 .WithMany(p => p.ProdcutsActions)
                 .HasForeignKey(pq => pq.AdminId);
 
-            modelBuilder.Entity<ProdcutAction>()
+            modelBuilder.Entity<ProductAction>()
                 .HasOne(pq => pq.Product)
                 .WithMany(c => c.ProdcutsActions)
                 .HasForeignKey(pq => pq.ProductId);
@@ -141,6 +141,6 @@ namespace Dressify.DataAccess
         public DbSet<ProductReport> ProductsReports { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<Penalty> Penalties { get; set; }
-        public DbSet<ProdcutAction> ProdcutsActions { get; set; }
+        public DbSet<ProductAction> ProdcutsActions { get; set; }
     }
 }

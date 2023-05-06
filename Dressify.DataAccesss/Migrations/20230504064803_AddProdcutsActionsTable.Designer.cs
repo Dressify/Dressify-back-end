@@ -171,7 +171,7 @@ namespace dressify.Migrations
                     b.ToTable("Penalties");
                 });
 
-            modelBuilder.Entity("Dressify.Models.ProdcutAction", b =>
+            modelBuilder.Entity("Dressify.Models.ProductAction", b =>
                 {
                     b.Property<string>("AdminId")
                         .HasColumnType("nvarchar(450)");
@@ -619,7 +619,7 @@ namespace dressify.Migrations
                     b.Navigation("Vendor");
                 });
 
-            modelBuilder.Entity("Dressify.Models.ProdcutAction", b =>
+            modelBuilder.Entity("Dressify.Models.ProductAction", b =>
                 {
                     b.HasOne("Dressify.Models.Admin", "Admin")
                         .WithMany("ProdcutsActions")

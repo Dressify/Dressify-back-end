@@ -35,7 +35,7 @@ namespace Dressify.Models
         public List<ProductImage>? ProductImages { get; set; }
         public List<ProductQuestion>? Questions { get; set; }
         public List<ProductReport>? Reports { get; set; }
-        public List<ProdcutAction>? ProdcutsActions { get; set; }
+        public List<ProductAction>? ProdcutsActions { get; set; }
         public List<ShoppingCart>? Carts { get; set; }
 
 
