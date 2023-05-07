@@ -2,6 +2,7 @@
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Utility;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace dressify.Controllers
@@ -96,6 +97,89 @@ namespace dressify.Controllers
             return BadRequest("User Name or Password Wrong");
         }
 
+        //Modify Photo For Vendor , Customer and Admin
+        [HttpPut("ModifyPhoto")]
+        public async Task<IActionResult> modifyPhoto(IFormFile photo)
+        {
+            var uId = _unitOfWork.getUID();
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
+            if (user != null) 
+            {
+                if (user.ProfilePic != null)
+                {
+                    var res = await _unitOfWork.ApplicationUser.DeletePhoto(user.PublicId);
+                    if (res == "ok")
+                    {
+                        user.ProfilePic = null;
+                        user.PublicId = null;
+                    }
+                }
+                CreatePhotoDto result = await _unitOfWork.ApplicationUser.AddPhoto(photo);
+                user.PublicId = result.PublicId;
+                user.ProfilePic = result.Url;
+                _unitOfWork.Save();
+                return Ok(result.Url);
+            }
+            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId);
+            if (admin != null)
+            {
+                if (admin.ProfilePic != null)
+                {
+                    var res = await _unitOfWork.Admin.DeletePhoto(admin.PublicId);
+                    if (res == "ok")
+                    {
+                        admin.ProfilePic = null;
+                        admin.PublicId = null;
+                    }
+                }
+                CreatePhotoDto result = await _unitOfWork.Admin.AddPhoto(photo);
+                admin.PublicId = result.PublicId;
+                admin.ProfilePic = result.Url;
+                //_unitOfWork.Admin.Update(admin);
+                return Ok(result.Url);
+            }
+        return Unauthorized();
+        }
+
+        //Delete Photo For Vendor , Customer and Admin
+        [HttpDelete("DeletePhoto")]
+        public async Task<IActionResult> DelePhoto()
+        {
+            var uId = _unitOfWork.getUID();
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
+            if (user != null)
+            {
+                if (user.ProfilePic != null)
+                {
+                    var res = await _unitOfWork.ApplicationUser.DeletePhoto(user.PublicId);
+                    if (res == "ok")
+                    {
+                        user.ProfilePic = null;
+                        user.PublicId = null;
+                    }
+                    return Ok();
+                }
+                else
+                    return BadRequest("User do not have photo");
+            }
+            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId);
+            if (admin != null)
+            {
+                if (admin.ProfilePic != null)
+                {
+                    var res = await _unitOfWork.Admin.DeletePhoto(admin.PublicId);
+                    if (res == "ok")
+                    {
+                        admin.ProfilePic = null;
+                        admin.PublicId = null;
+                    }
+                    return Ok();
+                }
+                else
+                    return BadRequest("User do not have photo");
+            }
+            return Unauthorized();
+        }
 
     }
 }

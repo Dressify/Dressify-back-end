@@ -88,6 +88,12 @@ namespace Dressify.DataAccess.Repository
 
         public async Task<string> DeletePhoto(string publicId)
         {
+            Account acc = new Account(
+               _cloudinaryConfig.Value.CloudName,
+               _cloudinaryConfig.Value.Key,
+           _cloudinaryConfig.Value.Secret
+               );
+            _cloudinary = new Cloudinary(acc);
             var deleteParams = new DeletionParams(publicId);
             var result = _cloudinary.Destroy(deleteParams);
             return result.Result;
