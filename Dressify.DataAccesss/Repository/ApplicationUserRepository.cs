@@ -41,7 +41,43 @@ namespace Dressify.DataAccess.Repository
             _roleManager = roleManager;
             _cloudinaryConfig = cloudinary;
         }
+        public async Task<AuthDto> CustomerRegisterAsync(CustRegisterDto dto)
+        {
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null)
+                return new AuthDto { Message = "Email is already registered!" };
 
+            if (await _userManager.FindByNameAsync(dto.Username) is not null)
+                return new AuthDto { Message = "Username is already registered!" };
+            var user = new ApplicationUser
+            {
+                UserName = dto.Username,
+                Email = dto.Email,
+            };
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Empty;
+
+                foreach (var error in result.Errors)
+                    errors += $"{error.Description},";
+
+                return new AuthDto { Message = errors };
+            }
+            await _userManager.AddToRoleAsync(user, SD.Role_Customer);
+
+            var jwtSecurityToken = await CreateJwtToken(user);
+            await _userManager.UpdateAsync(user);
+            return new AuthDto
+            {
+                Email = user.Email,
+                ExpiresOn = jwtSecurityToken.ValidTo,
+                IsAuthenticated = true,
+                Role = SD.Role_Customer,
+                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                Username = user.UserName,
+                ImgUrl = user.ProfilePic,
+            };
+        }
         public async Task<AuthDto> RegisterAsync(RegisterDto dto)
         {
             if (await _userManager.FindByEmailAsync(dto.Email) is not null)

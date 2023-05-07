@@ -16,13 +16,15 @@ namespace dressify.Controllers
         {
             _unitOfWork = unitOfWork;
         }
-        [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto model)
+        [HttpPost("CustRegister")]
+        public async Task<IActionResult> CustRegisterAsync([FromBody] CustRegisterDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _unitOfWork.ApplicationUser.RegisterAsync(model);
+            var result = await _unitOfWork.ApplicationUser.CustomerRegisterAsync(model);
+            if(!result.IsAuthenticated)
+                return BadRequest(result.Message);
             return Ok(result);
         }
 
