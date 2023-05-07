@@ -10,7 +10,7 @@ namespace Dressify.DataAccess.Dtos
     public class TokenRequestDto
     {
         [Required]
-        public string Email { get; set; }
+        public string stringLogin { get; set; }
         [Required]
         public string Password { get; set; }
     }

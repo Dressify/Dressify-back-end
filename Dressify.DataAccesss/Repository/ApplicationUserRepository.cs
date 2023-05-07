@@ -124,9 +124,11 @@ namespace Dressify.DataAccess.Repository
         public async Task<AuthDto> GetTokenAsync(TokenRequestDto model)
         {
             var authModel = new AuthDto();
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-
+            var user = await _userManager.FindByEmailAsync(model.stringLogin);
+            if (user == null)
+            {
+                user =await _userManager.FindByNameAsync(model.stringLogin);    
+            }
             if (user is null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
                 authModel.Message = "Email or Password is incorrect!";
