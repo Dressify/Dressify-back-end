@@ -7,12 +7,14 @@ namespace Dressify.Models
     {
 
         public string? ProfilePic { get; set; }
+        public string? PublicId { get; set; }
         public string? Gender { get; set; }
         public string? Address { get; set; }
         public DateTime? DOB { get; set; }
         public int? Age { get; set; }
         public string? FName { get; set; }
         public string? LName { get; set; }
+
         public List<WishList>? WishesLists { get; set; }
 
         public List<ProductQuestion>? QuestionsAsked { get; set; }

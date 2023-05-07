@@ -16,6 +16,7 @@ namespace Dressify.Models
         public byte[]? PasswordSalt { get; set; }
         public string Email { get; set; }
         public string ProfilePic { get; set; }
+        public string? PublicId { get; set; }
         public List<ProductReport>? Reports { get; set; }
         public List<Penalty>? Penalties { get; set; }
         public List<ProductAction>? ProdcutsActions { get; set; }
