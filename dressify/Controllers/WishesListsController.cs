@@ -29,7 +29,7 @@ namespace dressify.Controllers
             List<Product> productList = new List<Product>();
             foreach (var item in result)
             {
-               var product= await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId, new[] { "ProductImages" });
+               var product= await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId&& p.IsSuspended==false, new[] { "ProductImages" });
                 productList.Add(product);
             }
             return Ok(productList);

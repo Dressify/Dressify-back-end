@@ -62,33 +62,6 @@ namespace dressify.Controllers
             return Ok(report);
         }
 
-        [HttpGet("GetSuspendedVendor")]
-        [Authorize]
-        public async Task<IActionResult> GetSuspendedVendor()
-        {
-            var uId = _unitOfWork.getUID();
-            if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
-            {
-                return Unauthorized();
-            }
-            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true);
-            return Ok(vendors);
-        }
-
-
-        [HttpGet("GetSuspendedProducts")]
-        [Authorize]
-        public async Task<IActionResult> GetSuspendedProducts()
-        {
-            var uId = _unitOfWork.getUID();
-            if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
-            {
-                return Unauthorized();
-            }
-            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == true);
-            return Ok(products);
-        }
-
         [HttpPut("SuspendProduct")]
         [Authorize]
         public async Task<IActionResult> SuspendProduct(ProductActionDto actionDto)
