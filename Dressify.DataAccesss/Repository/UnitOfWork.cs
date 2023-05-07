@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Http;
 using Dressify.DataAccess.Dtos;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -25,6 +27,7 @@ namespace Dressify.DataAccess.Repository
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+
         public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
@@ -32,7 +35,8 @@ namespace Dressify.DataAccess.Repository
             _jwt = jwt.Value;
             _roleManager = roleManager;
             _cloudinaryConfig = cloudinary;
-            ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager);
+
+            ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager, cloudinary);
             Product = new ProductRepository(_context);
             WishList = new WishListRepository(_context);
             ProductQuestion = new ProductQuestionRepository(_context);
@@ -40,7 +44,7 @@ namespace Dressify.DataAccess.Repository
             ProductReport = new ProductReportRepository(_context);
             ProductAction = new ProductActionRepository(_context);
             SuperAdmin = new SuperAdminRepository(_context);
-            Admin = new AdminRepository(_context);
+            Admin = new AdminRepository(_context, cloudinary);
 
             ProductImage = new ProductImageRepository(_context, cloudinary);
             ShoppingCart = new ShoppingCartRepository(_context);

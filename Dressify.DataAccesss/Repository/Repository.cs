@@ -1,6 +1,9 @@
-﻿using Dressify.DataAccess.Dtos;
+﻿using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
+using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Utility;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,6 +11,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Dressify.DataAccess.Helpers;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -15,10 +21,14 @@ namespace Dressify.DataAccess.Repository
     {
         protected ApplicationDbContext _context;
 
+
+
+
         //constructor
         public Repository(ApplicationDbContext context)
         {
             _context = context;
+           
         }
 
         //Return all rows of Table

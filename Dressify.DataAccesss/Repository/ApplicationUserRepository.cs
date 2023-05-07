@@ -29,15 +29,17 @@ namespace Dressify.DataAccess.Repository
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JWT _jwt;
-
+        private Cloudinary _cloudinary;
+        private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ApplicationUserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager) : base(context)
+        public ApplicationUserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary) : base(context)
         {
             _context = context;
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
+            _cloudinaryConfig = cloudinary;
         }
 
         public async Task<AuthDto> RegisterAsync(RegisterDto dto)
@@ -148,6 +150,40 @@ namespace Dressify.DataAccess.Repository
                 signingCredentials: signingCredentials);
 
             return jwtSecurityToken;
+        }
+        public async Task<CreatePhotoDto> AddPhoto(IFormFile file)
+        {
+            Account acc = new Account(
+                _cloudinaryConfig.Value.CloudName,
+                _cloudinaryConfig.Value.Key,
+            _cloudinaryConfig.Value.Secret
+                );
+            _cloudinary = new Cloudinary(acc);
+            var uploadResult = new ImageUploadResult();
+            if (file.Length > 0)
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(file.Name, stream)
+                    };
+                    uploadResult = _cloudinary.Upload(uploadParams);
+                }
+            }
+            var CreatedPhoto = new CreatePhotoDto
+            {
+                Url = uploadResult.Url.ToString(),
+                PublicId = uploadResult.PublicId
+            };
+            return CreatedPhoto;
+        }
+
+        public async Task<string> DeletePhoto(string publicId)
+        {
+            var deleteParams = new DeletionParams(publicId);
+            var result = _cloudinary.Destroy(deleteParams);
+            return result.Result;
         }
 
     }

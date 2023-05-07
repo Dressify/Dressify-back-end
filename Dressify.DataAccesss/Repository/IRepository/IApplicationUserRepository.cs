@@ -1,5 +1,6 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Dressify.DataAccess.Repository.IRepository
         Task<AuthDto> GetTokenAsync(TokenRequestDto dto);
         Task<ApplicationUser> GetUserAsync(string userId);
         Task<string> GetRoleAsync(ApplicationUser user);
+        Task<CreatePhotoDto> AddPhoto(IFormFile file);
+        Task<string> DeletePhoto(string publicId);
 
     }
 }

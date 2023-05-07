@@ -1,4 +1,5 @@
 ﻿using Dressify.DataAccess.Dtos;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,5 +32,6 @@ namespace Dressify.DataAccess.Repository.IRepository
         int Save();
         string getUID();
         Task<AuthDto> CreateJwtToken(AdminTokenRequestDto model);
+
     }
 }
