@@ -30,13 +30,13 @@ namespace dressify.Controllers
         [Authorize]
         public async Task<IActionResult> CreateAdmin([FromBody] AddAdminDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.SuperAdmin.FindAllAsync(u=>u.SuperAdminId==uId)==null)
             {
                 return Unauthorized();
             }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             var result = await _unitOfWork.Admin.CreateAdminAsync(dto);
             if (result.Message != "")
                 return BadRequest(result.Message);

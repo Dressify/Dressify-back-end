@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Dressify.DataAccess.Dtos
 {
-    public class ProductActionDto
+    public class VendorActionDto
     {
         [Required]
-        public int ProductId { get; set; }
+        public string VendorId { get; set; }
         [Required]
-        public string? Action { get; set; }
+        public string? Reasson { get; set; }
         public string? SuspendedUntil { get; set; }
     }
 }

@@ -42,6 +42,7 @@ namespace Dressify.DataAccess.Repository
             ProductQuestion = new ProductQuestionRepository(_context);
             ProductRate = new ProductRateRepository(_context);
             ProductReport = new ProductReportRepository(_context);
+            Penalty = new PenaltyRepository(_context);
             ProductAction = new ProductActionRepository(_context);
             SuperAdmin = new SuperAdminRepository(_context);
             Admin = new AdminRepository(_context, cloudinary);
@@ -60,6 +61,8 @@ namespace Dressify.DataAccess.Repository
         public IProductQuestionRepository ProductQuestion { get; private set; }
         public IProductRateRepository ProductRate { get; private set; }
         public IProductReportRepository ProductReport { get; private set; }
+        public IPenaltyRepository Penalty { get; private set; }
+
         public IProductActionRepository ProductAction { get; private set; }
         public IProductImageRepository ProductImage { get; private set; }
         public ISuperAdminRepository   SuperAdmin { get; private set; }
