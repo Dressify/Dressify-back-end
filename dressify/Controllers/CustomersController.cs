@@ -206,6 +206,8 @@ namespace dressify.Controllers
                 LName   =user.LName,
                 UserName=user.UserName,
                 Email   = user.Email,
+                imgUrl  = user.ProfilePic,
+                PhoneNumber = user.PhoneNumber,
             };
             return customerProfile;
         }
@@ -223,6 +225,8 @@ namespace dressify.Controllers
              user.FName   = customerProfile.FName;
              user.LName   = customerProfile.LName;
              user.Email   = customerProfile.Email;
+             user.PhoneNumber = customerProfile.PhoneNumber;
+
             _unitOfWork.ApplicationUser.Update(user);
             _unitOfWork.Save();
             return Ok();
