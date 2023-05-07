@@ -215,7 +215,11 @@ namespace dressify.Controllers
         public async Task<IActionResult> EditCustomerProfile(CustomerEditProfileDto customerProfile)
         {
             var uId = _unitOfWork.getUID();
-            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);           
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);    
+            if (customerProfile.Email == null)
+            {
+                return BadRequest(" email can not be null");
+            }
             if ( user.Email != customerProfile.Email) 
             {
                 if (await _userManager.FindByEmailAsync(customerProfile.Email) is not null)
