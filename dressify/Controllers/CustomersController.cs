@@ -8,6 +8,9 @@ using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Dressify.Models;
 using System.Security.Claims;
 using System.Security.Principal;
+using Stripe;
+using System.Xml.Linq;
+using Microsoft.AspNetCore.Identity;
 
 namespace dressify.Controllers
 {
@@ -16,10 +19,12 @@ namespace dressify.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CustomersController(IUnitOfWork unitOfWork)
+        public CustomersController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
 
@@ -189,6 +194,39 @@ namespace dressify.Controllers
             return Ok();
         }
 
+        [HttpGet("ViewCustomerProfile")]
+        public async Task<CustomerProfileDto> viewCustomerProfile()
+        {
+            var uId  = _unitOfWork.getUID();
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id ==uId);
+            var customerProfile = new CustomerProfileDto()
+            {
+                Address = user.Address,
+                FName   = user.FName,
+                LName   =user.LName,
+                UserName=user.UserName,
+                Email   = user.Email,
+            };
+            return customerProfile;
+        }
+        [HttpPost("EditCustomerProfile")]
+        public async Task<IActionResult> EditCustomerProfile(CustomerEditProfileDto customerProfile)
+        {
+            var uId = _unitOfWork.getUID();
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);           
+            if ( user.Email != customerProfile.Email) 
+            {
+                if (await _userManager.FindByEmailAsync(customerProfile.Email) is not null)
+                    return BadRequest("Email is already registered!");
+            } 
+             user.Address = customerProfile.Address;
+             user.FName   = customerProfile.FName;
+             user.LName   = customerProfile.LName;
+             user.Email   = customerProfile.Email;
+            _unitOfWork.ApplicationUser.Update(user);
+            _unitOfWork.Save();
+            return Ok();
+        }
     }
 
 }
