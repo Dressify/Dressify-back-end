@@ -11,8 +11,7 @@ namespace Dressify.DataAccess.Dtos
     {
         [Required]
         public int ProductId { get; set; }
-        [Required]
-        public string? Action { get; set; }
+        public string? Reasson { get; set; }
         public string? SuspendedUntil { get; set; }
     }
 }

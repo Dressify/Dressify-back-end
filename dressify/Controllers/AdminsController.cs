@@ -1,6 +1,7 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Dressify.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +60,27 @@ namespace dressify.Controllers
             report.Action = reportDto.Action;
             _unitOfWork.ProductReport.Update(report);
             _unitOfWork.Save();
+
+            if (reportDto.Action == SD.Action_SuspendProduct)
+            {
+                var productAction = new ProductActionDto()
+                {
+                    ProductId = report.ProductId,
+                    Reasson= "because report ID : "+report.ReportId.ToString(),
+                    SuspendedUntil=reportDto.SuspendedUntil,
+                };
+                return await SuspendProduct(productAction);
+            }
+            if (reportDto.Action == SD.Action_SuspendVendor)
+            {
+                var vendorAction = new VendorActionDto()
+                {
+                    VendorId = report.VendorId,
+                    Reasson = "because report ID : " + report.ReportId.ToString(),
+                    SuspendedUntil = reportDto.SuspendedUntil,
+                };
+                return await SuspendVendor(vendorAction);
+            }     
             return Ok(report);
         }
 
@@ -95,7 +117,7 @@ namespace dressify.Controllers
                 AdminId = uId,
                 ProductId = actionDto.ProductId,
                 VendorId = Product.VendorId,
-                Action = actionDto.Action,
+                Reasson = actionDto.Reasson,
                 Date = DateTime.UtcNow,
             };
 
@@ -163,8 +185,27 @@ namespace dressify.Controllers
                 Date = DateTime.UtcNow,
             };
 
+            var products = await _unitOfWork.Product.FindAllAsync(u => u.VendorId == actionDto.VendorId);
+            if (products.Any())
+            {
+                foreach (var product in products)
+                {
+                    if (product.IsSuspended == false)
+                    {
+                        product.IsSuspended = true;
+                        product.SuspendedUntil = vendor.SuspendedUntil;
+                        _unitOfWork.Product.Update(product);
+                    }
+                    else if (product.SuspendedUntil <= vendor.SuspendedUntil)
+                    {
+                        product.IsSuspended = true;
+                        product.SuspendedUntil = vendor.SuspendedUntil;
+                        _unitOfWork.Product.Update(product);
+                    }
+                }
+            }
             _unitOfWork.ApplicationUser.Update(vendor);
-            _unitOfWork.Penalty.AddAsync(Penalty);
+            await _unitOfWork.Penalty.AddAsync(Penalty);
             _unitOfWork.Save();
             return Ok(Penalty);
         }

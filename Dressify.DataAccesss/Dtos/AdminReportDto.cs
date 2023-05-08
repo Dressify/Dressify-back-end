@@ -10,5 +10,8 @@ namespace Dressify.DataAccess.Dtos
     {
         public int ReportId { get; set; }
         public string? Action { get; set; }
+        public string? Reasson { get; set; }
+        public string? SuspendedUntil { get; set; }
+
     }
 }

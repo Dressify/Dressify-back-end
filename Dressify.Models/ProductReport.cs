@@ -20,6 +20,8 @@ namespace Dressify.Models
         [ForeignKey("CustomerId")]
         public ApplicationUser Customer { get; set; }
         public string VendorId { get; set; }
+        [ForeignKey("VendorId")]
+        public ApplicationUser Vendor { get; set; }
         public string? AdminId { get; set; }
         [ForeignKey("AdminId")]
         public Admin? Admin { get; set; }

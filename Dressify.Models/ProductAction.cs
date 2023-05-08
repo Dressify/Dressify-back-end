@@ -18,7 +18,7 @@ namespace Dressify.Models
         public string VendorId { get; set; }
         [ForeignKey("VendorId")]
         public ApplicationUser Vendor { get; set; }
-        public string? Action { get; set; }
+        public string? Reasson { get; set; }
         public DateTime Date { get; set; } = DateTime.Now;
         public DateTime SuspendedUntil { get; set; }
     }

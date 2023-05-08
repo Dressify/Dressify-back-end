@@ -26,7 +26,7 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
-            var productReports = await _unitOfWork.ProductReport.GetAllAsync(new[] { "Product" });
+            var productReports = await _unitOfWork.ProductReport.GetAllAsync(new[] { "Product", "Customer","Vendor" });
             return Ok(productReports);
         }
 
@@ -39,7 +39,7 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
-            var productReports = await _unitOfWork.ProductReport.FindAllAsync(u=>u.ReportStatus==false,new[] {  "Product" });
+            var productReports = await _unitOfWork.ProductReport.FindAllAsync(u=>u.ReportStatus==false,new[] { "Product", "Customer", "Vendor" });
             return Ok(productReports);
         }
     }

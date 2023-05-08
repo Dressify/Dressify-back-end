@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace Dressify.Utility
 {
     public static class SD
-    {   //Roles
+    { 
+        //Roles
         public const string Role_Customer = "Customer";
         public const string Role_Vendor = "Vendor";
         public const string Role_Sales = "Sales";
         public const string Role_Admin = "Admin";
         public const string Role_SuperAdmin = "SuperAdmin";
-
 
         //order by
         public const string Ascending = "ASC";
@@ -33,5 +33,12 @@ namespace Dressify.Utility
         //Payment Status
         public const string PaymentStatus_Succeded = "succeeded";
         public const string PaymentStatus_Failed = "failed";
+
+        //Product Actions
+        public const string Action_Ignore = "ignore";
+        public const string Action_SuspendProduct = "suspendProduct";
+        public const string Action_SuspendVendor = "suspendVendor";
+
+
     }
 }
