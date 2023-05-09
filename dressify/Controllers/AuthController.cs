@@ -28,6 +28,7 @@ namespace dressify.Controllers
             return Ok(result);
         }
 
+        // login for customer and vendor
         [HttpPost("Login")]
         public async Task<IActionResult> GetTokenAsync([FromBody] TokenRequestDto model)
         {
@@ -98,6 +99,7 @@ namespace dressify.Controllers
             //If he is neither than admin nor than super admin
             return BadRequest("User Name or Password Wrong");
         }
+
 
         //Modify Photo For Vendor , Customer and Admin
         [HttpPut("ModifyPhoto")]

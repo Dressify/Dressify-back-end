@@ -211,7 +211,7 @@ namespace dressify.Controllers
             };
             return customerProfile;
         }
-        [HttpPost("EditCustomerProfile")]
+        [HttpPut("EditCustomerProfile")]
         public async Task<IActionResult> EditCustomerProfile(CustomerEditProfileDto customerProfile)
         {
             var uId = _unitOfWork.getUID();

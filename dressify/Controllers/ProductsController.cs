@@ -17,12 +17,15 @@ namespace dressify.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpGet("listAllProducts")] 
-        public async Task<IActionResult> GetAllProducts()
+        [HttpGet("GetProductspage")] 
+        public async Task<IActionResult> GetProductsPage(int pageNumber , int pageSize )
         {
-            var products = await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,new[] { "Vendor", "ProductImages", "Questions" });
+            var skip = (pageNumber - 1) * pageSize;
+            var products = await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,skip,pageSize,new[] { "Vendor", "ProductImages"});
             return Ok(products);
         }
+
+
         [HttpGet("GetProductDetails")]
         public async Task<IActionResult> GetProduct(int id)
         {

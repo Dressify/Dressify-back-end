@@ -21,9 +21,6 @@ namespace Dressify.DataAccess.Repository
     {
         protected ApplicationDbContext _context;
 
-
-
-
         //constructor
         public Repository(ApplicationDbContext context)
         {
@@ -107,15 +104,59 @@ namespace Dressify.DataAccess.Repository
             return await query.Where(criteria).ToListAsync();
         }
 
+
+        /// <summary>
+        ///  next 2 functions for paging
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? skip, int? take,
+             string[] includes = null)
+        {
+            IQueryable<T> query = _context.Set<T>().Where(criteria);
+
+
+            if (skip.HasValue)
+                query = query.Skip(skip.Value);
+
+            if (take.HasValue)
+                query = query.Take(take.Value);
+            if (includes != null)
+                foreach (var include in includes)
+                    query = query.Include(include);
+
+            return query.ToList();
+        }
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? skip, int? take,
+             string[] includes = null)
+        {
+            IQueryable<T> query = _context.Set<T>().Where(criteria);
+
+            if (take.HasValue)
+                query = query.Take(take.Value);
+
+            if (skip.HasValue)
+                query = query.Skip(skip.Value);
+            if (includes != null)
+                foreach (var include in includes)
+                    query = query.Include(include);
+
+            return await query.ToListAsync();
+        }
+
         //Get list of elements using experession 
         //include used to get data belong to element from another table which element have a foreign key
         //Ex: FindAll(user => user.name == "x", include = new []{ " Purches "})
         //Skip, skips elements up to a specified position starting from the first element in a sequence.
         //Take, takes elements up to a specified position starting from the first element in a sequence.
         public IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? skip, int? take,
-           Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending)
+           Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null)
         {
             IQueryable<T> query = _context.Set<T>().Where(criteria);
+
 
             if (skip.HasValue)
                 query = query.Skip(skip.Value);
@@ -130,11 +171,14 @@ namespace Dressify.DataAccess.Repository
                 else
                     query = query.OrderByDescending(orderBy);
             }
+            if (includes != null)
+                foreach (var include in includes)
+                    query = query.Include(include);
 
             return query.ToList();
         }
         public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? take, int? skip,
-            Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending)
+            Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null)
         {
             IQueryable<T> query = _context.Set<T>().Where(criteria);
 
@@ -151,6 +195,9 @@ namespace Dressify.DataAccess.Repository
                 else
                     query = query.OrderByDescending(orderBy);
             }
+            if (includes != null)
+                foreach (var include in includes)
+                    query = query.Include(include);
 
             return await query.ToListAsync();
         }
