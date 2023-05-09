@@ -3,6 +3,7 @@ using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace dressify.Controllers
@@ -133,7 +134,7 @@ namespace dressify.Controllers
                 user.PublicId = result.PublicId;
                 user.ProfilePic = result.Url;
                 _unitOfWork.Save();
-                return Ok(result.Url);
+                return Ok(result);
             }
             var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId);
             if (admin != null)
@@ -151,7 +152,7 @@ namespace dressify.Controllers
                 admin.PublicId = result.PublicId;
                 admin.ProfilePic = result.Url;
                 //_unitOfWork.Admin.Update(admin);
-                return Ok(result.Url);
+                return Ok(result);
             }
         return Unauthorized();
         }
