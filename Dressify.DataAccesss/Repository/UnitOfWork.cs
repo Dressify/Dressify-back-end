@@ -116,5 +116,29 @@ namespace Dressify.DataAccess.Repository
             return authModel;
 
         }
+
+        public void Unsuspend()
+        {
+            var now = DateTime.UtcNow;
+            var suspendedProducts =  _context.Products.Where(p => p.IsSuspended && p.SuspendedUntil.HasValue && p.SuspendedUntil.Value <= now).ToList();
+            var suspendedVendors = _context.Users.Where(p => p.IsSuspended && p.SuspendedUntil.HasValue && p.SuspendedUntil.Value <= now).ToList();
+
+            foreach (var product in suspendedProducts)
+            {
+                product.IsSuspended = false;
+                product.SuspendedUntil = null;
+
+                _context.Products.Update(product);
+            }
+
+            foreach (var vendor in suspendedVendors)
+            {
+                vendor.IsSuspended = false;
+                vendor.SuspendedUntil = null;
+
+                _context.Users.Update(vendor);
+            }
+             _context.SaveChanges();
+        }
     }
 }
