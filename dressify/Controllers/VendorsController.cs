@@ -164,6 +164,15 @@ namespace dressify.Controllers
             return Ok();
         }
 
+        public async Task<IActionResult> ViewOwnProducts()
+        {
+            var vendorId = _unitOfWork.getUID();
+            var vendorProducts = await _unitOfWork.Product.FindAllAsync(p => p.VendorId == vendorId , new[] { "ProductImages" });
+            if (vendorProducts == null)
+                return BadRequest("You dont have any products");
+            return Ok(vendorProducts);
+        }
+
 
 
 
