@@ -21,10 +21,8 @@ namespace Dressify.DataAccess.Repository.IRepository
         IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, string[] includes = null);
         Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, string[] includes = null);
         // for paging 
-        IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? take, int? skip,
-          string[] includes = null);
-        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? skip, int? take,
-          string[] includes = null);
+        IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? take, int? skip ,string[] includes = null);
+        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? skip, int? take, string[] includes = null);
         ///--------------------------------------------------------------------------
         IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? take, int? skip,
            Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null);

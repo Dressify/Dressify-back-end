@@ -18,10 +18,10 @@ namespace dressify.Controllers
         }
 
         [HttpGet("GetProductspage")] 
-        public async Task<IActionResult> GetProductsPage(int pageNumber , int pageSize )
+        public async Task<IActionResult> GetProductsPage(int pageNumber , int pageSize , double? minPrice, double? maxPrice, string? gender, string? category)
         {
             var skip = (pageNumber - 1) * pageSize;
-            var products = await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,skip,pageSize,new[] { "Vendor", "ProductImages"});
+            var products = await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,skip,pageSize, minPrice, maxPrice, gender, category,new[] { "Vendor", "ProductImages"});
             return Ok(products);
         }
 
