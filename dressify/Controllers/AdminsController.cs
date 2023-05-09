@@ -2,6 +2,7 @@
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Dressify.Utility;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -45,11 +46,14 @@ namespace dressify.Controllers
         [Authorize]
         public async Task<IActionResult> ActionReport([FromBody] AdminReportDto reportDto)
         {
+
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
             {
                 return Unauthorized();
             }
+            RecurringJob.AddOrUpdate(() => _unitOfWork.Unsuspend(), Cron.Daily(0));
+
             var report = await _unitOfWork.ProductReport.FindAsync(u => u.ReportId == reportDto.ReportId);
             if (report == null)
             {
