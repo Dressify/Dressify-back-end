@@ -134,7 +134,11 @@ namespace Dressify.DataAccess.Repository
                 authModel.Message = "Email or Password is incorrect!";
                 return authModel;
             }
-
+            if (user.IsSuspended)
+            {
+                authModel.Message = "You are supended unitl: "+user.SuspendedUntil.ToString();
+                return authModel;
+            }
             var jwtSecurityToken = await CreateJwtToken(user);
             var rolesList = await _userManager.GetRolesAsync(user);
 

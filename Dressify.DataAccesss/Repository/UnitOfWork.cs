@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
+using Dressify.Utility;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -95,7 +96,9 @@ namespace Dressify.DataAccess.Repository
             {
                 new Claim(JwtRegisteredClaimNames.Sub, model.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("uid", model.ID)
+                new Claim("uid", model.ID),
+                new Claim("Role", SD.Role_Admin),
+
             };
             var identity = new ClaimsIdentity(claims, "MyApplication");
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));

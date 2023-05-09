@@ -35,13 +35,25 @@ namespace dressify.Controllers
             foreach (var item in result)
             {
                 var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId, new[] { "ProductImages" });
-                var obj = new CartDto
+                if (product.IsSuspended)
                 {
-                    Product = product,
-                    IsRent  = item.IsRent,
-                    quantity=item.Quantity,
+                    _unitOfWork.ShoppingCart.Delete(item);
+                    _unitOfWork.Save();
+                }
+                else
+                {
+                    var obj = new CartDto
+                    {
+                        Product = product,
+                        IsRent = item.IsRent,
+                        quantity = item.Quantity,
+                    };
+                    cart.Add(obj);
                 };
-                cart.Add(obj);
+            }
+            if (!cart.Any())
+            {
+                return BadRequest("There are no products in the Cart ");
             }
             return Ok(cart);
         }

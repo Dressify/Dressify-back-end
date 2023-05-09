@@ -18,7 +18,7 @@ namespace dressify.Controllers
         }
 
         //Product has more than 10 reports that have been checked
-        [HttpGet]
+        [HttpGet("NeedToPunch")]
         [Authorize]
         public async Task<IActionResult> NeedToPunch([FromQuery] int? reportCountThreshold = 10)
         {
