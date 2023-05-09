@@ -149,6 +149,9 @@ namespace Dressify.DataAccess
                .HasOne(pq => pq.Vendor)
                .WithMany(od => od.OrdersDetails)
                .HasForeignKey(pq => pq.VendorId);
+            modelBuilder.Entity<OrderDetails>()
+            .Property(pq => pq.Date)
+            .HasDefaultValueSql("GETUTCDATE()");
 
 
         }

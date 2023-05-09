@@ -21,6 +21,8 @@ namespace Dressify.Models
         public string? Phone { get; set; }
         public double? TotalPrice { get; set; }
         public string? payementMethod { get; set; }
+        public DateTime? Date { get; set; }
+
         public DateTime? PaymentDate { get; set; }
         [DefaultValue(SD.Status_Pending)]
         public string OrderStatus { get; set; }
