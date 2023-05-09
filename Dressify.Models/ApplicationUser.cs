@@ -11,10 +11,24 @@ namespace Dressify.Models
         public string? Gender { get; set; }
         public string? Address { get; set; }
         public DateTime? DOB { get; set; }
-        public int? Age { get; set; }
+        public int? Age => CalculateAge();
         public string? FName { get; set; }
         public string? LName { get; set; }
+        private int? CalculateAge()
+        {
+            var today = DateTime.Today;
+            if (DOB != null)
+            {
+                var age = today.Year - DOB.Value.Year;
 
+                if (DOB > today.AddYears(-age))
+                {
+                    age--;
+                }
+                return age;
+            }
+            return Age;
+        }
         public List<WishList>? WishesLists { get; set; }
 
         public List<ProductQuestion>? QuestionsAsked { get; set; }
