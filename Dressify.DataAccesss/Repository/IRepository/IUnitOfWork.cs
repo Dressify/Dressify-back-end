@@ -34,6 +34,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         int Save();
         string getUID();
         Task<AuthDto> CreateJwtToken(AdminTokenRequestDto model);
+        void Unsuspend();
 
     }
 }

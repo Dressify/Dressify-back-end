@@ -1,9 +1,9 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
 namespace dressify.Controllers
 {
     [Route("api/[controller]")]
@@ -20,6 +20,7 @@ namespace dressify.Controllers
         [HttpGet("listAllProducts")] 
         public async Task<IActionResult> GetAllProducts()
         {
+            RecurringJob.AddOrUpdate(() => _unitOfWork.Unsuspend(), Cron.Daily(0));
             var products = await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,new[] { "Vendor", "ProductImages", "Questions" });
             return Ok(products);
         }

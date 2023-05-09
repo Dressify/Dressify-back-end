@@ -224,6 +224,19 @@ namespace dressify.Controllers
             {
                 return NotFound(VendorId);
             }
+            if(Vendor.SuspendedUntil>= DateTime.UtcNow.AddYears(90))
+            {
+                var products = await _unitOfWork.Product.FindAllAsync(u => u.VendorId == VendorId);
+                if (products.Any())
+                {
+                    foreach (var product in products)
+                    {
+                        product.IsSuspended = false;
+                        product.SuspendedUntil = null;
+                        _unitOfWork.Product.Update(product);
+                    }
+                }
+            }
             Vendor.IsSuspended = false;
             Vendor.SuspendedUntil = null;
             _unitOfWork.ApplicationUser.Update(Vendor);
