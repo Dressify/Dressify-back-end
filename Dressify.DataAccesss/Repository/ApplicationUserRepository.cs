@@ -78,6 +78,48 @@ namespace Dressify.DataAccess.Repository
                 ImgUrl = user.ProfilePic,
             };
         }
+        public async Task<AuthDto> VendorRegisterAsync(VendorRegisterDto dto)
+        {
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null)
+                return new AuthDto { Message = "Email is already registered!" };
+
+            if (await _userManager.FindByNameAsync(dto.UserName) is not null)
+                return new AuthDto { Message = "Username is already registered!" };
+            var user = new ApplicationUser
+            {
+                UserName = dto.UserName,
+                Email = dto.Email,
+                PhoneNumber = dto.Phone,
+                FName = dto.FName,
+                LName = dto.LName,
+                NId =dto.nId,
+                Address=dto.address
+            };
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Empty;
+
+                foreach (var error in result.Errors)
+                    errors += $"{error.Description},";
+
+                return new AuthDto { Message = errors };
+            }
+            await _userManager.AddToRoleAsync(user, SD.Role_Vendor);
+
+            var jwtSecurityToken = await CreateJwtToken(user);
+            await _userManager.UpdateAsync(user);
+            return new AuthDto
+            {
+                Email = user.Email,
+                ExpiresOn = jwtSecurityToken.ValidTo,
+                IsAuthenticated = true,
+                Role = SD.Role_Vendor,
+                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                Username = user.UserName,
+                ImgUrl = user.ProfilePic,
+            };
+        }
         public async Task<AuthDto> RegisterAsync(RegisterDto dto)
         {
             if (await _userManager.FindByEmailAsync(dto.Email) is not null)

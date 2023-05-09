@@ -18,6 +18,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         Task<string> GetRoleAsync(ApplicationUser user);
         Task<CreatePhotoDto> AddPhoto(IFormFile file);
         Task<string> DeletePhoto(string publicId);
+        Task<AuthDto> VendorRegisterAsync(VendorRegisterDto dto);
 
     }
 }

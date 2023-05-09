@@ -163,7 +163,7 @@ namespace dressify.Controllers
             }
             return Ok();
         }
-
+        [HttpGet("ViewOwnProducts")]
         public async Task<IActionResult> ViewOwnProducts()
         {
             var vendorId = _unitOfWork.getUID();

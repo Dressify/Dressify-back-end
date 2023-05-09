@@ -27,6 +27,17 @@ namespace dressify.Controllers
                 return BadRequest(result.Message);
             return Ok(result);
         }
+        [HttpGet("VendorRegister")]
+        public async Task<IActionResult> VendorRegisterAsync([FromBody] VendorRegisterDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var result = await _unitOfWork.ApplicationUser.VendorRegisterAsync(model);
+            if (!result.IsAuthenticated)
+                return BadRequest(result.Message);
+            return Ok(result);
+        }
+
 
         // login for customer and vendor
         [HttpPost("Login")]
