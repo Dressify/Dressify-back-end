@@ -195,7 +195,7 @@ namespace dressify.Controllers
         }
 
         [HttpGet("ViewCustomerProfile")]
-        public async Task<CustomerProfileDto> viewCustomerProfile()
+        public async Task<CustomerProfileDto> ViewCustomerProfile()
         {
             var uId  = _unitOfWork.getUID();
             var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id ==uId);
@@ -211,6 +211,7 @@ namespace dressify.Controllers
             };
             return customerProfile;
         }
+
         [HttpPut("EditCustomerProfile")]
         public async Task<IActionResult> EditCustomerProfile(CustomerEditProfileDto customerProfile)
         {
@@ -236,7 +237,7 @@ namespace dressify.Controllers
             return Ok();
         }
         [HttpGet("ViewVendorProfile")]
-        public async Task<VendorProfileDto> viewVendorProfile()
+        public async Task<VendorProfileDto> ViewVendorProfile()
         {
             var uId = _unitOfWork.getUID();
             var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);

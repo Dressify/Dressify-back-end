@@ -2,9 +2,11 @@
 using Dressify.DataAccess.Helpers;
 using Dressify.DataAccess.Repository;
 using Dressify.DataAccess.Repository.IRepository;
+using Dressify.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Common;
@@ -90,6 +92,37 @@ namespace dressify.Controllers
                 Email = admin.Email,
             };
             return Ok(adminProfile);
+        }
+
+        [HttpPut("EditAdminProfile")]
+        [Authorize]
+        public async Task<IActionResult> EditAdminProfile(AdminPorfileDto adminPorfile)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.SuperAdmin.FindAllAsync(u => u.SuperAdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == adminPorfile.AdminId);
+            if (admin == null)
+            {
+                return NotFound();
+            }
+            if (admin.Email != adminPorfile.Email)
+            {
+                if (await _unitOfWork.Admin.FindAsync(u=>u.Email== adminPorfile.Email) != null)
+                    return BadRequest("Email is already registered!");
+            }
+            admin.AdminName = adminPorfile.AdminName;
+            admin.ProfilePic = adminPorfile.ProfilePic;
+            admin.Email = adminPorfile.Email;
+            _unitOfWork.Admin.Update(admin);
+            _unitOfWork.Save();
+            return Ok(adminPorfile);
         }
 
         [Authorize]
