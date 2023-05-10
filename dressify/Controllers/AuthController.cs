@@ -113,9 +113,9 @@ namespace dressify.Controllers
         }
 
 
-        //Modify Photo For Vendor , Customer and Admin
+        //Modify Photo For Vendor ,and Customer 
         [HttpPut("ModifyPhoto")]
-        public async Task<IActionResult> modifyPhoto(IFormFile photo)
+        public async Task<IActionResult> ModifyPhoto(IFormFile photo)
         {
             var uId = _unitOfWork.getUID();
             var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
@@ -136,28 +136,10 @@ namespace dressify.Controllers
                 _unitOfWork.Save();
                 return Ok(result);
             }
-            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId);
-            if (admin != null)
-            {
-                if (admin.ProfilePic != null)
-                {
-                    var res = await _unitOfWork.Admin.DeletePhoto(admin.PublicId);
-                    if (res == "ok")
-                    {
-                        admin.ProfilePic = null;
-                        admin.PublicId = null;
-                    }
-                }
-                CreatePhotoDto result = await _unitOfWork.Admin.AddPhoto(photo);
-                admin.PublicId = result.PublicId;
-                admin.ProfilePic = result.Url;
-                //_unitOfWork.Admin.Update(admin);
-                return Ok(result);
-            }
         return Unauthorized();
         }
 
-        //Delete Photo For Vendor , Customer and Admin
+        //Delete Photo For Vendor ,and Customer 
         [HttpDelete("DeletePhoto")]
         public async Task<IActionResult> DelePhoto()
         {
@@ -172,22 +154,6 @@ namespace dressify.Controllers
                     {
                         user.ProfilePic = null;
                         user.PublicId = null;
-                    }
-                    return Ok();
-                }
-                else
-                    return BadRequest("User do not have photo");
-            }
-            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId);
-            if (admin != null)
-            {
-                if (admin.ProfilePic != null)
-                {
-                    var res = await _unitOfWork.Admin.DeletePhoto(admin.PublicId);
-                    if (res == "ok")
-                    {
-                        admin.ProfilePic = null;
-                        admin.PublicId = null;
                     }
                     return Ok();
                 }

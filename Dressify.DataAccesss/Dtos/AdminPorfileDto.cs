@@ -16,7 +16,6 @@ namespace Dressify.DataAccess.Dtos
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-        [Required]
-        public string ProfilePic { get; set; }
+        public string? ProfilePic { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace dressify.Controllers
 
         [HttpPost("CreateAdmin")]
         [Authorize]
-        public async Task<IActionResult> CreateAdmin([FromBody] AddAdminDto dto)
+        public async Task<IActionResult> CreateAdmin(IFormFile Photo, [FromForm]AddAdminDto dto)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.SuperAdmin.FindAllAsync(u=>u.SuperAdminId==uId)==null)
@@ -39,6 +39,11 @@ namespace dressify.Controllers
             }
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            CreatePhotoDto photodto = await _unitOfWork.Admin.AddPhoto(Photo);
+            dto.PublicId = photodto.PublicId;
+            dto.ProfilePic = photodto.Url;
+
             var result = await _unitOfWork.Admin.CreateAdminAsync(dto);
             if (result.Message != "")
                 return BadRequest(result.Message);
@@ -80,6 +85,10 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
+            if (adminId == null)
+            {
+                return BadRequest("Enter an AdminID");
+            }
             var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == adminId);
             if (admin == null)
             {
@@ -107,6 +116,10 @@ namespace dressify.Controllers
             {
                 return BadRequest(ModelState);
             }
+            if(adminPorfile.AdminId == null)
+            {
+                return BadRequest("Enter an AdminID");
+            }
             var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == adminPorfile.AdminId);
             if (admin == null)
             {
@@ -118,12 +131,36 @@ namespace dressify.Controllers
                     return BadRequest("Email is already registered!");
             }
             admin.AdminName = adminPorfile.AdminName;
-            admin.ProfilePic = adminPorfile.ProfilePic;
             admin.Email = adminPorfile.Email;
             _unitOfWork.Admin.Update(admin);
             _unitOfWork.Save();
             return Ok(adminPorfile);
         }
+
+        [HttpPut("ModifyAdminPhoto")]
+        public async Task<IActionResult> ModifyAdminPhoto(IFormFile photo , [FromHeader] string adminId)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.SuperAdmin.FindAllAsync(u => u.SuperAdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == adminId);
+            if (admin != null)
+            {
+                if (admin.ProfilePic != null)
+                {
+                    var res = await _unitOfWork.Admin.DeletePhoto(admin.PublicId);
+                }
+                CreatePhotoDto result = await _unitOfWork.Admin.AddPhoto(photo);
+                admin.PublicId = result.PublicId;
+                admin.ProfilePic = result.Url;
+                _unitOfWork.Admin.Update(admin);
+                return Ok(result);
+            }
+            return NotFound();
+        }
+
 
         [Authorize]
         [HttpGet("TestSUPerAdmin")]

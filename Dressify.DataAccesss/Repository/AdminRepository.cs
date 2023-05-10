@@ -45,6 +45,8 @@ namespace Dressify.DataAccess.Repository
                 PasswordSalt = passwordSalt,
                 Email = adminDto.Email,
                 ProfilePic=adminDto.ProfilePic,
+                PublicId = adminDto.PublicId,
+
             };
             await _context.Admins.AddAsync(admin);
             await _context.SaveChangesAsync();
