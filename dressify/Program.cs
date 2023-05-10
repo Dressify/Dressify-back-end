@@ -105,7 +105,7 @@ SeedDatabase();
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHangfireDashboard("/abcdefg", new DashboardOptions
+app.UseHangfireDashboard("/jgdiff", new DashboardOptions
 {
     Authorization = new[] { new HangfireAuthorizationFilter() }
 });

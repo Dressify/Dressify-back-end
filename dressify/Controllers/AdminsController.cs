@@ -21,6 +21,24 @@ namespace dressify.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        [HttpGet("ViewAdminProfile")]
+        [Authorize]
+        public async Task<IActionResult> ViewAdminProfile()
+        {
+            var Uid = _unitOfWork.getUID();
+            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == Uid);
+            if (admin==null)
+            {
+                return Unauthorized();
+            }
+            var adminProfile = new AdminPorfileDto()
+            {
+                AdminName = admin.AdminName,
+                ProfilePic=admin.ProfilePic,
+                Email=admin.Email,
+            };
+            return Ok(adminProfile);
+        }
         [HttpPut("CheckReport")]
         [Authorize]
         public async Task<IActionResult> CheckReport([FromQuery]int reportId)
