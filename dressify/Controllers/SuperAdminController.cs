@@ -43,8 +43,31 @@ namespace dressify.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetAllAdmins")]
+        [Authorize]
+        public async Task<IActionResult> GetAllAdmins()
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.SuperAdmin.FindAllAsync(u => u.SuperAdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            var admins = await _unitOfWork.Admin.GetAllAsync();
 
-        
+            if (!admins.Any())
+            {
+                return NoContent();
+            }
+
+            var adminsDtos = admins.Select(admin => new AllAdminsDto
+            {
+                AdminId = admin.AdminId,
+                AdminName = admin.AdminName,
+                Email = admin.Email,
+                ProfilePic = admin.ProfilePic
+            }).ToList();
+            return Ok(adminsDtos);
+        }
 
         [Authorize]
         [HttpGet("TestSUPerAdmin")]
