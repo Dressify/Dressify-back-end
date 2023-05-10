@@ -30,7 +30,7 @@ namespace dressify.Controllers
             {
                 return NotFound("vendor does not exist");
             }
-            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId, new[] {"Product"});
+            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answear == null, new[] { "Product" });
             if (questions.Any())
             {
                 return NoContent();
