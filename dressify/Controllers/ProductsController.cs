@@ -17,11 +17,11 @@ namespace dressify.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpGet("GetProductspage")] 
-        public async Task<IActionResult> GetProductsPage([FromQuery]GetProductsDto model)
+        [HttpGet("GetProductspage")]
+        public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
         {
             var skip = (model.PageNumber - 1) * model.PageSize;
-            var products = await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,skip,model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,new[] { "Vendor", "ProductImages"});
+            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == false, skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category, new[] { "Vendor", "ProductImages" });
             return Ok(products);
         }
 
@@ -29,13 +29,13 @@ namespace dressify.Controllers
         [HttpGet("GetProductDetails")]
         public async Task<IActionResult> GetProduct(int id)
         {
-            
-            var product = await _unitOfWork.Product.FindAsync(p=> p.ProductId == id , new[] { "Vendor", "ProductImages", "Questions" }
-);              if(product == null)
-                    return NotFound();
+
+            var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == id, new[] { "Vendor", "ProductImages", "Questions" }
+); if (product == null)
+                return NotFound();
             if (product.IsSuspended)
             {
-                return BadRequest("product is suspended untill: " +product.SuspendedUntil);
+                return BadRequest("product is suspended untill: " + product.SuspendedUntil);
             }
             var Details = new ProductDetailsDto
             {
@@ -48,14 +48,18 @@ namespace dressify.Controllers
         [HttpGet("GetCategories")]
         public async Task<IActionResult> GetCategories()
         {
-            var categories = _unitOfWork.Product.GetAll().Select(p => p.Category).Distinct().ToList();
-
-            if (!categories.Any())
+            var distinctValues = _unitOfWork.Product.GetAll()
+              .Select(p => new { p.Category, p.SubCategory, p.Type }).Distinct().ToList();
+            if (!distinctValues.Any())
             {
                 return NoContent();
             }
+    
+            var categories = distinctValues.Select(p => p.Category).ToList();
+            var subCategories = distinctValues.Select(p => p.SubCategory).ToList();
+            var types = distinctValues.Select(p => p.Type).ToList();
 
-            return Ok(categories);
+            return Ok(new { categories, subCategories, types });
         }
 
         [HttpGet("SearchProducts")]
