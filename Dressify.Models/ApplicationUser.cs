@@ -27,7 +27,7 @@ namespace Dressify.Models
                 }
                 return age;
             }
-            return Age;
+            return null;
         }
         public List<WishList>? WishesLists { get; set; }
 

@@ -18,7 +18,7 @@ namespace dressify.Controllers
         }
 
         [HttpGet("GetProductspage")] 
-        public async Task<IActionResult> GetProductsPage(GetProductsDto model)
+        public async Task<IActionResult> GetProductsPage([FromQuery]GetProductsDto model)
         {
             var skip = (model.PageNumber - 1) * model.PageSize;
             var products = await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,skip,model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,new[] { "Vendor", "ProductImages"});
