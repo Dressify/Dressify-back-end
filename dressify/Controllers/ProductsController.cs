@@ -45,6 +45,20 @@ namespace dressify.Controllers
             return Ok(Details);
         }
 
+        [HttpGet("SearchProducts")]
+        public async Task<IActionResult> SearchProducts(string searchTerm)
+        {
+            var products = await _unitOfWork.Product.FindAllAsync(p =>
+                (p.ProductName.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm)))
+                && p.IsSuspended == false, new[] { "ProductImages" });
+
+            if (!products.Any())
+            {
+                return NotFound();
+            }
+            return Ok(products);
+        }
+
         [HttpGet("GetSuspendedProducts")]
         [Authorize]
         public async Task<IActionResult> GetSuspendedProducts()
