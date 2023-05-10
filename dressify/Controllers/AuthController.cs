@@ -154,6 +154,7 @@ namespace dressify.Controllers
                     {
                         user.ProfilePic = null;
                         user.PublicId = null;
+                        _unitOfWork.Save();
                     }
                     return Ok();
                 }
