@@ -45,6 +45,19 @@ namespace dressify.Controllers
             return Ok(Details);
         }
 
+        [HttpGet("GetCategories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = _unitOfWork.Product.GetAll().Select(p => p.Category).Distinct().ToList();
+
+            if (!categories.Any())
+            {
+                return NoContent();
+            }
+
+            return Ok(categories);
+        }
+
         [HttpGet("SearchProducts")]
         public async Task<IActionResult> SearchProducts(string searchTerm)
         {
