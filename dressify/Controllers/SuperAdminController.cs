@@ -69,6 +69,29 @@ namespace dressify.Controllers
             return Ok(adminsDtos);
         }
 
+        [HttpGet("GetAdminProfile")]
+        [Authorize]
+        public async Task<IActionResult> GetAdminProfile([FromHeader]string adminId)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.SuperAdmin.FindAllAsync(u => u.SuperAdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            var admin = await _unitOfWork.Admin.FindAsync(u => u.AdminId == adminId);
+            if (admin == null)
+            {
+                return NoContent();
+            }
+            var adminProfile = new AdminPorfileDto()
+            {
+                AdminName = admin.AdminName,
+                ProfilePic = admin.ProfilePic,
+                Email = admin.Email,
+            };
+            return Ok(adminProfile);
+        }
+
         [Authorize]
         [HttpGet("TestSUPerAdmin")]
         public async Task<IActionResult> Test()
