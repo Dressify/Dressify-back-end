@@ -1,4 +1,5 @@
 ﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Helpers;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Utility;
 using Microsoft.AspNetCore.Mvc;
@@ -163,6 +164,16 @@ namespace dressify.Controllers
             }
             return Unauthorized();
         }
+
+        //replace real email with your target mail
+        //[HttpGet("TestEmail")]
+        //public async Task<IActionResult> Test()
+        //{
+        //    var message = new Message(new string[] { "RealEmail@gmail.com"},"Test","<h1>nice</h1>");
+        //    _unitOfWork.SendEmail(message);
+        //    return Ok("done");
+        //}
+
 
     }
 }

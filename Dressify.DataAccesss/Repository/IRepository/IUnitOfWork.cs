@@ -1,4 +1,5 @@
 ﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Helpers;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         string getUID();
         Task<AuthDto> CreateJwtToken(AdminTokenRequestDto model);
         void Unsuspend();
+        void SendEmail(Message message);
 
     }
 }

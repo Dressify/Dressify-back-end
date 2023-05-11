@@ -16,6 +16,8 @@ using System.IdentityModel.Tokens.Jwt;
 using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
 using Dressify.Utility;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -27,15 +29,18 @@ namespace Dressify.DataAccess.Repository
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly EmailConfiguration _emailConfiguration;
 
 
-        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary, IHttpContextAccessor httpContextAccessor)
+
+        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IOptions<EmailConfiguration> emailConfiguration, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _userManager = userManager;
             _jwt = jwt.Value;
             _roleManager = roleManager;
             _cloudinaryConfig = cloudinary;
+            _emailConfiguration = emailConfiguration.Value;
 
             ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager, cloudinary);
             Product = new ProductRepository(_context);
@@ -84,6 +89,8 @@ namespace Dressify.DataAccess.Repository
         public string getUID()
         {
             var claimsIdentity = (ClaimsIdentity)_httpContextAccessor.HttpContext.User.Identity;
+            if (claimsIdentity == null)
+                return null;
             var uId = claimsIdentity.FindFirst("uid").Value;
             return uId;
         }
@@ -142,6 +149,45 @@ namespace Dressify.DataAccess.Repository
                 _context.Users.Update(vendor);
             }
              _context.SaveChanges();
+        }
+        public void SendEmail(Message message)
+        {
+            var emailMessage = CreateEmailMessage(message);
+            Send(emailMessage);
+        }
+
+        private MimeMessage CreateEmailMessage(Message message)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress("email", _emailConfiguration.From));
+            emailMessage.To.AddRange(message.To);
+            emailMessage.Subject = message.Subject;
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
+
+            return emailMessage;
+        }
+
+        private void Send(MimeMessage mailMessage)
+        {
+            using var client = new SmtpClient();
+            try
+            {
+                client.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.Port, true);
+                client.AuthenticationMechanisms.Remove("XOAUTH2");
+                client.Authenticate(_emailConfiguration.UserName, _emailConfiguration.Password);
+
+                client.Send(mailMessage);
+            }
+            catch
+            {
+                //log an error message or throw an exception or both.
+                throw;
+            }
+            finally
+            {
+                client.Disconnect(true);
+                client.Dispose();
+            }
         }
     }
 }
