@@ -70,8 +70,6 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
-            RecurringJob.AddOrUpdate(() => _unitOfWork.Unsuspend(), Cron.Daily(0));
-
             var report = await _unitOfWork.ProductReport.FindAsync(u => u.ReportId == reportDto.ReportId);
             if (report == null)
             {
