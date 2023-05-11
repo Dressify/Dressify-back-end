@@ -30,7 +30,7 @@ namespace dressify.Controllers
             {
                 return NotFound("vendor does not exist");
             }
-            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answear == null, new[] { "Product" });
+            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answer == null, new[] { "Product" });
             if (questions.Any())
             {
                 return NoContent();
@@ -39,7 +39,7 @@ namespace dressify.Controllers
         }
 
         [HttpPut("AnswearQuestion")]
-        public async Task<IActionResult> AnswearQuestion(AnswearDto obj)
+        public async Task<IActionResult> AnswearQuestion(AnswerDto obj)
         {
             var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
@@ -57,12 +57,12 @@ namespace dressify.Controllers
             {
                 return BadRequest("question does not exist");
             }
-            if (obj.Answear == null || obj.Answear == "")
+            if (obj.Answer == null || obj.Answer == "")
             {
                 return BadRequest("What's your Answear?!");
             }
 
-            question.Answear=obj.Answear;
+            question.Answer=obj.Answer;
             question.VendorId=user.Id;
 
             _unitOfWork.ProductQuestion.Update(question);

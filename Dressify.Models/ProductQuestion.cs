@@ -13,7 +13,7 @@ namespace Dressify.Models
         [Key]
         public int QuestionID { get; set; }
         public string Question { get; set; }
-        public string? Answear { get; set; }
+        public string? Answer { get; set; }
         public DateTime QuestionDate { get; set; }=DateTime.Now;
         public int ProductId { get; set; }
         [ForeignKey("ProductId")]
