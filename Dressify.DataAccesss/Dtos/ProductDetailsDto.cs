@@ -10,7 +10,8 @@ namespace Dressify.DataAccess.Dtos
     public class ProductDetailsDto
     {
         public Product Product { get; set; }
-        public int? quantity { get; set; }
+        public double AverageRate { get; set; }
+        public int? Quantity { get; set; }
 
     }
 }

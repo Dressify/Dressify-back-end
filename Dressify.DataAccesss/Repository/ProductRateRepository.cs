@@ -15,5 +15,14 @@ namespace Dressify.DataAccess.Repository
         {
             _context = context;
         }
+
+        public double CalculateAverageRate(IEnumerable<ProductRate> rates)
+        {
+            if(!rates.Any())
+                return 0;
+            var rateSum = rates.Where(r => r.Rate.HasValue).Sum(r => r.Rate.Value);
+            var count = rates.Count(r => r.Rate.HasValue);
+            return count == 0 ? 0 : (double)rateSum / count;
+        }
     }
 }

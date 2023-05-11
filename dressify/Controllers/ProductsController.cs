@@ -21,17 +21,26 @@ namespace dressify.Controllers
         public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
         {
             var skip = (model.PageNumber - 1) * model.PageSize;
-            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == false, skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category, new[] { "Vendor", "ProductImages" });
-            return Ok(products);
+            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == false,
+                skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,
+                new[] { "Vendor", "ProductImages", "ProductRates" });
+           
+            var productsWithAvgRates = products.Select(p => new
+            {
+                Product = p,
+                AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
+            }).ToList();
+            return Ok(productsWithAvgRates);
         }
 
 
         [HttpGet("GetProductDetails")]
-        public async Task<IActionResult> GetProduct(int id)
+        public async Task<IActionResult> GetProduct([FromQuery] int id)
         {
 
-            var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == id, new[] { "Vendor", "ProductImages", "Questions" }
-); if (product == null)
+            var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == id,
+                new[] { "Vendor", "ProductImages", "Questions" , "ProductRates" });
+            if (product == null)
                 return NotFound();
             if (product.IsSuspended)
             {
@@ -40,13 +49,14 @@ namespace dressify.Controllers
             var Details = new ProductDetailsDto
             {
                 Product = product,
-                quantity = 1,
+                AverageRate = _unitOfWork.ProductRate.CalculateAverageRate(product.ProductRates),
+                Quantity = 1,
             };
             return Ok(Details);
         }
 
         [HttpGet("GetProductReviews")]
-        public async Task<IActionResult> GetProductReviews(int id)
+        public async Task<IActionResult> GetProductReviews([FromQuery] int id)
         {
             var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == id); 
             if (product == null)
@@ -96,7 +106,7 @@ namespace dressify.Controllers
         }
 
         [HttpGet("SearchProducts")]
-        public async Task<IActionResult> SearchProducts(string searchTerm)
+        public async Task<IActionResult> SearchProducts([FromQuery] string searchTerm)
         {
             var products = await _unitOfWork.Product.FindAllAsync(p =>
                 (p.ProductName.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm)))

@@ -9,5 +9,7 @@ namespace Dressify.DataAccess.Repository.IRepository
 {
     public interface IProductRateRepository : IRepository<ProductRate>
     {
+        double CalculateAverageRate(IEnumerable<ProductRate> rates);
+
     }
 }
