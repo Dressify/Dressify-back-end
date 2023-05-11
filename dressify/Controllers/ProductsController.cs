@@ -45,6 +45,39 @@ namespace dressify.Controllers
             return Ok(Details);
         }
 
+        [HttpGet("GetProductReviews")]
+        public async Task<IActionResult> GetProductReviews(int id)
+        {
+            var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == id); 
+            if (product == null)
+                return NotFound();
+            var ratingList = await _unitOfWork.ProductRate.FindAllAsync(r => r.ProductId == id , new[] { "ApplicationUser" } );
+            var count = ratingList.Count();
+            decimal? sum=0;
+            var productRates = new ProductRatesDto() 
+            {
+                Count = count,
+            };    
+            var rates = new List<CustomerRateDto>();
+            
+            foreach(var r in ratingList)
+            {
+                var result = new CustomerRateDto()
+                {
+                    rate =  r.Rate,
+                    RateComment = r.RateComment,
+                    CustomerName =r.ApplicationUser.UserName,
+                };
+                sum += r.Rate;
+                rates.Add(result);
+            }
+            var ave = sum / productRates.Count;
+            productRates.average = ave;
+            productRates.customerRates = rates;
+            return Ok(productRates);
+        }
+
+
         [HttpGet("GetCategories")]
         public async Task<IActionResult> GetCategories()
         {
