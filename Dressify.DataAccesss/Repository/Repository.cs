@@ -34,7 +34,7 @@ namespace Dressify.DataAccess.Repository
             return _context.Set<T>().ToList();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(string[]? includes=null)
+        public async Task<IEnumerable<T>> GetAllAsync( string[]? includes = null)
         {
             IQueryable<T> query = _context.Set<T>();
 
@@ -44,7 +44,20 @@ namespace Dressify.DataAccess.Repository
 
             return await query.ToListAsync();
         }
+        public async Task<IEnumerable<T>> GetAllAsync(int? take = null, int? skip = null, string[]? includes = null)
+        {
+            IQueryable<T> query = _context.Set<T>();
+           
+            if (skip.HasValue)
+                query = query.Skip(skip.Value);
+            if (take.HasValue)
+                query = query.Take(take.Value);
+            if (includes != null)
+                foreach (var incluse in includes)
+                    query = query.Include(incluse);
 
+            return await query.ToListAsync();
+        }
         //Get specific element using ID
         public T GetById(int id)
         {
@@ -134,12 +147,10 @@ namespace Dressify.DataAccess.Repository
              string[] includes = null)
         {
             IQueryable<T> query = _context.Set<T>().Where(criteria);
-
-            if (take.HasValue)
-                query = query.Take(take.Value);
-
             if (skip.HasValue)
                 query = query.Skip(skip.Value);
+            if (take.HasValue)
+                query = query.Take(take.Value);
             if (includes != null)
                 foreach (var include in includes)
                     query = query.Include(include);
@@ -177,30 +188,32 @@ namespace Dressify.DataAccess.Repository
 
             return query.ToList();
         }
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? take, int? skip,
-            Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null)
-        {
-            IQueryable<T> query = _context.Set<T>().Where(criteria);
 
-            if (take.HasValue)
-                query = query.Take(take.Value);
+        //public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? take, int? skip,
+        //    Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null)
+        //{
+        //    IQueryable<T> query = _context.Set<T>().Where(criteria);
 
-            if (skip.HasValue)
-                query = query.Skip(skip.Value);
+        //    if (take.HasValue)
+        //        query = query.Take(take.Value);
 
-            if (orderBy != null)
-            {
-                if (orderByDirection == SD.Ascending)
-                    query = query.OrderBy(orderBy);
-                else
-                    query = query.OrderByDescending(orderBy);
-            }
-            if (includes != null)
-                foreach (var include in includes)
-                    query = query.Include(include);
+        //    if (skip.HasValue)
+        //        query = query.Skip(skip.Value);
 
-            return await query.ToListAsync();
-        }
+        //    if (orderBy != null)
+        //    {
+        //        if (orderByDirection == SD.Ascending)
+        //            query = query.OrderBy(orderBy);
+        //        else
+        //            query = query.OrderByDescending(orderBy);
+        //    }
+        //    if (includes != null)
+        //        foreach (var include in includes)
+        //            query = query.Include(include);
+
+        //    return await query.ToListAsync();
+        //}
+       
         public T Add(T entity)
         {
             _context.Set<T>().Add(entity);

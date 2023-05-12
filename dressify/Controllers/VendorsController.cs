@@ -5,6 +5,7 @@ using Dressify.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing.Printing;
 
 namespace dressify.Controllers
 {
@@ -22,7 +23,7 @@ namespace dressify.Controllers
 
         [HttpGet("GetAllQuestions")]
         [Authorize(Roles = SD.Role_Vendor)]
-        public async Task<ActionResult<IEnumerable<ProductQuestion>>> GetAllQuestions()
+        public async Task<ActionResult<IEnumerable<ProductQuestion>>> GetAllQuestions([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
             var vendor = await _unitOfWork.ApplicationUser.GetUserAsync(uId);
@@ -30,8 +31,10 @@ namespace dressify.Controllers
             {
                 return NotFound("vendor does not exist");
             }
-            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answer == null, new[] { "Product" });
-            if (questions.Any())
+            var skip = (PageNumber - 1) * PageSize;
+
+            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answer == null,skip,PageSize, new[] { "Product" });
+            if (!questions.Any())
             {
                 return NoContent();
             }
@@ -111,25 +114,27 @@ namespace dressify.Controllers
 
         [HttpGet("GetSuspendedVendor")]
         [Authorize]
-        public async Task<IActionResult> GetSuspendedVendor()
+        public async Task<IActionResult> GetSuspendedVendor([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
             {
                 return Unauthorized();
             }
-            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true);
+            var skip = (PageNumber - 1) * PageSize;
+            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
             return Ok(vendors);
         }
 
         [HttpGet("GetPendingOrders")]
-        public async Task<IActionResult> GetPendingOrders()
+        public async Task<IActionResult> GetPendingOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
             var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
             if (vendor.IsSuspended == true)
                 return BadRequest("Vendor is Suspended");
-            var PendingOrders = _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId );
+            var skip = (PageNumber - 1) * PageSize;
+            var PendingOrders = _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize );
             return Ok(PendingOrders);
         }
         [HttpPut("ConfirmtPendingOrders")]
@@ -164,17 +169,28 @@ namespace dressify.Controllers
             return Ok();
         }
         [HttpGet("ViewOwnProducts")]
-        public async Task<IActionResult> ViewOwnProducts()
+        public async Task<IActionResult> ViewOwnProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var vendorId = _unitOfWork.getUID();
-            var vendorProducts = await _unitOfWork.Product.FindAllAsync(p => p.VendorId == vendorId , new[] { "ProductImages" });
+            var skip = (PageNumber - 1) * PageSize;
+            var vendorProducts = await _unitOfWork.Product.FindAllAsync(p => p.VendorId == vendorId, skip, PageSize, new[] { "ProductImages" });
             if (vendorProducts == null)
                 return BadRequest("You dont have any products");
             return Ok(vendorProducts);
         }
 
 
-
+        [HttpPost("AddQuantity")]
+        [Authorize]
+        public async Task<IActionResult> AddQuantity([FromQuery]int productId, [FromQuery]int quantity)
+        {
+            var vendorId = _unitOfWork.getUID();
+            var product = await _unitOfWork.Product.FindAsync(u => u.ProductId == productId);
+            product.Quantity += quantity;
+            _unitOfWork.Product.Update(product);
+            _unitOfWork.Save();
+            return Ok(product);
+        }
 
     }
 }

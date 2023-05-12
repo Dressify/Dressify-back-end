@@ -15,7 +15,8 @@ namespace Dressify.DataAccess.Repository.IRepository
         T GetById(int id);
         Task<T> GetByIdAsync(int id);
         IEnumerable<T> GetAll();
-        Task<IEnumerable<T>> GetAllAsync(string[]? includes = null);
+        Task<IEnumerable<T>> GetAllAsync( string[]? includes = null);
+        Task<IEnumerable<T>> GetAllAsync(int? take=null, int? skip=null ,string[]? includes = null);
         T Find(Expression<Func<T, bool>> criteria, string[] includes = null);
         Task<T> FindAsync(Expression<Func<T, bool>> criteria, string[] includes = null);
         IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, string[] includes = null);
@@ -26,8 +27,8 @@ namespace Dressify.DataAccess.Repository.IRepository
         ///--------------------------------------------------------------------------
         IEnumerable<T> FindAll(Expression<Func<T, bool>> criteria, int? take, int? skip,
            Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null);
-        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? skip, int? take,
-           Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null);
+        //Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> criteria, int? skip, int? take,
+        //   Expression<Func<T, object>> orderBy = null, string orderByDirection = SD.Ascending, string[] includes = null);
         T Add(T entity);
         Task<T> AddAsync(T entity);
         IEnumerable<T> AddRange(IEnumerable<T> entities);

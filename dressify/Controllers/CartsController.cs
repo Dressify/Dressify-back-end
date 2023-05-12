@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
+using System.Drawing.Printing;
 using System.Security.Claims;
 
 namespace dressify.Controllers
@@ -24,10 +25,11 @@ namespace dressify.Controllers
 
         [Authorize]
         [HttpGet("GetCustomerCart")]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAsync([FromQuery] int? PageNumber,[FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
-            var result = await _unitOfWork.ShoppingCart.FindAllAsync(C => C.CustomerId == uId);
+            var skip = (PageNumber - 1) * PageSize;
+            var result = await _unitOfWork.ShoppingCart.FindAllAsync(C => C.CustomerId == uId,skip, PageSize);
             if (result.Count() == 0)
                 return BadRequest("There are no products in the Cart ");
 

@@ -11,11 +11,11 @@ namespace Dressify.DataAccess.Repository.IRepository
 {
     public interface IProductRepository : IRepository<Product>
     {
-        Task<List<Product>> GetProductsAsync(int? reportCountThreshold);
+        Task<List<Product>> GetProductsAsync(int? skip, int? take, int? reportCountThreshold);
         IEnumerable<Product> FindAll(Expression<Func<Product, bool>> criteria, int? take, int? skip,
          double? minPrice, double? maxPrice, string? gender, string? category,
          string[] includes = null);
-        Task<IEnumerable<Product>> FindAllAsync(Expression<Func<Product, bool>> criteria, int? skip, int? take,
+        Task<IEnumerable<Product>> FindAllProductAsync(Expression<Func<Product, bool>> criteria, int? skip, int? take,
          double? minPrice, double? maxPrice, string? gender, string? category,
          string[] includes = null);
     }

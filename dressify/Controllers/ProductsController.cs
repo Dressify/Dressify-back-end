@@ -21,7 +21,7 @@ namespace dressify.Controllers
         public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
         {
             var skip = (model.PageNumber - 1) * model.PageSize;
-            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == false,
+            var products = await _unitOfWork.Product.FindAllProductAsync(u => u.IsSuspended == false,
                 skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,
                 new[] { "Vendor", "ProductImages", "ProductRates" });
            
@@ -121,14 +121,15 @@ namespace dressify.Controllers
 
         [HttpGet("GetSuspendedProducts")]
         [Authorize]
-        public async Task<IActionResult> GetSuspendedProducts()
+        public async Task<IActionResult> GetSuspendedProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
             {
                 return Unauthorized();
             }
-            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == true);
+            var skip = (PageNumber - 1) * PageSize;
+            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
             return Ok(products);
         }
 

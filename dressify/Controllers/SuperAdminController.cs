@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Common;
+using System.Drawing.Printing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -58,14 +59,16 @@ namespace dressify.Controllers
 
         [HttpGet("GetAllAdmins")]
         [Authorize]
-        public async Task<IActionResult> GetAllAdmins()
+        public async Task<IActionResult> GetAllAdmins([FromQuery] int? PageNumber,[FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.SuperAdmin.FindAllAsync(u => u.SuperAdminId == uId) == null)
             {
                 return Unauthorized();
             }
-            var admins = await _unitOfWork.Admin.GetAllAsync();
+            var skip = (PageNumber - 1) * PageSize;
+
+            var admins = await _unitOfWork.Admin.GetAllAsync(PageSize,skip);
 
             if (!admins.Any())
             {

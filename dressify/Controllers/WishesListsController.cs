@@ -20,17 +20,25 @@ namespace dressify.Controllers
 
 
         [HttpGet("GetCustomerWishList")]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAsync([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var result = await _unitOfWork.WishList.FindAllAsync(C=> C.CustomerId == _unitOfWork.getUID());
-            if(result.Count()==0)
+            if(!result.Any())
                 return Ok("There are no products in the whish list ");
-
+            var skip = (PageNumber - 1) * PageSize;
             List<Product> productList = new List<Product>();
             foreach (var item in result)
             {
                var product= await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId&& p.IsSuspended==false, new[] { "ProductImages" });
                 productList.Add(product);
+            }
+            if (skip.HasValue)
+            {
+                productList.Skip(skip.Value);
+            }
+            if (PageSize.HasValue)
+            {
+                productList.Take(PageSize.Value);
             }
             return Ok(productList);
         }

@@ -20,7 +20,7 @@ namespace Dressify.DataAccess.Repository
             _context = context;
         }
 
-        public async Task<List<Product>> GetProductsAsync(int? reportCountThreshold = 10)
+        public async Task<List<Product>> GetProductsAsync(int? skip, int? take, int? reportCountThreshold)
         {
             reportCountThreshold ??= 10; // if reportCountThreshold is null, set its value to 10
 
@@ -29,7 +29,10 @@ namespace Dressify.DataAccess.Repository
                 && p.Reports.Any(pr => pr.ReportStatus == true)
                 && p.IsSuspended == false)
                 .ToListAsync();
-
+            if(skip.HasValue&& take.HasValue)
+            {
+                products.Skip(skip.Value).Take(take.Value);
+            }
             return products;
         }
         public IEnumerable<Product> FindAll(Expression<Func<Product, bool>> criteria, int? skip, int? take, double? minPrice, double? maxPrice, string? gender, string? category, string[] includes = null)
@@ -66,7 +69,7 @@ namespace Dressify.DataAccess.Repository
 
             return query.ToList();
         }
-        public async Task<IEnumerable<Product>> FindAllAsync(Expression<Func<Product, bool>> criteria, int? skip, int? take, double? minPrice, double? maxPrice, string? gender, string? category, string[] includes = null)
+        public async Task<IEnumerable<Product>> FindAllProductAsync(Expression<Func<Product, bool>> criteria, int? skip, int? take, double? minPrice, double? maxPrice, string? gender, string? category, string[] includes = null)
         {
             IQueryable<Product> query = _context.Set<Product>().Where(criteria);
             if (minPrice.HasValue)
@@ -88,11 +91,11 @@ namespace Dressify.DataAccess.Repository
             {
                 query = query.Where(p => p.Category == category);
             }
-            if (take.HasValue)
-                query = query.Take(take.Value);
-
+           
             if (skip.HasValue)
                 query = query.Skip(skip.Value);
+            if (take.HasValue)
+                query = query.Take(take.Value);
             if (includes != null)
                 foreach (var include in includes)
                     query = query.Include(include);
