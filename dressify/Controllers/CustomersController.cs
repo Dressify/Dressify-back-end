@@ -277,6 +277,19 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
+
+
+        [HttpDelete("DeleteCustomerCart")]
+        public async Task<IActionResult> Clear()
+        {
+            var uId = _unitOfWork.getUID();
+            var cart = await _unitOfWork.ShoppingCart.FindAllAsync(c => c.CustomerId == uId);
+            if(cart == null)
+                return BadRequest("Customer Don't have any products");
+            _unitOfWork.ShoppingCart.DeleteRange(cart);
+            _unitOfWork.Save();
+            return Ok();
+        }
     }
 
 }
