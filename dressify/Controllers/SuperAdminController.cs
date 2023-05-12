@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NuGet.Common;
 using System.IdentityModel.Tokens.Jwt;
@@ -33,12 +34,17 @@ namespace dressify.Controllers
         public async Task<IActionResult> CreateAdmin(IFormFile Photo, [FromForm]AddAdminDto dto)
         {
             var uId = _unitOfWork.getUID();
-            if (await _unitOfWork.SuperAdmin.FindAllAsync(u=>u.SuperAdminId==uId)==null)
-            {
+            if (await _unitOfWork.SuperAdmin.FindAllAsync(u => u.SuperAdminId == uId) == null)
                 return Unauthorized();
-            }
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            if (await _unitOfWork.Admin.FindAsync(u => u.Email == dto.Email) is not null)
+                return BadRequest("Email is already registered");
+
+            if (await _unitOfWork.Admin.FindAsync(u => u.AdminName == dto.AdminName) is not null)
+                return BadRequest("Username is already registered!");
 
             CreatePhotoDto photodto = await _unitOfWork.Admin.AddPhoto(Photo);
             dto.PublicId = photodto.PublicId;
@@ -130,6 +136,11 @@ namespace dressify.Controllers
                 if (await _unitOfWork.Admin.FindAsync(u=>u.Email== adminPorfile.Email) != null)
                     return BadRequest("Email is already registered!");
             }
+            if (admin.AdminName != adminPorfile.AdminName)
+            {
+                if (await _unitOfWork.Admin.FindAsync(u => u.AdminName == adminPorfile.AdminName) != null)
+                    return BadRequest("Admin Name is already registered!");
+            }
             admin.AdminName = adminPorfile.AdminName;
             admin.Email = adminPorfile.Email;
             _unitOfWork.Admin.Update(admin);
@@ -161,13 +172,5 @@ namespace dressify.Controllers
             return NotFound();
         }
 
-
-        [Authorize]
-        [HttpGet("TestSUPerAdmin")]
-        public async Task<IActionResult> Test()
-        {
-            var uId = _unitOfWork.getUID();
-            return Ok("niceeeeeeeeee");
-        }
     }
 }

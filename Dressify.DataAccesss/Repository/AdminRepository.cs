@@ -30,12 +30,6 @@ namespace Dressify.DataAccess.Repository
 
         public async Task<AuthDto> CreateAdminAsync(AddAdminDto adminDto)
         {
-            if (await _context.Admins.FirstOrDefaultAsync(u => u.Email == adminDto.Email) is not null)
-                return new AuthDto { Message = "Email is already registered!" };
-
-            if (await _context.Admins.FirstOrDefaultAsync(u => u.AdminName == adminDto.AdminName) is not null)
-                return new AuthDto { Message = "Username is already registered!" };
-
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(adminDto.Password, out passwordHash, out passwordSalt);
             var admin = new Admin
