@@ -86,6 +86,7 @@ namespace dressify.Controllers
                 Fname = user.FName,
                 Lname = user.LName,
                 Address = user.Address,
+                Email = user.Email,
                 detailsList = new List<SummaryDetailsListDto>()
         };
             foreach (var item in ListCart)

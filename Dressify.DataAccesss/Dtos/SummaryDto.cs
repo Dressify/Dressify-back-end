@@ -13,6 +13,7 @@ namespace Dressify.DataAccess.Dtos
         public string? Lname { get; set; }
         public string? Address { get; set; }
         public string? Phone { get; set; }
+        public string? Email { get; set; }
         public List<SummaryDetailsListDto> detailsList { get; set; }
     }
 }
