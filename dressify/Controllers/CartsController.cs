@@ -39,8 +39,7 @@ namespace dressify.Controllers
             var count = await _unitOfWork.ShoppingCart.CountAsync();
 
             if (!result.Any())
-                return NoContent();
-
+                return BadRequest("There are no products in the Cart ");
             List<CartDto> cart = new List<CartDto>();
             foreach (var item in result)
             {

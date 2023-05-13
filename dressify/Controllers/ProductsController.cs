@@ -50,7 +50,7 @@ namespace dressify.Controllers
                 return NotFound();
             if (product.IsSuspended)
             {
-                return BadRequest("product is suspended untill: " + product.SuspendedUntil);
+                return BadRequest("product is suspended untill: " + product.SuspendedUntil.ToString());
             }
             var Details = new ProductDetailsDto
             {
