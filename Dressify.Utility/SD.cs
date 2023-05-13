@@ -41,6 +41,9 @@ namespace Dressify.Utility
         public const string Action_SuspendProduct = "suspendProduct";
         public const string Action_SuspendVendor = "suspendVendor";
 
+        //Sales Photo
+        public const string ImgUrl = "https://res.cloudinary.com/ddsavy6nu/image/upload/v1684009222/xgm4z70exhppblassiaf_g38jon.png";
+        public const string publicId = "xgm4z70exhppblassiaf_g38jon";
 
     }
 }
