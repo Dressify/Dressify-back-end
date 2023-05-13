@@ -58,7 +58,9 @@ namespace dressify.Controllers
                         quantity = item.Quantity,
                     };
                     if (product.Sale > 0) {
-                        obj.price = (decimal?)(item.Quantity * product.Price * (product.Sale / 100)); }
+                        var discount = (decimal?)(item.Quantity * product.Price * (product.Sale / 100)); 
+                        obj.price = (decimal?)(item.Quantity * product.Price) - discount;
+                    }
                     else {
                         obj.price = (decimal?)(item.Quantity * product.Price);
                     } 
