@@ -34,9 +34,10 @@ namespace dressify.Controllers
             var productsWithAvgRates = products.Select(p => new
             {
                 Product = p,
+                Count = count,
                 AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
             }).ToList();
-            return Ok(new { Count = count, ProductsWithAvgRates = productsWithAvgRates });
+            return Ok(productsWithAvgRates);
         }
 
 
