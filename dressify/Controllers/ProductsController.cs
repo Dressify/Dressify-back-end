@@ -75,9 +75,15 @@ namespace dressify.Controllers
             {
                 Count = count,
             };    
+
             var rates = new List<CustomerRateDto>();
-            
-            foreach(var r in ratingList)
+            if (count == 0)
+            {
+                productRates.customerRates = rates;
+                productRates.average = 0;
+                return Ok(productRates);
+            }
+            foreach (var r in ratingList)
             {
                 var result = new CustomerRateDto()
                 {
