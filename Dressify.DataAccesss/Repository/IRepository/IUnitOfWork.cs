@@ -38,6 +38,9 @@ namespace Dressify.DataAccess.Repository.IRepository
         void Unsuspend();
         void SendEmail(Message message);
         decimal CalculatePrice(int quantity, float price, float? sale = 0);
+        public void ShipOrders();
+        public void DeliverOrders();
+        public void ConfirmOredrs();
 
     }
 }

@@ -85,8 +85,9 @@ namespace dressify.Controllers
                 Phone = user.PhoneNumber,
                 Fname = user.FName,
                 Lname = user.LName,
-                Address = user.Address
-            };
+                Address = user.Address,
+                detailsList = new List<SummaryDetailsListDto>()
+        };
             foreach (var item in ListCart)
             {
                 var productDetail = new SummaryDetailsListDto()

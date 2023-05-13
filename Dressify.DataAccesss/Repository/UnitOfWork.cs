@@ -151,6 +151,57 @@ namespace Dressify.DataAccess.Repository
             }
              _context.SaveChanges();
         }
+        public void ConfirmOredrs()
+        {   //orderDetails
+            var now = DateTime.UtcNow;
+            var PendingProducts = _context.OrdersDetails.Where(p => p.Status == SD.Status_Pending &&p.Date.AddMinutes(1)<= now );
+            foreach (var product in PendingProducts)
+            {
+                product.Status = SD.Status_Confirmed;
+            }
+            _context.OrdersDetails.UpdateRange(PendingProducts);
+
+            //Orders
+            var PendingOrders = _context.Orders.Where(o => o.OrderStatus == SD.Status_Pending);
+            foreach (var order in PendingOrders)
+            {
+                var OrderDetails = _context.OrdersDetails.Where(d => d.OrderId == order.OrderId);
+                bool isConfirmed = OrderDetails.All(r => r.Status == SD.Status_Confirmed);
+                if(isConfirmed)
+                {
+                    order.OrderStatus = SD.Status_Confirmed;
+                    order.Date = DateTime.UtcNow;
+                    _context.Orders.Update(order);
+                }
+            }
+            _context.SaveChanges();
+        }
+        public void ShipOrders()
+        {
+            var now = DateTime.UtcNow;
+            var confirmedProducts = _context.Orders.Where(o => o.OrderStatus == SD.Status_Confirmed && o.Date.Value.AddMinutes(10)<= now);
+            foreach (var order in confirmedProducts)
+            {
+                order.OrderStatus = SD.Status_Shipped;
+                order.Date = DateTime.UtcNow;
+            }
+            _context.Orders.UpdateRange(confirmedProducts);
+            _context.SaveChanges();
+        }
+        public void DeliverOrders()
+        {
+            var now = DateTime.UtcNow;
+            var ShipedOrders = _context.Orders.Where(o => o.OrderStatus == SD.Status_Shipped&& o.Date.Value.AddMinutes(10) <= now);
+            foreach (var order in ShipedOrders)
+            {
+                order.OrderStatus = SD.Status_Delivered;
+                order.Date = DateTime.UtcNow;
+            }
+            _context.Orders.UpdateRange(ShipedOrders);
+            _context.SaveChanges();
+        }
+
+
         public void SendEmail(Message message)
         {
             var emailMessage = CreateEmailMessage(message);

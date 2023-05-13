@@ -23,6 +23,8 @@ namespace Dressify.Utility
         public const string Status_Pending = "Pending";
         public const string Status_Confirmed = "Confirmed";
         public const string Status_Delivered = "Delivered";
+        public const string Status_Shipped = "Shipped";
+
         //only for Order 
         public const string Status_Cancelled = "Cancelled";
 
