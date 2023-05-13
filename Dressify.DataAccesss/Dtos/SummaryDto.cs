@@ -9,7 +9,10 @@ namespace Dressify.DataAccess.Dtos
 {
     public class SummaryDto
     {
-        public Order Order { get; set; }
-        public IEnumerable<ShoppingCart> ListCart { get; set; }
+        public string? Fname { get; set; }
+        public string? Lname { get; set; }
+        public string? Address { get; set; }
+        public string? Phone { get; set; }
+        public List<SummaryDetailsListDto> detailsList { get; set; }
     }
 }

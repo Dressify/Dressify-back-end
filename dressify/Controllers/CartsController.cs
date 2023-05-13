@@ -56,14 +56,9 @@ namespace dressify.Controllers
                         Product = product,
                         IsRent = item.IsRent,
                         quantity = item.Quantity,
+                        price = _unitOfWork.CalculatePrice(item.Quantity.Value, product.Price,product.Sale)
                     };
-                    if (product.Sale > 0) {
-                        var discount = (decimal?)(item.Quantity * product.Price * (product.Sale / 100)); 
-                        obj.price = (decimal?)(item.Quantity * product.Price) - discount;
-                    }
-                    else {
-                        obj.price = (decimal?)(item.Quantity * product.Price);
-                    } 
+                    
                     cart.Add(obj);
                 };
             }
@@ -79,79 +74,87 @@ namespace dressify.Controllers
         public async Task<IActionResult> GetSummary()
         {
             var uId = _unitOfWork.getUID();
-            var Summary = new SummaryDto()
-            {
-                ListCart = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" }),
-                Order = new()
-            };
-            if (Summary.ListCart == null)
+            var ListCart = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
+
+            if (ListCart == null)
                 return BadRequest("No Items in Customer Cart");
-            Summary.Order.Customer = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
-            Summary.Order.Phone = Summary.Order.Customer.PhoneNumber;
-            Summary.Order.Address = Summary.Order.Customer.Address;
-            foreach (var item in Summary.ListCart)
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
+
+            var summary = new SummaryDto()
             {
-                item.Price = (double)(item.Quantity * item.Product.Price);
-                Summary.Order.TotalPrice += item.Price;
+                Phone = user.PhoneNumber,
+                Fname = user.FName,
+                Lname = user.LName,
+                Address = user.Address
+            };
+            foreach (var item in ListCart)
+            {
+                var productDetail = new SummaryDetailsListDto()
+                {
+                    IsRent = item.IsRent,
+                    Quantity = item.Quantity.Value,
+                    ProductName = item.Product.ProductName,
+                    Price = _unitOfWork.CalculatePrice(item.Quantity.Value, item.Product.Price, item.Product.Sale),
+                };
+               summary.detailsList.Add(productDetail);
             }
-            return Ok(Summary);
+            return Ok(summary);
         }
 
-        [HttpPost("Payment")]
-        public async Task<IActionResult> payment(SummaryDto Summary)
-        {
-            var uId = _unitOfWork.getUID();
-            Summary.ListCart = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
-            Summary.Order.CustomerId = uId;
+        //[HttpPost("Payment")]
+        //public async Task<IActionResult> payment(SummaryDto Summary)
+        //{
+        //    var uId = _unitOfWork.getUID();
+        //    Summary.ListCart = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
+        //    Summary.Order.CustomerId = uId;
+        //    foreach (var cart in Summary.ListCart)
+        //    {
+        //       var product =await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId); 
+        //        OrderDetails orderDetail = new()
+        //        {
+        //            ProductId = cart.ProductId,
+        //            Price = cart.Price,
+        //            OrderId = Summary.Order.OrderId,
+        //            Quantity = cart.Quantity,
+        //            VendorId = product.VendorId,
+        //        };
+        //        _unitOfWork.OrderDetails.Add(orderDetail);
+        //        _unitOfWork.Save();
+        //    }
+        //    if (Summary.Order.payementMethod == SD.PaymentMethod_Credit)
+        //    {
+        //        Summary.Order.payementMethod = SD.PaymentMethod_Credit;
+        //        // Stripe
+        //        var paymentIntentService = new PaymentIntentService();
+        //        var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
+        //        {
+        //            Amount = (long?)(Summary.Order.TotalPrice * 100),
+        //            Currency = "usd",
+        //            AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+        //            {
+        //                Enabled = true,
+        //            },
+        //        });
+        //        var clientSecret = paymentIntent.ClientSecret;
 
-            foreach (var cart in Summary.ListCart)
-            {
-               var product =await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId); 
-                OrderDetails orderDetail = new()
-                {
-                    ProductId = cart.ProductId,
-                    Price = cart.Price,
-                    OrderId = Summary.Order.OrderId,
-                    Quantity = cart.Quantity,
-                    VendorId = product.VendorId,
-                };
-                _unitOfWork.OrderDetails.Add(orderDetail);
-                _unitOfWork.Save();
-            }
-            if (Summary.Order.payementMethod == SD.PaymentMethod_Credit)
-            {
-                Summary.Order.payementMethod = SD.PaymentMethod_Credit;
-                // Stripe
-                var paymentIntentService = new PaymentIntentService();
-                var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
-                {
-                    Amount = (long?)(Summary.Order.TotalPrice * 100),
-                    Currency = "usd",
-                    AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
-                    {
-                        Enabled = true,
-                    },
-                });
-                var clientSecret = paymentIntent.ClientSecret;
+        //        var bill = new PayBill()
+        //        {
+        //            PaymentIntentId = paymentIntent.Id,
+        //            Status = paymentIntent.Status,
+        //        };
+        //        _unitOfWork.Order.Add(Summary.Order);
+        //        _unitOfWork.PayBill.Add(bill);
+        //        _unitOfWork.Save();
+        //        return Ok(clientSecret);
+        //    }
+        //    Summary.Order.PaymentDate = DateTime.Now;
+        //    Summary.Order.payementMethod = SD.PaymentMethod_Cash;
+        //    Summary.Order.OrderStatus = SD.Status_Confirmed;
+        //    _unitOfWork.Order.Add(Summary.Order);
+        //    _unitOfWork.Save();
 
-                var bill = new PayBill()
-                {
-                    PaymentIntentId = paymentIntent.Id,
-                    Status = paymentIntent.Status,
-                };
-                _unitOfWork.Order.Add(Summary.Order);
-                _unitOfWork.PayBill.Add(bill);
-                _unitOfWork.Save();
-                return Ok(clientSecret);
-            }
-            Summary.Order.PaymentDate = DateTime.Now;
-            Summary.Order.payementMethod = SD.PaymentMethod_Cash;
-            Summary.Order.OrderStatus = SD.Status_Confirmed;
-            _unitOfWork.Order.Add(Summary.Order);
-            _unitOfWork.Save();
-
-            return Ok();
-        }
+        //    return Ok();
+        //}
 
 
         [HttpPut("IncrementQuantity")]

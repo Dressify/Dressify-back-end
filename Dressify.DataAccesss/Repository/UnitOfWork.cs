@@ -18,6 +18,7 @@ using CloudinaryDotNet;
 using Dressify.Utility;
 using MimeKit;
 using MailKit.Net.Smtp;
+using Stripe;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -187,6 +188,21 @@ namespace Dressify.DataAccess.Repository
             {
                 client.Disconnect(true);
                 client.Dispose();
+            }
+        }
+        public decimal CalculatePrice(int quantity, float price, float? sale = 0)
+        {
+            if (sale > 0)
+            {
+                var discount = (decimal?)(quantity * price * (sale / 100));
+                var res = (decimal?)(quantity * price) - discount;
+                return res.Value;
+
+            }
+            else
+            {
+                var res = (decimal?)(quantity * price);
+                return res.Value;
             }
         }
     }

@@ -37,6 +37,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         Task<AuthDto> CreateJwtToken(AdminTokenRequestDto model);
         void Unsuspend();
         void SendEmail(Message message);
+        decimal CalculatePrice(int quantity, float price, float? sale = 0);
 
     }
 }
