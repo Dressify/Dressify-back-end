@@ -28,16 +28,29 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
 
-            var products = await _unitOfWork.Product.GetProductsAsync(skip,PageSize,reportCountThreshold);
+            var products = await _unitOfWork.Product.GetProductsAsync(reportCountThreshold);
+            var count = products.Count();
 
-            if (products.Count == 0)
+            if (skip.HasValue)
+            {
+                products.Skip(skip.Value);
+            }
+            if(PageSize.HasValue)
+            {
+                products.Take(PageSize.Value);
+            }
+            if (!products.Any())
             {
                 return NoContent();
             }
 
-            return Ok(products);
+            return Ok(new { Count = count, Products = products });
         }
 
     }

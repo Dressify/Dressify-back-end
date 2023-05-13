@@ -31,14 +31,20 @@ namespace dressify.Controllers
             {
                 return NotFound("vendor does not exist");
             }
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
 
             var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answer == null,skip,PageSize, new[] { "Product" });
+            var count = await _unitOfWork.ProductQuestion.CountAsync(u => u.VendorId == uId && u.Answer == null);
+
             if (!questions.Any())
             {
                 return NoContent();
             }
-            return Ok(questions);
+            return Ok(new { Count = count, Questions = questions });
         }
 
         [HttpPut("AnswearQuestion")]
@@ -121,9 +127,14 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
             var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
-            return Ok(vendors);
+            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.IsSuspended == true);
+            return Ok(new { Count = count, Vendors = vendors });
         }
 
         [HttpGet("GetPendingOrders")]
@@ -133,9 +144,14 @@ namespace dressify.Controllers
             var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
             if (vendor.IsSuspended == true)
                 return BadRequest("Vendor is Suspended");
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
-            var PendingOrders = _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize );
-            return Ok(PendingOrders);
+            var pendingOrders = _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize );
+            var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId);
+            return Ok(new { Count = count, PendingOrders = pendingOrders });
         }
         [HttpPut("ConfirmtPendingOrders")]
         public async Task<IActionResult> ConfirmtPendingOrders(int orderId , int productId)
@@ -172,11 +188,16 @@ namespace dressify.Controllers
         public async Task<IActionResult> ViewOwnProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var vendorId = _unitOfWork.getUID();
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
             var vendorProducts = await _unitOfWork.Product.FindAllAsync(p => p.VendorId == vendorId, skip, PageSize, new[] { "ProductImages" });
-            if (vendorProducts == null)
-                return BadRequest("You dont have any products");
-            return Ok(vendorProducts);
+            var count = await _unitOfWork.Product.CountAsync(p => p.VendorId == vendorId);
+            if (!vendorProducts.Any())
+                return NoContent();
+            return Ok(new { Count = count, VendorProducts = vendorProducts });
         }
 
 

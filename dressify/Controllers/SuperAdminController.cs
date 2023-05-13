@@ -66,10 +66,16 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
+
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+
             var skip = (PageNumber - 1) * PageSize;
 
             var admins = await _unitOfWork.Admin.GetAllAsync(PageSize,skip);
-
+            var count = await _unitOfWork.Admin.CountAsync();
             if (!admins.Any())
             {
                 return NoContent();
@@ -82,7 +88,7 @@ namespace dressify.Controllers
                 Email = admin.Email,
                 ProfilePic = admin.ProfilePic
             }).ToList();
-            return Ok(adminsDtos);
+            return Ok(new { Count = count, Admins = adminsDtos });
         }
 
         [HttpGet("GetAdminProfile")]
@@ -105,6 +111,7 @@ namespace dressify.Controllers
             }
             var adminProfile = new AdminPorfileDto()
             {
+                AdminId=adminId,
                 AdminName = admin.AdminName,
                 ProfilePic = admin.ProfilePic,
                 Email = admin.Email,

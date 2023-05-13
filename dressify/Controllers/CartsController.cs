@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using System.Drawing.Printing;
+using System.Linq;
 using System.Security.Claims;
 
 namespace dressify.Controllers
@@ -28,10 +29,17 @@ namespace dressify.Controllers
         public async Task<IActionResult> GetAsync([FromQuery] int? PageNumber,[FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+
             var skip = (PageNumber - 1) * PageSize;
-            var result = await _unitOfWork.ShoppingCart.FindAllAsync(C => C.CustomerId == uId,skip, PageSize);
-            if (result.Count() == 0)
-                return BadRequest("There are no products in the Cart ");
+            var result = await _unitOfWork.ShoppingCart.FindAllAsync(C => C.CustomerId == uId);
+            var count = await _unitOfWork.ShoppingCart.CountAsync();
+
+            if (!result.Any())
+                return NoContent();
 
             List<CartDto> cart = new List<CartDto>();
             foreach (var item in result)
@@ -57,7 +65,8 @@ namespace dressify.Controllers
             {
                 return BadRequest("There are no products in the Cart ");
             }
-            return Ok(cart);
+            cart.Skip(skip.Value).Take(PageSize.Value);
+            return Ok(new { Count = count, Carts = cart });
         }
 
         [HttpGet("GetOrderSummary")]

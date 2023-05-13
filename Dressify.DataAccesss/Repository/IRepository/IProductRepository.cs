@@ -11,7 +11,7 @@ namespace Dressify.DataAccess.Repository.IRepository
 {
     public interface IProductRepository : IRepository<Product>
     {
-        Task<List<Product>> GetProductsAsync(int? skip, int? take, int? reportCountThreshold);
+        Task<List<Product>> GetProductsAsync(int? reportCountThreshold);
         IEnumerable<Product> FindAll(Expression<Func<Product, bool>> criteria, int? take, int? skip,
          double? minPrice, double? maxPrice, string? gender, string? category,
          string[] includes = null);

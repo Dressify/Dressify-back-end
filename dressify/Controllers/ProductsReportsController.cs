@@ -26,10 +26,16 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
 
             var productReports = await _unitOfWork.ProductReport.GetAllAsync(PageSize,skip, new[] { "Product", "Customer","Vendor" });
-            return Ok(productReports);
+            var count = await _unitOfWork.ProductReport.CountAsync();
+
+            return Ok(new { Count = count, ProductReports = productReports });
         }
 
         [HttpGet("GetUncheckedReports")]
@@ -41,10 +47,16 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
 
             var productReports = await _unitOfWork.ProductReport.FindAllAsync(u=>u.ReportStatus==false,skip, PageSize, new[] { "Product", "Customer", "Vendor" });
-            return Ok(productReports);
+            var count = await _unitOfWork.ProductReport.CountAsync();
+
+            return Ok(new { Count = count, ProductReports = productReports });
         }
     }
 }

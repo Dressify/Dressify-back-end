@@ -25,6 +25,11 @@ namespace dressify.Controllers
             var result = await _unitOfWork.WishList.FindAllAsync(C=> C.CustomerId == _unitOfWork.getUID());
             if(!result.Any())
                 return Ok("There are no products in the whish list ");
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+
             var skip = (PageNumber - 1) * PageSize;
             List<Product> productList = new List<Product>();
             foreach (var item in result)
@@ -32,6 +37,8 @@ namespace dressify.Controllers
                var product= await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId&& p.IsSuspended==false, new[] { "ProductImages" });
                 productList.Add(product);
             }
+            var count = productList.Count();
+
             if (skip.HasValue)
             {
                 productList.Skip(skip.Value);
@@ -40,9 +47,9 @@ namespace dressify.Controllers
             {
                 productList.Take(PageSize.Value);
             }
-            return Ok(productList);
+            return Ok(new { Count = count, ProductList = productList });
         }
-        
+
 
     }
 }

@@ -33,6 +33,7 @@ namespace dressify.Controllers
             }
             var adminProfile = new AdminPorfileDto()
             {
+                AdminId = admin.AdminId,
                 AdminName = admin.AdminName,
                 ProfilePic=admin.ProfilePic,
                 Email=admin.Email,

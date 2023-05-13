@@ -20,7 +20,7 @@ namespace Dressify.DataAccess.Repository
             _context = context;
         }
 
-        public async Task<List<Product>> GetProductsAsync(int? skip, int? take, int? reportCountThreshold)
+        public async Task<List<Product>> GetProductsAsync(int? reportCountThreshold)
         {
             reportCountThreshold ??= 10; // if reportCountThreshold is null, set its value to 10
 
@@ -29,10 +29,6 @@ namespace Dressify.DataAccess.Repository
                 && p.Reports.Any(pr => pr.ReportStatus == true)
                 && p.IsSuspended == false)
                 .ToListAsync();
-            if(skip.HasValue&& take.HasValue)
-            {
-                products.Skip(skip.Value).Take(take.Value);
-            }
             return products;
         }
         public IEnumerable<Product> FindAll(Expression<Func<Product, bool>> criteria, int? skip, int? take, double? minPrice, double? maxPrice, string? gender, string? category, string[] includes = null)

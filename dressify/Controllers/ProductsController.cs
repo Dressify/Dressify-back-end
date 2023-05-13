@@ -3,6 +3,7 @@ using Dressify.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing.Printing;
 
 namespace dressify.Controllers
 {
@@ -20,17 +21,22 @@ namespace dressify.Controllers
         [HttpGet("GetProductspage")]
         public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
         {
+            if (model.PageNumber <= 0 || model.PageNumber <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (model.PageNumber - 1) * model.PageSize;
             var products = await _unitOfWork.Product.FindAllProductAsync(u => u.IsSuspended == false,
                 skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,
                 new[] { "Vendor", "ProductImages", "ProductRates" });
-           
+            var count = await _unitOfWork.Product.CountAsync();
+
             var productsWithAvgRates = products.Select(p => new
             {
                 Product = p,
                 AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
             }).ToList();
-            return Ok(productsWithAvgRates);
+            return Ok(new { Count = count, ProductsWithAvgRates = productsWithAvgRates });
         }
 
 
@@ -128,9 +134,15 @@ namespace dressify.Controllers
             {
                 return Unauthorized();
             }
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
             var skip = (PageNumber - 1) * PageSize;
             var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
-            return Ok(products);
+            var count = await _unitOfWork.Product.CountAsync(u => u.IsSuspended == true);
+
+            return Ok(new { Count = count, Products = products });
         }
 
 
