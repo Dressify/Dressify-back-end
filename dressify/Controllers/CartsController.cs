@@ -57,6 +57,11 @@ namespace dressify.Controllers
                         IsRent = item.IsRent,
                         quantity = item.Quantity,
                     };
+                    if (product.Sale > 0) {
+                        obj.price = (decimal?)(item.Quantity * product.Price * (product.Sale / 100)); }
+                    else {
+                        obj.price = (decimal?)(item.Quantity * product.Price);
+                    } 
                     cart.Add(obj);
                 };
             }

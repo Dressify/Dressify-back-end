@@ -13,5 +13,6 @@ namespace Dressify.DataAccess.Dtos
         public Product Product { get; set; }
         public int? quantity { get; set; }
         public bool IsRent { get; set; }
+        public decimal? price { get; set; }
     }
 }
