@@ -29,7 +29,7 @@ namespace dressify.Controllers
                 return BadRequest(result.Message);
             return Ok(result);
         }
-        [HttpGet("VendorRegister")]
+        [HttpPost("VendorRegister")]
         public async Task<IActionResult> VendorRegisterAsync([FromBody] VendorRegisterDto model)
         {
             if (!ModelState.IsValid)
