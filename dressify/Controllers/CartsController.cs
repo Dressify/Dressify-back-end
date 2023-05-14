@@ -108,8 +108,14 @@ namespace dressify.Controllers
             var uId = _unitOfWork.getUID();
             var cartList = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
             var order = new Order();
+            order.PaymentDate = DateTime.Now;
+            order.Address = dto.Address;
+            order.Phone = dto.Phone;
+            order.OrderStatus = SD.Status_Pending;
             order.payementMethod = SD.PaymentMethod_Cash;
             order.CustomerId = uId;
+            _unitOfWork.Order.Add(order);
+            _unitOfWork.Save();
             foreach (var cart in cartList)
             {
                 var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId);
@@ -120,18 +126,21 @@ namespace dressify.Controllers
                     OrderId = order.OrderId,
                     Quantity = cart.Quantity,
                     VendorId = product.VendorId,
+                    Status =SD.Status_Pending,
+                    ProductName = product.ProductName,
                 };
                 order.TotalPrice += (orderDetail.Price * orderDetail.Quantity);
+                product.Quantity -= cart.Quantity.Value;
+                product.Purchases += cart.Quantity.Value;
                 _unitOfWork.OrderDetails.Add(orderDetail);
+                _unitOfWork.Product.Update(product);
             }
-            order.PaymentDate = DateTime.Now;
-            order.Address = dto.Address;
-            order.Phone = dto.Phone;
-            order.OrderStatus = SD.Status_Pending;
-            _unitOfWork.Order.Add(order);
+            _unitOfWork.ShoppingCart.DeleteRange(cartList);
+            _unitOfWork.Order.Update(order);
             _unitOfWork.Save();
             return Ok();
         }
+
         [HttpPost("paywithCredit")]
         public async Task<IActionResult> PayWithStripe(PayDto dto)
         {
@@ -140,6 +149,11 @@ namespace dressify.Controllers
             var order = new Order();
             order.payementMethod = SD.PaymentMethod_Credit;
             order.CustomerId = uId;
+            order.PaymentDate = DateTime.Now;
+            order.Address = dto.Address;
+            order.Phone = dto.Phone;
+            order.OrderStatus = SD.Status_Pending;
+            _unitOfWork.Order.Add(order);
             foreach (var cart in cartList)
             {
                 var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId);
@@ -150,9 +164,14 @@ namespace dressify.Controllers
                     OrderId = order.OrderId,
                     Quantity = cart.Quantity,
                     VendorId = product.VendorId,
+                    ProductName = product.ProductName,
                 };
                 order.TotalPrice += (orderDetail.Price * orderDetail.Quantity);
                 _unitOfWork.OrderDetails.Add(orderDetail);
+                product.Purchases += cart.Quantity.Value;
+                product.Quantity -= cart.Quantity.Value;
+                _unitOfWork.OrderDetails.Add(orderDetail);
+                _unitOfWork.Product.Update(product);
             }
             var paymentIntentService = new PaymentIntentService();
             var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
@@ -170,12 +189,8 @@ namespace dressify.Controllers
             {
                 PaymentIntentId = paymentIntent.Id,
                 Status = paymentIntent.Status,
-            };
-            order.PaymentDate = DateTime.Now;
-            order.Address = dto.Address;
-            order.Phone = dto.Phone;
-            order.OrderStatus = SD.Status_Pending;
-            _unitOfWork.Order.Add(order);
+            };           
+            _unitOfWork.Order.Update(order);
             _unitOfWork.Save();
             return Ok(clientSecret);
         }
@@ -342,7 +357,7 @@ namespace dressify.Controllers
 
             var clientSecret = paymentIntent.ClientSecret;
             return Ok(clientSecret);
-        }
+        }   
         //[HttpPost("TestRefund")]
         //public async Task<IActionResult> TestRefund() 
         //{
