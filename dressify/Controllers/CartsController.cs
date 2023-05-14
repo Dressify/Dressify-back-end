@@ -114,6 +114,7 @@ namespace dressify.Controllers
             order.OrderStatus = SD.Status_Pending;
             order.payementMethod = SD.PaymentMethod_Cash;
             order.CustomerId = uId;
+            order.TotalPrice = 0;
             _unitOfWork.Order.Add(order);
             _unitOfWork.Save();
             foreach (var cart in cartList)
@@ -255,8 +256,11 @@ namespace dressify.Controllers
         public async Task<IActionResult> Plus(int productId)
         {
             var uId = _unitOfWork.getUID();
+            var product = await _unitOfWork.Product.FindAsync(u => u.ProductId == productId);
             var cart = await _unitOfWork.ShoppingCart.FindAsync(c => c.ProductId == productId && c.CustomerId == uId);
-            _unitOfWork.ShoppingCart.IncrementCount(cart, 1);
+            var newQuantity= _unitOfWork.ShoppingCart.IncrementCount(cart, 1);
+            if (newQuantity > product.Quantity)
+                return BadRequest("There is not enough product");
             _unitOfWork.Save();
             return Ok();
         }
