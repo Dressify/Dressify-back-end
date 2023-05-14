@@ -17,6 +17,5 @@ namespace Dressify.DataAccess.Dtos
         public double? MaxPrice { get; set; }
         public string? Gender { get; set; }
         public string? Category { get; set; }
-        public bool IsFilter { get; set; } ;
     }
 }
