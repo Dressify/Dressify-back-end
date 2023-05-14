@@ -14,7 +14,7 @@ namespace Dressify.DataAccess.Dtos
         public string? Email { get; set; }
         public string? FName { get; set; }
         public string? LName { get; set; }
-        public int? NId { get; set; }
+        public string? NId { get; set; }
         public string StoreName { get; set; }
         public string? ProfilePic { get; set; }
         public string Phone { get; set; }
