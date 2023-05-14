@@ -236,47 +236,7 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
-        [HttpGet("ViewVendorProfile")]
-        public async Task<VendorProfileDto> ViewVendorProfile()
-        {
-            var uId = _unitOfWork.getUID();
-            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
-            var VendorProfile = new VendorProfileDto()
-            {
-                Address = user.Address,
-                FName = user.FName,
-                LName = user.LName,
-                UserName = user.UserName,
-                Email = user.Email,
-                imgUrl = user.ProfilePic,
-                PhoneNumber = user.PhoneNumber,
-            };
-            return VendorProfile;
-        }
-        [HttpPut("EditVendorProfile")]
-        public async Task<IActionResult> EditVendorProfile(VendorProfileDto vendorProfile)
-        {
-            var uId = _unitOfWork.getUID();
-            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
-            if (vendorProfile.Email == null)
-            {
-                return BadRequest(" email can not be null");
-            }
-            if (user.Email != vendorProfile.Email)
-            {
-                if (await _userManager.FindByEmailAsync(vendorProfile.Email) is not null)
-                    return BadRequest("Email is already registered!");
-            }
-            user.Address = vendorProfile.Address;
-            user.FName = vendorProfile.FName;
-            user.LName = vendorProfile.LName;
-            user.Email = vendorProfile.Email;
-            user.PhoneNumber = vendorProfile.PhoneNumber;
-
-            _unitOfWork.ApplicationUser.Update(user);
-            _unitOfWork.Save();
-            return Ok();
-        }
+        
 
 
         [HttpDelete("DeleteCustomerCart")]

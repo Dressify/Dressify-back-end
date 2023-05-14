@@ -50,16 +50,6 @@ namespace Dressify.DataAccess.DbInitializer
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Sales)).GetAwaiter().GetResult();
                  
-                //add Dressify Vendor to DB
-                _userManager.CreateAsync(new ApplicationUser
-                {
-                    UserName="Dressify",
-                    Email="Dressify@gmail.com",
-                    PhoneNumber="011",
-                    StoreName="DressifyStore",
-                },"Admin123*").GetAwaiter().GetResult();
-                ApplicationUser user = _context.Users.FirstOrDefault(u => u.Email == "Dressify@gmail.com");
-                _userManager.AddToRoleAsync(user, SD.Role_Sales).GetAwaiter().GetResult();
             }
             var SuperAdmin=new SuperAdmin
             {

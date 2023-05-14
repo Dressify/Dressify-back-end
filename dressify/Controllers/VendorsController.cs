@@ -4,6 +4,7 @@ using Dressify.Models;
 using Dressify.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing.Printing;
 
@@ -15,69 +16,14 @@ namespace dressify.Controllers
     {
 
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public VendorsController(IUnitOfWork unitOfWork)
+        public VendorsController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
-        [HttpGet("GetAllQuestions")]
-        [Authorize(Roles = SD.Role_Vendor)]
-        public async Task<ActionResult<IEnumerable<ProductQuestion>>> GetAllQuestions([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
-        {
-            var uId = _unitOfWork.getUID();
-            var vendor = await _unitOfWork.ApplicationUser.GetUserAsync(uId);
-            if (vendor == null)
-            {
-                return NotFound("vendor does not exist");
-            }
-            if (PageNumber <= 0 || PageSize <= 0)
-            {
-                return BadRequest("Page number and page size must be positive integers.");
-            }
-            var skip = (PageNumber - 1) * PageSize;
-
-            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answer == null,skip,PageSize, new[] { "Product" });
-            var count = await _unitOfWork.ProductQuestion.CountAsync(u => u.VendorId == uId && u.Answer == null);
-
-            if (!questions.Any())
-            {
-                return NoContent();
-            }
-            return Ok(new { Count = count, Questions = questions });
-        }
-
-        [HttpPut("AnswearQuestion")]
-        public async Task<IActionResult> AnswearQuestion(AnswerDto obj)
-        {
-            var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
-            var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
-            var question = await _unitOfWork.ProductQuestion.GetByIdAsync(obj.QuestionId);
-
-            if (user == null)
-            {
-                return BadRequest("user does not exist");
-            }
-            if (product == null)
-            {
-                return BadRequest("product does not exist");
-            }
-            if (question == null)
-            {
-                return BadRequest("question does not exist");
-            }
-            if (obj.Answer == null || obj.Answer == "")
-            {
-                return BadRequest("What's your Answear?!");
-            }
-
-            question.Answer=obj.Answer;
-            question.VendorId=user.Id;
-
-            _unitOfWork.ProductQuestion.Update(question);
-            _unitOfWork.Save();
-            return Ok(question);
-        }
         [HttpPost("AddProduct")]
         public async Task<IActionResult> AddProduct([FromForm] CreateProductDto dto)
         {
@@ -115,28 +61,63 @@ namespace dressify.Controllers
                 _unitOfWork.Save();
             }
             return Ok();
-        }
-
-
-        [HttpGet("GetSuspendedVendor")]
-        [Authorize]
-        public async Task<IActionResult> GetSuspendedVendor([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        } 
+        [HttpGet("GetAllQuestions")]
+        [Authorize(Roles = SD.Role_Vendor)]
+        public async Task<ActionResult<IEnumerable<ProductQuestion>>> GetAllQuestions([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
-            if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
+            var vendor = await _unitOfWork.ApplicationUser.GetUserAsync(uId);
+            if (vendor == null)
             {
-                return Unauthorized();
+                return NotFound("vendor does not exist");
             }
             if (PageNumber <= 0 || PageSize <= 0)
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
             var skip = (PageNumber - 1) * PageSize;
-            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
-            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.IsSuspended == true);
-            return Ok(new { Count = count, Vendors = vendors });
-        }
 
+            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answer == null,skip,PageSize, new[] { "Product" });
+            var count = await _unitOfWork.ProductQuestion.CountAsync(u => u.VendorId == uId && u.Answer == null);
+
+            if (!questions.Any())
+            {
+                return NoContent();
+            }
+            return Ok(new { Count = count, Questions = questions });
+        }
+        [HttpPut("AnswearQuestion")]
+        public async Task<IActionResult> AnswearQuestion(AnswerDto obj)
+        {
+            var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
+            var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
+            var question = await _unitOfWork.ProductQuestion.GetByIdAsync(obj.QuestionId);
+
+            if (user == null)
+            {
+                return BadRequest("user does not exist");
+            }
+            if (product == null)
+            {
+                return BadRequest("product does not exist");
+            }
+            if (question == null)
+            {
+                return BadRequest("question does not exist");
+            }
+            if (obj.Answer == null || obj.Answer == "")
+            {
+                return BadRequest("What's your Answear?!");
+            }
+
+            question.Answer=obj.Answer;
+            question.VendorId=user.Id;
+
+            _unitOfWork.ProductQuestion.Update(question);
+            _unitOfWork.Save();
+            return Ok(question);
+        }
         [HttpGet("GetPendingOrders")]
         public async Task<IActionResult> GetPendingOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
@@ -199,8 +180,6 @@ namespace dressify.Controllers
                 return NoContent();
             return Ok(new { Count = count, VendorProducts = vendorProducts });
         }
-
-
         [HttpPost("AddQuantity")]
         [Authorize]
         public async Task<IActionResult> AddQuantity([FromQuery]int productId, [FromQuery]int quantity)
@@ -211,6 +190,65 @@ namespace dressify.Controllers
             _unitOfWork.Product.Update(product);
             _unitOfWork.Save();
             return Ok(product);
+        }
+        [HttpGet("ViewVendorProfile")]
+        public async Task<VendorProfileDto> ViewVendorProfile()
+        {
+            var uId = _unitOfWork.getUID();
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
+            var VendorProfile = new VendorProfileDto()
+            {
+                Address = user.Address,
+                FName = user.FName,
+                LName = user.LName,
+                UserName = user.UserName,
+                Email = user.Email,
+                imgUrl = user.ProfilePic,
+                PhoneNumber = user.PhoneNumber,
+            };
+            return VendorProfile;
+        }
+        [HttpPut("EditVendorProfile")]
+        public async Task<IActionResult> EditVendorProfile(VendorProfileDto vendorProfile)
+        {
+            var uId = _unitOfWork.getUID();
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
+            if (vendorProfile.Email == null)
+            {
+                return BadRequest(" email can not be null");
+            }
+            if (user.Email != vendorProfile.Email)
+            {
+                if (await _userManager.FindByEmailAsync(vendorProfile.Email) is not null)
+                    return BadRequest("Email is already registered!");
+            }
+            user.Address = vendorProfile.Address;
+            user.FName = vendorProfile.FName;
+            user.LName = vendorProfile.LName;
+            user.Email = vendorProfile.Email;
+            user.PhoneNumber = vendorProfile.PhoneNumber;
+
+            _unitOfWork.ApplicationUser.Update(user);
+            _unitOfWork.Save();
+            return Ok();
+        }
+        [HttpGet("GetSuspendedVendor")]
+        [Authorize]
+        public async Task<IActionResult> GetSuspendedVendor([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+            var skip = (PageNumber - 1) * PageSize;
+            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
+            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.IsSuspended == true);
+            return Ok(new { Count = count, Vendors = vendors });
         }
 
     }
