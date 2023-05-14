@@ -103,6 +103,39 @@ namespace dressify.Controllers
             });
         }
 
+        [HttpGet("GetAllSales")]
+        [Authorize]
+        public async Task<IActionResult> GetAllSales([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+
+            var skip = (PageNumber - 1) * PageSize;
+
+            var sales = await _unitOfWork.ApplicationUser.FindAllAsync(u=>u.StoreName==SD.StoreName,PageSize, skip);
+            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.StoreName == SD.StoreName);
+            if (!sales.Any())
+            {
+                return NoContent();
+            }
+
+            var SalesDtos = sales.Select(sales => new AllSalesDto
+            {
+                SalesId = sales.Id,
+                SalesName = sales.UserName,
+                Email = sales.Email,
+                ProfilePic = sales.ProfilePic
+            }).ToList();
+            return Ok(new { Count = count, Sales = SalesDtos });
+        }
 
         [HttpPut("CheckReport")]
         [Authorize]
