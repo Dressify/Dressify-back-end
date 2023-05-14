@@ -204,7 +204,7 @@ namespace dressify.Controllers
                     return BadRequest("Admin Name is already registered!");
             }
             sales.UserName = dto.SalesName;
-            sales.Email = dto.SalesName;
+            sales.Email = dto.Email;
             sales.FName = dto.FName;
             sales.LName=dto.LName;
             sales.NId = dto.NId;
