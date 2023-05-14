@@ -81,7 +81,7 @@ namespace dressify.Controllers
                 _unitOfWork.ProductImage.Add(productImg);
                 _unitOfWork.Save();
             }
-            return Ok();
+            return Ok(product);
         }
 
         [HttpGet("ViewSalesProducts")]
@@ -93,20 +93,15 @@ namespace dressify.Controllers
                 return BadRequest("Page number and page size must be positive integers.");
             }
             var skip = (PageNumber - 1) * PageSize;
-            var salesUsers = await _userManager.GetUsersInRoleAsync(SD.Role_Sales);
-            if (!salesUsers.Any())
-            {
-                return NoContent();
-            }
-            var salesProducts = await _unitOfWork.Product.FindAllAsync(p => salesUsers.Any(s => s.Id == p.VendorId && s.StoreName == SD.StoreName), skip, PageSize, new[] { "ProductImages" });
-            var count = await _unitOfWork.Product.CountAsync(p => salesUsers.Any(s => s.Id == p.VendorId && s.StoreName == SD.StoreName));
+            var salesProducts = await _unitOfWork.Product.FindAllAsync(p=>p.Vendor.StoreName==SD.StoreName, skip, PageSize, new[] { "ProductImages" });
+            var count = await _unitOfWork.Product.CountAsync(p => p.Vendor.StoreName == SD.StoreName);
 
             if (!salesProducts.Any())
                 return NoContent();
             return Ok(new { Count = count, SalesProducts = salesProducts });
         }
 
-        [HttpPost("AddQuantity")]
+        [HttpPut("AddQuantity")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> AddQuantity([FromQuery] int productId, [FromQuery] int quantity)
         {
@@ -132,8 +127,8 @@ namespace dressify.Controllers
             {
                 return NoContent();
             }
-            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => salesUsers.Any(s => s.Id == u.Product.VendorId), skip, PageSize, new[] { "Product" });
-            var count = await _unitOfWork.ProductQuestion.CountAsync(u => salesUsers.Any(s => s.Id == u.Product.VendorId));
+            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(p => p.Product.Vendor.StoreName == SD.StoreName, skip, PageSize, new[] { "Product" });
+            var count = await _unitOfWork.ProductQuestion.CountAsync(p => p.Product.Vendor.StoreName == SD.StoreName);
 
             if (!questions.Any())
             {
@@ -187,6 +182,10 @@ namespace dressify.Controllers
             }
             var skip = (PageNumber - 1) * PageSize;
             var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && salesIds.Contains(od.VendorId), skip, PageSize);
+            if(!pendingOrders.Any())
+            {
+                return NoContent();
+            }
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && salesIds.Contains(od.VendorId));
             return Ok(new { Count = count, PendingSalesOrders = pendingOrders });
         }

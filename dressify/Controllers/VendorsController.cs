@@ -180,7 +180,7 @@ namespace dressify.Controllers
                 return NoContent();
             return Ok(new { Count = count, VendorProducts = vendorProducts });
         }
-        [HttpPost("AddQuantity")]
+        [HttpPut("AddQuantity")]
         [Authorize]
         public async Task<IActionResult> AddQuantity([FromQuery]int productId, [FromQuery]int quantity)
         {
