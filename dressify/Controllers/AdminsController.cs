@@ -171,6 +171,49 @@ namespace dressify.Controllers
             return Ok(salesProfile);
         }
 
+        [HttpPut("EditSalesProfile")]
+        [Authorize]
+        public async Task<IActionResult> EditSalesProfile(EditSalesProfileDto dto)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (dto.SalesId == null)
+            {
+                return BadRequest("Enter an SalesId");
+            }
+            var sales = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == dto.SalesId);
+            if (sales == null)
+            {
+                return NotFound();
+            }
+            if (sales.Email != dto.Email)
+            {
+                if (await _unitOfWork.ApplicationUser.FindAsync(u => u.Email == dto.Email) != null)
+                    return BadRequest("Email is already registered!");
+            }
+            if (sales.UserName != dto.SalesName)
+            {
+                if (await _unitOfWork.ApplicationUser.FindAsync(u => u.UserName == dto.SalesName) != null)
+                    return BadRequest("Admin Name is already registered!");
+            }
+            sales.UserName = dto.SalesName;
+            sales.Email = dto.SalesName;
+            sales.FName = dto.FName;
+            sales.LName=dto.LName;
+            sales.NId = dto.NId;
+
+            _unitOfWork.ApplicationUser.Update(sales);
+            _unitOfWork.Save();
+            return Ok(dto);
+        }
+
         [HttpPut("CheckReport")]
         [Authorize]
         public async Task<IActionResult> CheckReport([FromQuery]int reportId)
