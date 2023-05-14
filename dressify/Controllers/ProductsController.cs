@@ -29,7 +29,17 @@ namespace dressify.Controllers
             var products = await _unitOfWork.Product.FindAllProductAsync(u => u.IsSuspended == false,
                 skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,
                 new[] { "Vendor", "ProductImages", "ProductRates" });
-            var count = await _unitOfWork.Product.CountAsync();
+            int count;
+            if(model.IsFilter)
+            {
+                count = products.Count();
+
+            }
+            else
+            {
+                count = await _unitOfWork.Product.CountAsync();
+
+            }
 
             var productsWithAvgRates = products.Select(p => new
             {
