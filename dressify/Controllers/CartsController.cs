@@ -102,6 +102,83 @@ namespace dressify.Controllers
             }
             return Ok(summary);
         }
+        [HttpPost("paywithCash")]
+        public async Task<IActionResult> Cash(SummaryDto dto)
+        {
+            var uId = _unitOfWork.getUID();
+            var cartList = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
+            var order = new Order();
+            order.payementMethod = SD.PaymentMethod_Cash;
+            order.CustomerId = uId;
+            foreach (var cart in cartList)
+            {
+                var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId);
+                OrderDetails orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    Price = (double?)_unitOfWork.CalculatePrice(1, product.Price, product.Sale),
+                    OrderId = order.OrderId,
+                    Quantity = cart.Quantity,
+                    VendorId = product.VendorId,
+                };
+                order.TotalPrice += (orderDetail.Price * orderDetail.Quantity);
+                _unitOfWork.OrderDetails.Add(orderDetail);
+            }
+            order.PaymentDate = DateTime.Now;
+            order.Address = dto.Address;
+            order.Phone = dto.Phone;
+            order.OrderStatus = SD.Status_Pending;
+            _unitOfWork.Order.Add(order);
+            _unitOfWork.Save();
+            return Ok();
+        }
+        [HttpPost("paywithCredit")]
+        public async Task<IActionResult> PayWithStripe(SummaryDto dto)
+        {
+            var uId = _unitOfWork.getUID();
+            var cartList = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
+            var order = new Order();
+            order.payementMethod = SD.PaymentMethod_Credit;
+            order.CustomerId = uId;
+            foreach (var cart in cartList)
+            {
+                var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId);
+                OrderDetails orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    Price = (double?)_unitOfWork.CalculatePrice(1, product.Price, product.Sale),
+                    OrderId = order.OrderId,
+                    Quantity = cart.Quantity,
+                    VendorId = product.VendorId,
+                };
+                order.TotalPrice += (orderDetail.Price * orderDetail.Quantity);
+                _unitOfWork.OrderDetails.Add(orderDetail);
+            }
+            var paymentIntentService = new PaymentIntentService();
+            var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
+            {
+                Amount = (long?)(order.TotalPrice * 100),
+                Currency = "usd",
+                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+                {
+                    Enabled = true,
+                },
+            });
+            var clientSecret = paymentIntent.ClientSecret;
+
+            var bill = new PayBill()
+            {
+                PaymentIntentId = paymentIntent.Id,
+                Status = paymentIntent.Status,
+            };
+            order.PaymentDate = DateTime.Now;
+            order.Address = dto.Address;
+            order.Phone = dto.Phone;
+            order.OrderStatus = SD.Status_Pending;
+            _unitOfWork.Order.Add(order);
+            _unitOfWork.Save();
+            return Ok(clientSecret);
+        }
 
         //[HttpPost("Payment")]
         //public async Task<IActionResult> payment(SummaryDto Summary)
@@ -111,11 +188,11 @@ namespace dressify.Controllers
         //    Summary.Order.CustomerId = uId;
         //    foreach (var cart in Summary.ListCart)
         //    {
-        //       var product =await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId); 
+        //        var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId);
         //        OrderDetails orderDetail = new()
         //        {
         //            ProductId = cart.ProductId,
-        //            Price = cart.Price,
+        //            Price =  ,
         //            OrderId = Summary.Order.OrderId,
         //            Quantity = cart.Quantity,
         //            VendorId = product.VendorId,
@@ -123,32 +200,32 @@ namespace dressify.Controllers
         //        _unitOfWork.OrderDetails.Add(orderDetail);
         //        _unitOfWork.Save();
         //    }
-        //    if (Summary.Order.payementMethod == SD.PaymentMethod_Credit)
-        //    {
-        //        Summary.Order.payementMethod = SD.PaymentMethod_Credit;
-        //        // Stripe
-        //        var paymentIntentService = new PaymentIntentService();
-        //        var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
-        //        {
-        //            Amount = (long?)(Summary.Order.TotalPrice * 100),
-        //            Currency = "usd",
-        //            AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
-        //            {
-        //                Enabled = true,
-        //            },
-        //        });
-        //        var clientSecret = paymentIntent.ClientSecret;
+        //    //if (Summary.Order.payementMethod == SD.PaymentMethod_Credit)
+        //    //{
+        //    //    Summary.Order.payementMethod = SD.PaymentMethod_Credit;
+        //    //    // Stripe
+        //    //    var paymentIntentService = new PaymentIntentService();
+        //    //    var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
+        //    //    {
+        //    //        Amount = (long?)(Summary.Order.TotalPrice * 100),
+        //    //        Currency = "usd",
+        //    //        AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+        //    //        {
+        //    //            Enabled = true,
+        //    //        },
+        //    //    });
+        //    //    var clientSecret = paymentIntent.ClientSecret;
 
-        //        var bill = new PayBill()
-        //        {
-        //            PaymentIntentId = paymentIntent.Id,
-        //            Status = paymentIntent.Status,
-        //        };
-        //        _unitOfWork.Order.Add(Summary.Order);
-        //        _unitOfWork.PayBill.Add(bill);
-        //        _unitOfWork.Save();
-        //        return Ok(clientSecret);
-        //    }
+        //    //    var bill = new PayBill()
+        //    //    {
+        //    //        PaymentIntentId = paymentIntent.Id,
+        //    //        Status = paymentIntent.Status,
+        //    //    };
+        //    //    _unitOfWork.Order.Add(Summary.Order);
+        //    //    _unitOfWork.PayBill.Add(bill);
+        //    //    _unitOfWork.Save();
+        //    //    return Ok(clientSecret);
+        //    //}
         //    Summary.Order.PaymentDate = DateTime.Now;
         //    Summary.Order.payementMethod = SD.PaymentMethod_Cash;
         //    Summary.Order.OrderStatus = SD.Status_Confirmed;
@@ -261,6 +338,8 @@ namespace dressify.Controllers
                     Enabled = true,
                 },
             });
+            var Status = paymentIntent.Status;
+
             var clientSecret = paymentIntent.ClientSecret;
             return Ok(clientSecret);
         }
