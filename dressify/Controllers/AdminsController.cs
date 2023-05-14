@@ -5,8 +5,10 @@ using Dressify.Utility;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace dressify.Controllers
 {
@@ -15,10 +17,11 @@ namespace dressify.Controllers
     public class AdminsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public AdminsController(IUnitOfWork unitOfWork)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public AdminsController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
         [HttpGet("ViewAdminProfile")]
@@ -40,6 +43,67 @@ namespace dressify.Controllers
             };
             return Ok(adminProfile);
         }
+
+        [HttpPost("CreateSales")]
+        [Authorize]
+        public async Task<IActionResult> CreateSales([FromForm] AddSalesDto dto)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
+                return Unauthorized();
+            
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null)
+                return BadRequest("Email is already registered!");
+
+            if (await _userManager.FindByNameAsync(dto.SalesName) is not null)
+                return BadRequest("Username is already registered!");
+            var user = new ApplicationUser
+            {
+                UserName = dto.SalesName,
+                Email = dto.Email,
+                NId = dto.NId,
+                FName = dto.FName,
+                LName = dto.LName,
+                PhoneNumber = SD.Phone,
+                Address = SD.Address,
+                ProfilePic=SD.ImgUrl,
+                PublicId=SD.PublicId,
+                StoreName=SD.StoreName,
+
+            };
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Empty;
+
+                foreach (var error in result.Errors)
+                    errors += $"{error.Description},";
+
+                return BadRequest(errors);
+            }
+            await _userManager.AddToRoleAsync(user, SD.Role_Sales);
+            await _userManager.UpdateAsync(user);
+            _unitOfWork.Save();
+            return Ok(new
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                NId = user.NId,
+                FName = user.FName,
+                LName = user.LName,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                ProfilePic = user.ProfilePic,
+                PublicId = user.PublicId,
+                StoreName = user.StoreName,
+                Role = SD.Role_Sales,
+            });
+        }
+
+
         [HttpPut("CheckReport")]
         [Authorize]
         public async Task<IActionResult> CheckReport([FromQuery]int reportId)

@@ -177,6 +177,7 @@ namespace dressify.Controllers
                 admin.PublicId = result.PublicId;
                 admin.ProfilePic = result.Url;
                 _unitOfWork.Admin.Update(admin);
+                _unitOfWork.Save();
                 return Ok(result);
             }
             return NotFound();
