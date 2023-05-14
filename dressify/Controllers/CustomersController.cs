@@ -149,6 +149,7 @@ namespace dressify.Controllers
             var uId = _unitOfWork.getUID();
             shoppingCart.CustomerId = uId;
             ShoppingCart cartFromDb = await _unitOfWork.ShoppingCart.FindAsync(x => x.CustomerId == uId && x.ProductId == shoppingCart.ProductId);
+            var product = await _unitOfWork.Product.FindAsync(u=>u.ProductId == shoppingCart.ProductId);
             var cart = new ShoppingCart
             {
                 CustomerId = shoppingCart.CustomerId,
@@ -156,6 +157,8 @@ namespace dressify.Controllers
                 IsRent=shoppingCart.IsRent,
                 Quantity=shoppingCart.quantity
             };
+            if (product.Quantity <= 0)
+                return BadRequest("Product Out of Stock");
             if (cartFromDb == null)
             {
                 _unitOfWork.ShoppingCart.Add(cart);
