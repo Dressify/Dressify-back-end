@@ -103,7 +103,7 @@ namespace dressify.Controllers
             return Ok(summary);
         }
         [HttpPost("paywithCash")]
-        public async Task<IActionResult> Cash(SummaryDto dto)
+        public async Task<IActionResult> Cash(PayDto dto)
         {
             var uId = _unitOfWork.getUID();
             var cartList = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
@@ -133,7 +133,7 @@ namespace dressify.Controllers
             return Ok();
         }
         [HttpPost("paywithCredit")]
-        public async Task<IActionResult> PayWithStripe(SummaryDto dto)
+        public async Task<IActionResult> PayWithStripe(PayDto dto)
         {
             var uId = _unitOfWork.getUID();
             var cartList = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
