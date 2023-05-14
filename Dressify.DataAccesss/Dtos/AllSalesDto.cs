@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Dressify.DataAccess.Dtos
 {
-    internal class AllSalesDto
+    public class AllSalesDto
     {
+        public string SalesId { get; set; }
+        public string SalesName { get; set; }
+        public string Email { get; set; }
+        public string StoreName { get; set; }
+        public string ProfilePic { get; set; }
     }
 }

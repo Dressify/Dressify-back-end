@@ -137,6 +137,40 @@ namespace dressify.Controllers
             return Ok(new { Count = count, Sales = SalesDtos });
         }
 
+        [HttpGet("GetSalesProfile")]
+        [Authorize]
+        public async Task<IActionResult> GetSalesProfile([FromHeader] string SalesId)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            if (SalesId == null)
+            {
+                return BadRequest("Enter an SalesId");
+            }
+            var sales = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == SalesId);
+            if (sales == null)
+            {
+                return NoContent();
+            }
+            var salesProfile = new SalesProfileDto()
+            {
+                SalesId = SalesId,
+                SalesName = sales.UserName,
+                ProfilePic = sales.ProfilePic,
+                Email = sales.Email,
+                Phone=sales.PhoneNumber,
+                FName = sales.FName,
+                LName = sales.LName,
+                Address=sales.Address,
+                NId=sales.NId,
+                StoreName=sales.StoreName
+            };
+            return Ok(salesProfile);
+        }
+
         [HttpPut("CheckReport")]
         [Authorize]
         public async Task<IActionResult> CheckReport([FromQuery]int reportId)
