@@ -105,15 +105,15 @@ namespace dressify.Controllers
         public async Task<IActionResult> GetCategories()
         {
             var distinctValues = _unitOfWork.Product.GetAll()
-              .Select(p => new { p.Category, p.SubCategory, p.Type }).Distinct().ToList();
+              .Select(p => new { p.Category, p.SubCategory, p.Type }).ToList();
             if (!distinctValues.Any())
             {
                 return NoContent();
             }
     
-            var categories = distinctValues.Select(p => p.Category).ToList();
-            var subCategories = distinctValues.Select(p => p.SubCategory).ToList();
-            var types = distinctValues.Select(p => p.Type).ToList();
+            var categories = distinctValues.Select(p => p.Category).Distinct().ToList();
+            var subCategories = distinctValues.Select(p => p.SubCategory).Distinct().ToList();
+            var types = distinctValues.Select(p => p.Type).Distinct().ToList();
 
             return Ok(new { categories, subCategories, types });
         }
