@@ -58,5 +58,20 @@ namespace dressify.Controllers
 
             return Ok(new { Count = count, ProductReports = productReports });
         }
+
+        [HttpGet("GetReportByID")]
+        [Authorize]
+        public async Task<IActionResult> GetReportByID([FromQuery]int reportId)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+
+            var productReport = await _unitOfWork.ProductReport.FindAsync(u => u.ReportId==reportId, new[] { "Product", "Customer", "Vendor" });
+
+            return Ok(productReport);
+        }
     }
 }
