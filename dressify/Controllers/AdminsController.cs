@@ -137,6 +137,40 @@ namespace dressify.Controllers
             return Ok(new { Count = count, Sales = SalesDtos });
         }
 
+        [HttpGet("GetAllVendors")]
+        [Authorize]
+        public async Task<IActionResult> GetAllVendors([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+
+            var skip = (PageNumber - 1) * PageSize;
+
+            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.StoreName != SD.StoreName, PageSize, skip);
+            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.StoreName != SD.StoreName);
+            if (!vendors.Any())
+            {
+                return NoContent();
+            }
+
+            var vendorsDtos = vendors.Select(sales => new AllSalesDto
+            {
+                SalesId = sales.Id,
+                SalesName = sales.UserName,
+                Email = sales.Email,
+                ProfilePic = sales.ProfilePic
+            }).ToList();
+            return Ok(new { Count = count, Vendors = vendorsDtos });
+        }
+
         [HttpGet("GetSalesProfile")]
         [Authorize]
         public async Task<IActionResult> GetSalesProfile([FromHeader] string SalesId)
