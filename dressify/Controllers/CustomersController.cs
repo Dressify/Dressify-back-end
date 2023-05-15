@@ -93,10 +93,10 @@ namespace dressify.Controllers
         }
 
         [HttpDelete("DeleteFromWishList")]
-        public async Task<IActionResult> DeleteFromWishList(WishListDto obj)
+        public async Task<IActionResult> DeleteFromWishList([FromQuery]int ProductId)
         {
             var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
-            var product = _unitOfWork.Product.GetById(obj.ProductId);
+            var product = _unitOfWork.Product.GetById(ProductId);
             if (user == null)
             {
                 return BadRequest("user does not exist");
@@ -105,12 +105,12 @@ namespace dressify.Controllers
             {
                 return BadRequest("product does not exist");
             }
-            var result = await _unitOfWork.WishList.FindAsync(w => w.ProductId == obj.ProductId && w.CustomerId == user.Id);
+            var result = await _unitOfWork.WishList.FindAsync(w => w.ProductId == ProductId && w.CustomerId == user.Id);
             if (result == null)
                 return BadRequest("This user does not have this product on Wish list");
             _unitOfWork.WishList.Delete(result);
             _unitOfWork.Save();
-            return Ok(obj);
+            return Ok(ProductId);
         }
 
 
