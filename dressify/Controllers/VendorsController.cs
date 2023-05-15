@@ -206,6 +206,7 @@ namespace dressify.Controllers
                 {
                     var order = await _unitOfWork.Order.FindAsync(o=> o.OrderId == orderId);
                     order.OrderStatus = SD.Status_Confirmed;
+                    order.Date= DateTime.Now;
                     _unitOfWork.Order.Update(order);
                     _unitOfWork.Save();
                 }
