@@ -19,7 +19,7 @@ namespace Dressify.DataAccess.Dtos
         public string? FName { get; set; }
         public string? LName { get; set; }
         [Required]
-        public int NId { get; set; }
+        public string NId { get; set; }
 
     }
 }

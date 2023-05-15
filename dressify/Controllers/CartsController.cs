@@ -114,6 +114,7 @@ namespace dressify.Controllers
             order.OrderStatus = SD.Status_Pending;
             order.payementMethod = SD.PaymentMethod_Cash;
             order.CustomerId = uId;
+            order.TotalPrice = 0;
             _unitOfWork.Order.Add(order);
             _unitOfWork.Save();
             foreach (var cart in cartList)
@@ -153,6 +154,7 @@ namespace dressify.Controllers
             order.Address = dto.Address;
             order.Phone = dto.Phone;
             order.OrderStatus = SD.Status_Pending;
+            order.TotalPrice = 0;
             _unitOfWork.Order.Add(order);
             foreach (var cart in cartList)
             {
@@ -172,6 +174,8 @@ namespace dressify.Controllers
                 product.Quantity -= cart.Quantity.Value;
                 _unitOfWork.OrderDetails.Add(orderDetail);
                 _unitOfWork.Product.Update(product);
+                _unitOfWork.Order.Update(order);
+                _unitOfWork.Save();
             }
             var paymentIntentService = new PaymentIntentService();
             var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
@@ -189,8 +193,9 @@ namespace dressify.Controllers
             {
                 PaymentIntentId = paymentIntent.Id,
                 Status = paymentIntent.Status,
+                OrderId= order.OrderId,
             };           
-            _unitOfWork.Order.Update(order);
+            _unitOfWork.PayBill.Add(bill);
             _unitOfWork.Save();
             return Ok(clientSecret);
         }
@@ -255,8 +260,11 @@ namespace dressify.Controllers
         public async Task<IActionResult> Plus(int productId)
         {
             var uId = _unitOfWork.getUID();
+            var product = await _unitOfWork.Product.FindAsync(u => u.ProductId == productId);
             var cart = await _unitOfWork.ShoppingCart.FindAsync(c => c.ProductId == productId && c.CustomerId == uId);
-            _unitOfWork.ShoppingCart.IncrementCount(cart, 1);
+            var newQuantity= _unitOfWork.ShoppingCart.IncrementCount(cart, 1);
+            if (newQuantity > product.Quantity)
+                return BadRequest("There is not enough product");
             _unitOfWork.Save();
             return Ok();
         }

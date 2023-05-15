@@ -20,7 +20,7 @@ namespace Dressify.DataAccess.Dtos
         [Required]
         public string Password { get; set; }
         [Required]
-        public int NId { get; set; }
+        public string NId { get; set; }
 
     }
 }

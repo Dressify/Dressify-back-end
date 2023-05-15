@@ -39,7 +39,7 @@ namespace Dressify.Models
 
         //Vendor props
         public string? StoreName { get; set; }
-        public int? NId  { get; set; }
+        public string? NId  { get; set; }
         public bool IsSuspended  { get; set; }=false;
         public DateTime? SuspendedUntil { get; set; }
 
