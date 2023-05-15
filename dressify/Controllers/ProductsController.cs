@@ -53,7 +53,7 @@ namespace dressify.Controllers
             model.PageSize ??= 10;
             var skip = (model.PageNumber - 1) * model.PageSize;
 
-            var productsQuery =await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,new[] { "Vendor", "ProductImages", "ProductRates" });
+            var productsQuery =await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,new[] { "ProductImages", "ProductRates" });
 
             if (model.MinPrice.HasValue)
             {
