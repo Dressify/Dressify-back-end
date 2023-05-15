@@ -210,6 +210,23 @@ namespace dressify.Controllers
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.Vendor.StoreName == SD.StoreName);
             return Ok(new { Count = count, PendingSalesOrders = pendingOrders });
         }
+        [HttpGet("GetSalesOrders")]
+        [Authorize(Roles = SD.Role_Sales)]
+        public async Task<IActionResult> GetSalesOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        {
+            if (PageNumber <= 0 || PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+            var skip = (PageNumber - 1) * PageSize;
+            var orders = await _unitOfWork.OrderDetails.FindAllAsync(od =>  od.Vendor.StoreName == SD.StoreName, skip, PageSize);
+            if (!orders.Any())
+            {
+                return NoContent();
+            }
+            var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Vendor.StoreName == SD.StoreName);
+            return Ok(new { Count = count, Orders = orders });
+        }
         [HttpGet("GetOrderById")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> GetOrderById(int orderId)
