@@ -179,7 +179,7 @@ namespace Dressify.DataAccess.Repository
         public void ShipOrders()
         {
             var now = DateTime.UtcNow;
-            var confirmedProducts = _context.Orders.Where(o => o.OrderStatus == SD.Status_Confirmed && o.Date.Value.AddMinutes(10)<= now);
+            var confirmedProducts = _context.Orders.Where(o => o.OrderStatus == SD.Status_Confirmed && o.Date.Value.AddMinutes(1)<= now);
             foreach (var order in confirmedProducts)
             {
                 order.OrderStatus = SD.Status_Shipped;
@@ -191,7 +191,7 @@ namespace Dressify.DataAccess.Repository
         public void DeliverOrders()
         {
             var now = DateTime.UtcNow;
-            var ShipedOrders = _context.Orders.Where(o => o.OrderStatus == SD.Status_Shipped&& o.Date.Value.AddMinutes(10) <= now);
+            var ShipedOrders = _context.Orders.Where(o => o.OrderStatus == SD.Status_Shipped&& o.Date.Value.AddMinutes(1) <= now);
             foreach (var order in ShipedOrders)
             {
                 order.OrderStatus = SD.Status_Delivered;
