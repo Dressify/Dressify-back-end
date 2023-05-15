@@ -43,7 +43,6 @@ namespace dressify.Controllers
             };
             return Ok(salesProfile);
         }
-
         [HttpPost("AddProduct")]
         [Authorize(Roles =SD.Role_Sales)]
         public async Task<IActionResult> AddProduct([FromForm] CreateProductDto dto)
@@ -83,7 +82,6 @@ namespace dressify.Controllers
             }
             return Ok(product);
         }
-
         [HttpGet("ViewSalesProducts")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> ViewSalesProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
@@ -100,18 +98,20 @@ namespace dressify.Controllers
                 return NoContent();
             return Ok(new { Count = count, SalesProducts = salesProducts });
         }
-
         [HttpPut("AddQuantity")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> AddQuantity([FromQuery] int productId, [FromQuery] int quantity)
         {
-            var product = await _unitOfWork.Product.FindAsync(u => u.ProductId == productId);
+            var product = await _unitOfWork.Product.FindAsync(u => u.ProductId == productId&&u.Vendor.StoreName==SD.StoreName);
+            if (product==null)
+            {
+                return Unauthorized();
+            }
             product.Quantity += quantity;
             _unitOfWork.Product.Update(product);
             _unitOfWork.Save();
             return Ok(product);
         }
-
         [HttpGet("GetAllQuestions")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<ActionResult<IEnumerable<ProductQuestion>>> GetAllQuestions([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
@@ -136,8 +136,8 @@ namespace dressify.Controllers
             }
             return Ok(new { Count = count, Questions = questions });
         }
-
         [HttpGet("GetQuestionById")]
+        [Authorize(Roles = SD.Role_Sales)]
         public async Task<ActionResult> GetQuestionById([FromQuery] int questionId)
         {
             var uId = _unitOfWork.getUID();
@@ -154,8 +154,6 @@ namespace dressify.Controllers
             }
             return Ok(question);
         }
-
-
         [HttpPut("AnswerQuestion")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> AnswerQuestion(AnswerDto obj)
@@ -192,7 +190,6 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok(question);
         }
-
         [HttpGet("GetPendingSalesOrders")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> GetPendingSalesOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)

@@ -104,7 +104,6 @@ namespace dressify.Controllers
             }
             return Ok(question);
         }
-
         [HttpPut("AnswerQuestion")]
         public async Task<IActionResult> AnswerQuestion(AnswerDto obj)
         {
@@ -233,7 +232,11 @@ namespace dressify.Controllers
         public async Task<IActionResult> AddQuantity([FromQuery]int productId, [FromQuery]int quantity)
         {
             var vendorId = _unitOfWork.getUID();
-            var product = await _unitOfWork.Product.FindAsync(u => u.ProductId == productId);
+            var product = await _unitOfWork.Product.FindAsync(u => u.ProductId == productId&&u.VendorId==vendorId);
+            if (product == null)
+            {
+                return Unauthorized();
+            }
             product.Quantity += quantity;
             _unitOfWork.Product.Update(product);
             _unitOfWork.Save();
