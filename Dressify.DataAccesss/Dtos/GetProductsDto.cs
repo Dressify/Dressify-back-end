@@ -17,5 +17,9 @@ namespace Dressify.DataAccess.Dtos
         public double? MaxPrice { get; set; }
         public string? Gender { get; set; }
         public string? Category { get; set; }
+        public string? SubCategory { get; set; }
+        public string? SearchTerm { get; set; }
+
+
     }
 }

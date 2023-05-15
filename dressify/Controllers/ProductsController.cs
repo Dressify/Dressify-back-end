@@ -1,9 +1,11 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
+using Dressify.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing.Printing;
+using System.Linq;
 
 namespace dressify.Controllers
 {
@@ -18,27 +20,91 @@ namespace dressify.Controllers
             _unitOfWork = unitOfWork;
         }
 
+        //[HttpGet("GetProductspage")]
+        //public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
+        //{
+        //    if (model.PageNumber <= 0 || model.PageNumber <= 0)
+        //    {
+        //        return BadRequest("Page number and page size must be positive integers.");
+        //    }
+        //    var skip = (model.PageNumber - 1) * model.PageSize;
+        //    var products = await _unitOfWork.Product.FindAllProductAsync(u => u.IsSuspended == false,
+        //        skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,
+        //        new[] { "Vendor", "ProductImages", "ProductRates" });
+        //    var count = await _unitOfWork.Product.CountAsync();
+
+        //    var productsWithAvgRates = products.Select(p => new
+        //    {
+        //        Product = p,
+        //        Count = count,
+        //        AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
+        //    }).ToList();
+        //    return Ok(productsWithAvgRates);
+        //}
+
         [HttpGet("GetProductspage")]
         public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
         {
-            if (model.PageNumber <= 0 || model.PageNumber <= 0)
+            if (model.PageNumber <= 0 || model.PageSize <= 0)
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+            model.PageNumber ??= 1;
+            model.PageSize ??= 10;
             var skip = (model.PageNumber - 1) * model.PageSize;
-            var products = await _unitOfWork.Product.FindAllProductAsync(u => u.IsSuspended == false,
-                skip, model.PageSize, model.MinPrice, model.MaxPrice, model.Gender, model.Category,
-                new[] { "Vendor", "ProductImages", "ProductRates" });
-            var count = await _unitOfWork.Product.CountAsync();
 
+            var productsQuery =await _unitOfWork.Product.FindAllAsync(u=>u.IsSuspended==false,new[] { "Vendor", "ProductImages", "ProductRates" });
+
+            if (model.MinPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.Price >= model.MinPrice.Value);
+            }
+
+            if (model.MaxPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.Price <= model.MaxPrice.Value);
+            }
+
+            if (!string.IsNullOrEmpty(model.Gender))
+            {
+                productsQuery = productsQuery.Where(p => p.Type == model.Gender);
+            }
+
+            if (!string.IsNullOrEmpty(model.Category))
+            {
+                productsQuery = productsQuery.Where(p => p.Category == model.Category);
+            }
+
+            if (!string.IsNullOrEmpty(model.SubCategory))
+            {
+                productsQuery = productsQuery.Where(p => p.SubCategory == model.SubCategory);
+            }
+
+            if (!string.IsNullOrEmpty(model.SearchTerm))
+            {
+                productsQuery = productsQuery.Where(p => p.ProductName.Contains(model.SearchTerm) || p.Description.Contains(model.SearchTerm));
+            }
+
+            var totalCount =  productsQuery.Count();
+            var products =  productsQuery
+                .Skip(skip.Value)
+                .Take(model.PageSize.Value)
+                .ToList();
+            if (!products.Any())
+            {
+                NoContent();
+            }
             var productsWithAvgRates = products.Select(p => new
             {
                 Product = p,
-                Count = count,
                 AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
             }).ToList();
-            return Ok(productsWithAvgRates);
+            
+
+            return Ok(new{ Count = totalCount, ProductsWithAvgRates= productsWithAvgRates });
         }
+
+
 
 
         [HttpGet("GetProductDetails")]
@@ -118,19 +184,19 @@ namespace dressify.Controllers
             return Ok(new { categories, subCategories, types });
         }
 
-        [HttpGet("SearchProducts")]
-        public async Task<IActionResult> SearchProducts([FromQuery] string searchTerm)
-        {
-            var products = await _unitOfWork.Product.FindAllAsync(p =>
-                (p.ProductName.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm)))
-                && p.IsSuspended == false, new[] { "ProductImages" });
+        //[HttpGet("SearchProducts")]
+        //public async Task<IActionResult> SearchProducts([FromQuery] string searchTerm)
+        //{
+        //    var products = await _unitOfWork.Product.FindAllAsync(p =>
+        //        (p.ProductName.Contains(searchTerm) || (p.Description != null && p.Description.Contains(searchTerm)))
+        //        && p.IsSuspended == false, new[] { "ProductImages" });
 
-            if (!products.Any())
-            {
-                return NotFound();
-            }
-            return Ok(products);
-        }
+        //    if (!products.Any())
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(products);
+        //}
 
         [HttpGet("GetSuspendedProducts")]
         [Authorize]
