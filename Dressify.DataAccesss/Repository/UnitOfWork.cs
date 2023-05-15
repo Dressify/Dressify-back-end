@@ -19,6 +19,7 @@ using Dressify.Utility;
 using MimeKit;
 using MailKit.Net.Smtp;
 using Stripe;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -31,10 +32,9 @@ namespace Dressify.DataAccess.Repository
         private readonly IOptions<CloudinarySettings> _cloudinaryConfig;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly EmailConfiguration _emailConfiguration;
+        private readonly StripeSettings _stripeSettings;
 
-
-
-        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IOptions<EmailConfiguration> emailConfiguration, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary, IHttpContextAccessor httpContextAccessor)
+        public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IOptions<EmailConfiguration> emailConfiguration, IOptions<JWT> jwt, RoleManager<IdentityRole> roleManager, IOptions<CloudinarySettings> cloudinary, IHttpContextAccessor httpContextAccessor, IOptions<StripeSettings> stripeSettings)
         {
             _context = context;
             _userManager = userManager;
@@ -42,6 +42,8 @@ namespace Dressify.DataAccess.Repository
             _roleManager = roleManager;
             _cloudinaryConfig = cloudinary;
             _emailConfiguration = emailConfiguration.Value;
+            _httpContextAccessor = httpContextAccessor;
+            _stripeSettings = stripeSettings.Value;
 
             ApplicationUser = new ApplicationUserRepository(context, userManager, jwt, roleManager, cloudinary);
             Product = new ProductRepository(_context);
@@ -59,8 +61,6 @@ namespace Dressify.DataAccess.Repository
             Order = new OrderRepository(_context);
             OrderDetails = new OrderDetailsRepository(_context);
             PayBill = new PayBillRepository(_context);
-
-            _httpContextAccessor = httpContextAccessor;
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public IProductRepository Product { get; private set; }
@@ -255,6 +255,27 @@ namespace Dressify.DataAccess.Repository
                 var res = (decimal?)(quantity * price);
                 return res.Value;
             }
+        }
+
+        public async Task<PayRepositoryDto> createPaymentIntent(int orderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            var service = new  PaymentIntentService();
+            PaymentIntent intent;
+            var options = new PaymentIntentCreateOptions
+            {
+                Amount = (long?)order.TotalPrice * 100,
+                Currency= "usd",
+                PaymentMethodTypes =new List<string> {"card"}
+            };
+            intent = await service.CreateAsync(options);
+            var model = new PayRepositoryDto()
+            {
+                paymentIntentId = intent.Id ,
+                ClientSecret    =intent.ClientSecret,
+                Status = intent.Status,
+            };
+            return model;
         }
     }
 }

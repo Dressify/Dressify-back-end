@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dressify.Utility
+namespace Dressify.DataAccess.Helpers
 {
     public class StripeSettings
     {

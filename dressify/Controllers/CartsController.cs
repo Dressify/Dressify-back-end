@@ -153,9 +153,10 @@ namespace dressify.Controllers
             order.PaymentDate = DateTime.Now;
             order.Address = dto.Address;
             order.Phone = dto.Phone;
-            order.OrderStatus = SD.Status_Pending;
+            order.OrderStatus = SD.Status_not_paid;
             order.TotalPrice = 0;
             _unitOfWork.Order.Add(order);
+            _unitOfWork.Save();
             foreach (var cart in cartList)
             {
                 var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId);
@@ -167,6 +168,7 @@ namespace dressify.Controllers
                     Quantity = cart.Quantity,
                     VendorId = product.VendorId,
                     ProductName = product.ProductName,
+                    Status =SD.Status_Pending
                 };
                 order.TotalPrice += (orderDetail.Price * orderDetail.Quantity);
                 _unitOfWork.OrderDetails.Add(orderDetail);
@@ -177,22 +179,13 @@ namespace dressify.Controllers
                 _unitOfWork.Order.Update(order);
                 _unitOfWork.Save();
             }
-            var paymentIntentService = new PaymentIntentService();
-            var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
-            {
-                Amount = (long?)(order.TotalPrice * 100),
-                Currency = "usd",
-                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
-                {
-                    Enabled = true,
-                },
-            });
-            var clientSecret = paymentIntent.ClientSecret;
+            var payment = await _unitOfWork.createPaymentIntent(order.OrderId);
+            var clientSecret = payment.ClientSecret;
 
             var bill = new PayBill()
             {
-                PaymentIntentId = paymentIntent.Id,
-                Status = paymentIntent.Status,
+                PaymentIntentId = payment.paymentIntentId,
+                Status = payment.Status,
                 OrderId= order.OrderId,
             };           
             _unitOfWork.PayBill.Add(bill);

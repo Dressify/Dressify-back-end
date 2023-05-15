@@ -1,6 +1,7 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Helpers;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -41,6 +42,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         public void ShipOrders();
         public void DeliverOrders();
         public void ConfirmOredrs();
+        Task<PayRepositoryDto> createPaymentIntent(int orderId);
 
     }
 }
