@@ -253,6 +253,30 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
+
+        [HttpGet("GetCustomrOrders")]
+        public async Task<IActionResult> getCusOrders()
+        {
+            var uId = _unitOfWork.getUID();
+            var customerOrders = new List<ViewOrderDto>() ;
+            var Orders= await _unitOfWork.Order.FindAllAsync(o => o.CustomerId == uId);
+            foreach(var order in Orders)
+            {
+                var orderDto = new ViewOrderDto()
+                {
+                    orderId = order.OrderId,
+                    TotalPrice = (float)order.TotalPrice,
+                    Status = order.OrderStatus,
+                    paymentMethod=order.payementMethod,
+                    dateTime = order.PaymentDate.Value,
+                };
+                var details = await _unitOfWork.OrderDetails.FindAllAsync(d => d.OrderId==order.OrderId);
+                var sum = _unitOfWork.OrderDetails.OrdersQuantity(details);
+                orderDto.Quantity = sum;
+                customerOrders.Add(orderDto);
+            }
+            return Ok(customerOrders);
+        }
     }
 
 }

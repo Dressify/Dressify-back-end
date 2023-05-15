@@ -18,5 +18,15 @@ namespace Dressify.DataAccess.Repository
         {
             _context = context;
         }
+
+        public int OrdersQuantity(IEnumerable<OrderDetails> Details)
+        {
+            int sum = 0;
+            foreach (var item in Details)
+            {
+                sum += item.Quantity.Value;
+            }
+            return sum;
+        }
     }
 }
