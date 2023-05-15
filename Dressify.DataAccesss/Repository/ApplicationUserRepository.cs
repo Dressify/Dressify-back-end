@@ -85,6 +85,8 @@ namespace Dressify.DataAccess.Repository
 
             if (await _userManager.FindByNameAsync(dto.UserName) is not null)
                 return new AuthDto { Message = "Username is already registered!" };
+            if(dto.StoreName==SD.StoreName)
+                return new AuthDto { Message = "Store Name is already registered!" };
             var user = new ApplicationUser
             {
                 UserName = dto.UserName,
@@ -93,6 +95,7 @@ namespace Dressify.DataAccess.Repository
                 FName = dto.FName,
                 LName = dto.LName,
                 NId =dto.nId,
+                StoreName=dto.StoreName,
                 Address=dto.address
             };
             var result = await _userManager.CreateAsync(user, dto.Password);
