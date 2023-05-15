@@ -137,9 +137,28 @@ namespace dressify.Controllers
             return Ok(new { Count = count, Questions = questions });
         }
 
-        [HttpPut("AnswearQuestion")]
+        [HttpGet("GetQuestionById")]
+        public async Task<ActionResult> GetQuestionById([FromQuery] int questionId)
+        {
+            var uId = _unitOfWork.getUID();
+            var vendor = await _unitOfWork.ApplicationUser.GetUserAsync(uId);
+            if (vendor == null)
+            {
+                return NotFound("vendor does not exist");
+            }
+            var question = await _unitOfWork.ProductQuestion.FindAsync(u => u.QuestionID == questionId && u.Product.Vendor.StoreName == SD.StoreName, new[] { "Product" });
+
+            if (question == null)
+            {
+                return NoContent();
+            }
+            return Ok(question);
+        }
+
+
+        [HttpPut("AnswerQuestion")]
         [Authorize(Roles = SD.Role_Sales)]
-        public async Task<IActionResult> AnswearQuestion(AnswerDto obj)
+        public async Task<IActionResult> AnswerQuestion(AnswerDto obj)
         {
             var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
@@ -160,6 +179,10 @@ namespace dressify.Controllers
             if (obj.Answer == null || obj.Answer == "")
             {
                 return BadRequest("What's your Answear?!");
+            }
+            if (question.Product.Vendor.StoreName != SD.StoreName)
+            {
+                return Unauthorized();
             }
 
             question.Answer = obj.Answer;

@@ -78,8 +78,8 @@ namespace dressify.Controllers
             }
             var skip = (PageNumber - 1) * PageSize;
 
-            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.VendorId == uId && u.Answer == null,skip,PageSize, new[] { "Product" });
-            var count = await _unitOfWork.ProductQuestion.CountAsync(u => u.VendorId == uId && u.Answer == null);
+            var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.Product.VendorId == uId && u.Answer == null,skip,PageSize, new[] { "Product" });
+            var count = await _unitOfWork.ProductQuestion.CountAsync(u => u.Product.VendorId == uId && u.Answer == null);
 
             if (!questions.Any())
             {
@@ -87,8 +87,26 @@ namespace dressify.Controllers
             }
             return Ok(new { Count = count, Questions = questions });
         }
-        [HttpPut("AnswearQuestion")]
-        public async Task<IActionResult> AnswearQuestion(AnswerDto obj)
+        [HttpGet("GetQuestionById")]
+        public async Task<ActionResult> GetQuestionById([FromQuery]int questionId)
+        {
+            var uId = _unitOfWork.getUID();
+            var vendor = await _unitOfWork.ApplicationUser.GetUserAsync(uId);
+            if (vendor == null)
+            {
+                return NotFound("vendor does not exist");
+            }
+            var question = await _unitOfWork.ProductQuestion.FindAsync(u => u.QuestionID==questionId&&u.Product.VendorId == uId, new[] { "Product" });
+           
+            if (question==null)
+            {
+                return NoContent();
+            }
+            return Ok(question);
+        }
+
+        [HttpPut("AnswerQuestion")]
+        public async Task<IActionResult> AnswerQuestion(AnswerDto obj)
         {
             var user = await _unitOfWork.ApplicationUser.GetUserAsync(_unitOfWork.getUID());
             var product = await _unitOfWork.Product.GetByIdAsync(obj.ProductId);
@@ -110,7 +128,10 @@ namespace dressify.Controllers
             {
                 return BadRequest("What's your Answear?!");
             }
-
+            if (question.Product.VendorId != user.Id)
+            {
+                return Unauthorized();
+            }
             question.Answer=obj.Answer;
             question.VendorId=user.Id;
 
