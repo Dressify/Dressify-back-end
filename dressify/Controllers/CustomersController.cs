@@ -254,13 +254,29 @@ namespace dressify.Controllers
             return Ok();
         }
 
-        [HttpGet("GetCustomrOrders")]
-        public async Task<IActionResult> getCusOrders()
+        [HttpGet("GetCustomerOrders")]
+        public async Task<IActionResult> getCusOrders([FromQuery] GetOrdersDto model)
         {
+            if (model.PageNumber <= 0 || model.PageSize <= 0)
+            {
+                return BadRequest("Page number and page size must be positive integers.");
+            }
+            model.PageNumber ??= 1;
+            model.PageSize ??= 10;
             var uId = _unitOfWork.getUID();
+            var skip = (model.PageNumber - 1) * model.PageSize;
             var customerOrders = new List<ViewOrderDto>() ;
-            var Orders= await _unitOfWork.Order.FindAllAsync(o => o.CustomerId == uId);
-            foreach(var order in Orders)
+            var result= await _unitOfWork.Order.FindAllAsync(o => o.CustomerId == uId);
+            var totalCount = result.Count();
+            var Orders = result
+               .Skip(skip.Value)
+               .Take(model.PageSize.Value)
+               .ToList();
+            if (!Orders.Any())
+            {
+                NoContent();
+            }
+            foreach (var order in Orders)
             {
                 var orderDto = new ViewOrderDto()
                 {
@@ -275,8 +291,29 @@ namespace dressify.Controllers
                 orderDto.Quantity = sum;
                 customerOrders.Add(orderDto);
             }
-            return Ok(customerOrders);
+            return Ok(new { Count = totalCount, ProductsWithAvgRates = customerOrders });
         }
+
+
+        [HttpGet("getOrderDetails")]
+        public async Task<IActionResult> getOrderDetails([FromQuery]int OrderId)
+        {
+            var uId = _unitOfWork.getUID();
+            var order = await _unitOfWork.Order.FindAsync(o => o.OrderId == OrderId);
+            var orderDetails = new ViewOrderDto()
+            {
+                orderId = order.OrderId,
+                TotalPrice = (float)order.TotalPrice,
+                Status = order.OrderStatus,
+                paymentMethod = order.payementMethod,
+                dateTime = order.PaymentDate.Value,
+            };
+            var details = await _unitOfWork.OrderDetails.FindAllAsync(d => d.OrderId == OrderId);
+            var sum = _unitOfWork.OrderDetails.OrdersQuantity(details);
+            orderDetails.Quantity = sum;
+            return Ok(orderDetails);
+        }
+
     }
 
 }
