@@ -155,6 +155,17 @@ namespace dressify.Controllers
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId);
             return Ok(new { Count = count, PendingOrders = pendingOrders });
         }
+        [HttpGet("GetOrderById")]
+        public async Task<IActionResult> GetOrderById(int orderId)
+        {
+            var uId = _unitOfWork.getUID();
+            var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
+            if (vendor.IsSuspended == true)
+                return BadRequest("Vendor is Suspended");
+            var Order = _unitOfWork.OrderDetails.FindAsync(od => od.OrderId== orderId&&od.VendorId==uId);
+            if (Order == null) return NotFound();
+            return Ok(Order);
+        }
         [HttpPut("ConfirmtPendingOrders")]
         public async Task<IActionResult> ConfirmtPendingOrders(int orderId , int productId)
         {

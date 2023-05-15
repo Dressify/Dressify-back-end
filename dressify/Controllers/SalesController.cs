@@ -197,22 +197,27 @@ namespace dressify.Controllers
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> GetPendingSalesOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
-            var salesUsers = await _userManager.GetUsersInRoleAsync(SD.Role_Sales);
-            var salesIds = salesUsers.Select(s => s.Id).ToArray();
             if (PageNumber <= 0 || PageSize <= 0)
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
             var skip = (PageNumber - 1) * PageSize;
-            var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && salesIds.Contains(od.VendorId), skip, PageSize);
+            var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.Vendor.StoreName==SD.StoreName, skip, PageSize);
             if(!pendingOrders.Any())
             {
                 return NoContent();
             }
-            var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && salesIds.Contains(od.VendorId));
+            var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.Vendor.StoreName == SD.StoreName);
             return Ok(new { Count = count, PendingSalesOrders = pendingOrders });
         }
-
+        [HttpGet("GetOrderById")]
+        [Authorize(Roles = SD.Role_Sales)]
+        public async Task<IActionResult> GetOrderById(int orderId)
+        {
+            var Order = _unitOfWork.OrderDetails.FindAsync(od => od.OrderId == orderId && od.Vendor.StoreName==SD.StoreName);
+            if (Order == null) return NotFound();
+            return Ok(Order);
+        }
         [HttpPut("ConfirmPendingOrders")]
         [Authorize(Roles = SD.Role_Sales)]
         public async Task<IActionResult> ConfirmPendingOrders([FromQuery] int orderId,[FromQuery] int productId)
