@@ -153,6 +153,8 @@ namespace Dressify.DataAccess.Repository
              string[] includes = null)
         {
             IQueryable<T> query = _context.Set<T>().Where(criteria);
+            if(!query.Any())
+                return Enumerable.Empty<T>();
             if (skip.HasValue)
                 query = query.Skip(skip.Value);
             if (take.HasValue)
