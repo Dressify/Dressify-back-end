@@ -59,7 +59,7 @@ namespace dressify.Controllers
 
         [HttpGet("GetAllAdmins")]
         [Authorize]
-        public async Task<IActionResult> GetAllAdmins([FromQuery] int? PageNumber,[FromQuery] int? PageSize)
+        public async Task<IActionResult> GetAllAdmins([FromQuery] int? PageNumber,[FromQuery] int? PageSize ,[FromQuery] string? SearchTerm)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.SuperAdmin.FindAllAsync(u => u.SuperAdminId == uId) == null)
@@ -71,11 +71,21 @@ namespace dressify.Controllers
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
-
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
 
-            var admins = await _unitOfWork.Admin.GetAllAsync(PageSize,skip);
-            var count = await _unitOfWork.Admin.CountAsync();
+            var adminsQuery = await _unitOfWork.Admin.GetAllAsync();
+            if (!string.IsNullOrEmpty(SearchTerm))
+            {
+                adminsQuery = adminsQuery.Where(p => p.AdminName.Contains(SearchTerm) || p.Email.Contains(SearchTerm));
+            }
+
+            var count = adminsQuery.Count();
+            var admins = adminsQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
             if (!admins.Any())
             {
                 return NoContent();

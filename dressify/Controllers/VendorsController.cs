@@ -214,16 +214,26 @@ namespace dressify.Controllers
             return Ok();
         }
         [HttpGet("ViewOwnProducts")]
-        public async Task<IActionResult> ViewOwnProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        public async Task<IActionResult> ViewOwnProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm)
         {
             var vendorId = _unitOfWork.getUID();
             if (PageNumber <= 0 || PageSize <= 0)
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
-            var vendorProducts = await _unitOfWork.Product.FindAllAsync(p => p.VendorId == vendorId, skip, PageSize, new[] { "ProductImages" });
-            var count = await _unitOfWork.Product.CountAsync(p => p.VendorId == vendorId);
+            var vendorProductsQuery = await _unitOfWork.Product.FindAllAsync(p => p.VendorId == vendorId, new[] { "ProductImages" });
+            if (!string.IsNullOrEmpty(SearchTerm))
+            {
+                vendorProductsQuery = vendorProductsQuery.Where(p => p.ProductName.Contains(SearchTerm) || ( p.Description!=null&&p.Description.Contains(SearchTerm)));
+            }
+            var count = vendorProductsQuery.Count();
+            var vendorProducts = vendorProductsQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
             if (!vendorProducts.Any())
                 return NoContent();
             return Ok(new { Count = count, VendorProducts = vendorProducts });
@@ -286,7 +296,7 @@ namespace dressify.Controllers
         }
         [HttpGet("GetSuspendedVendor")]
         [Authorize]
-        public async Task<IActionResult> GetSuspendedVendor([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        public async Task<IActionResult> GetSuspendedVendor([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
@@ -297,9 +307,23 @@ namespace dressify.Controllers
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
-            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
-            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.IsSuspended == true);
+            var vendorsQuery = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true);
+            if (!string.IsNullOrEmpty(SearchTerm))
+            {
+                vendorsQuery = vendorsQuery.Where(p => p.UserName.Contains(SearchTerm) || p.FName.Contains(SearchTerm) || p.LName.Contains(SearchTerm) || p.StoreName.Contains(SearchTerm));
+            }
+            var count = vendorsQuery.Count();
+            var vendors = vendorsQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
+            if (!vendors.Any())
+            {
+                return NoContent();
+            }
             return Ok(new { Count = count, Vendors = vendors });
         }
 

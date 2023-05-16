@@ -105,23 +105,34 @@ namespace dressify.Controllers
 
         [HttpGet("GetAllSales")]
         [Authorize]
-        public async Task<IActionResult> GetAllSales([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        public async Task<IActionResult> GetAllSales([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
             {
                 return Unauthorized();
             }
-
+            
             if (PageNumber <= 0 || PageSize <= 0)
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
-
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
 
-            var sales = await _unitOfWork.ApplicationUser.FindAllAsync(u=>u.StoreName==SD.StoreName,PageSize, skip);
-            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.StoreName == SD.StoreName);
+            var salesQuery = await _unitOfWork.ApplicationUser.FindAllAsync(u=>u.StoreName==SD.StoreName);
+
+            if (!string.IsNullOrEmpty(SearchTerm))
+            {
+                salesQuery = salesQuery.Where(p => p.UserName.Contains(SearchTerm) || p.FName.Contains(SearchTerm) || p.LName.Contains(SearchTerm));
+            }
+
+            var count = salesQuery.Count();
+            var sales = salesQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
             if (!sales.Any())
             {
                 return NoContent();
@@ -131,6 +142,8 @@ namespace dressify.Controllers
             {
                 SalesId = sales.Id,
                 SalesName = sales.UserName,
+                FName=sales.FName,
+                LName=sales.LName,
                 Email = sales.Email,
                 ProfilePic = sales.ProfilePic
             }).ToList();
@@ -139,23 +152,33 @@ namespace dressify.Controllers
 
         [HttpGet("GetAllVendors")]
         [Authorize]
-        public async Task<IActionResult> GetAllVendors([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        public async Task<IActionResult> GetAllVendors([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
             {
                 return Unauthorized();
             }
-
+            
             if (PageNumber <= 0 || PageSize <= 0)
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
-
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
 
-            var vendors = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.StoreName != SD.StoreName, PageSize, skip);
-            var count = await _unitOfWork.ApplicationUser.CountAsync(u => u.StoreName != SD.StoreName);
+            var vendorsQuery = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.StoreName != null && u.StoreName != SD.StoreName);
+            if (!string.IsNullOrEmpty(SearchTerm))
+            {
+                vendorsQuery = vendorsQuery.Where(p => p.UserName.Contains(SearchTerm) || p.FName.Contains(SearchTerm) || p.LName.Contains(SearchTerm) || p.StoreName.Contains(SearchTerm));
+            }
+
+            var count = vendorsQuery.Count();
+            var vendors = vendorsQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
             if (!vendors.Any())
             {
                 return NoContent();
@@ -165,6 +188,8 @@ namespace dressify.Controllers
             {
                 SalesId = sales.Id,
                 SalesName = sales.UserName,
+                FName = sales.FName,
+                LName = sales.LName,
                 Email = sales.Email,
                 ProfilePic = sales.ProfilePic
             }).ToList();

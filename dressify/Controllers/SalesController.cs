@@ -84,16 +84,25 @@ namespace dressify.Controllers
         }
         [HttpGet("ViewSalesProducts")]
         [Authorize(Roles = SD.Role_Sales)]
-        public async Task<IActionResult> ViewSalesProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        public async Task<IActionResult> ViewSalesProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm)
         {
             if (PageNumber <= 0 || PageSize <= 0)
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
-            var salesProducts = await _unitOfWork.Product.FindAllAsync(p=>p.Vendor.StoreName==SD.StoreName, skip, PageSize, new[] { "ProductImages" });
-            var count = await _unitOfWork.Product.CountAsync(p => p.Vendor.StoreName == SD.StoreName);
-
+            var salesProductsQuery = await _unitOfWork.Product.FindAllAsync(p=>p.Vendor.StoreName==SD.StoreName, skip, PageSize, new[] { "ProductImages" });
+            if (!string.IsNullOrEmpty(SearchTerm))
+            {
+                salesProductsQuery = salesProductsQuery.Where(p => p.ProductName.Contains(SearchTerm) || (p.Description != null && p.Description.Contains(SearchTerm)));
+            }
+            var count = salesProductsQuery.Count();
+            var salesProducts = salesProductsQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
             if (!salesProducts.Any())
                 return NoContent();
             return Ok(new { Count = count, SalesProducts = salesProducts });

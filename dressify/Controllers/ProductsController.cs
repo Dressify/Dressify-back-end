@@ -105,8 +105,6 @@ namespace dressify.Controllers
         }
 
 
-
-
         [HttpGet("GetProductDetails")]
         public async Task<IActionResult> GetProduct([FromQuery] int id)
         {

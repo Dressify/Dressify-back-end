@@ -1,5 +1,6 @@
 ﻿using Dressify.DataAccess.Repository;
 using Dressify.DataAccess.Repository.IRepository;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ namespace dressify.Controllers
         //Product has more than 10 reports that have been checked
         [HttpGet("NeedToPunch")]
         [Authorize]
-        public async Task<IActionResult> NeedToPunch([FromQuery] int? PageNumber, [FromQuery] int? PageSize,[FromQuery] int? reportCountThreshold)
+        public async Task<IActionResult> NeedToPunch([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm, [FromQuery] int? reportCountThreshold)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
@@ -32,23 +33,23 @@ namespace dressify.Controllers
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
 
-            var products = await _unitOfWork.Product.GetProductsAsync(reportCountThreshold);
-            var count = products.Count();
+            var productsQuery = _unitOfWork.Product.GetProducts(reportCountThreshold);
 
-            if (skip.HasValue)
+            if (!string.IsNullOrEmpty(SearchTerm))
             {
-                products.Skip(skip.Value);
+                productsQuery = productsQuery.Where(p=>p.ProductName.Contains(SearchTerm)||(p.Description!=null && p.Description.Contains(SearchTerm)));
             }
-            if(PageSize.HasValue)
-            {
-                products.Take(PageSize.Value);
-            }
-            if (!products.Any())
-            {
-                return NoContent();
-            }
+
+            var count = productsQuery.Count();
+
+            var products = productsQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
 
             return Ok(new { Count = count, Products = products });
         }

@@ -34,6 +34,12 @@ namespace Dressify.DataAccess.Repository
             return _context.Set<T>().ToList();
         }
 
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await _context.Set<T>().ToListAsync();
+
+        }
+
         public async Task<IEnumerable<T>> GetAllAsync( string[]? includes = null)
         {
             IQueryable<T> query = _context.Set<T>();
