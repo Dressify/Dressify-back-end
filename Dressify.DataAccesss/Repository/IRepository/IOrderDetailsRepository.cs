@@ -11,5 +11,7 @@ namespace Dressify.DataAccess.Repository.IRepository
     public interface IOrderDetailsRepository : IRepository<OrderDetails>
     {
        int OrdersQuantity(IEnumerable<OrderDetails> Details);
+        void returnProductQuantity(int orderid);
+
     }
 }
