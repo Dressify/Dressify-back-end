@@ -358,7 +358,7 @@ namespace dressify.Controllers
 
             var clientSecret = paymentIntent.ClientSecret;
             return Ok(clientSecret);
-        }   
+        }
         //[HttpPost("TestRefund")]
         //public async Task<IActionResult> TestRefund() 
         //{
@@ -370,5 +370,18 @@ namespace dressify.Controllers
         //    var service = new RefundService();
         //    Refund refund = service.Create(options);
         //}
+        [HttpPost("testrefund")]
+        public async Task<IActionResult> RefundPayment(string paymentIntentId)
+        {
+            var refundOptions = new RefundCreateOptions
+            {
+                PaymentIntent = "pi_3N8B03Dz65k2SKUd1gOOojch"
+
+            };
+            var refundService = new RefundService();
+            var refund = await refundService.CreateAsync(refundOptions);
+            return Ok();    
+        }
+
     }
 }

@@ -166,7 +166,13 @@ namespace Dressify.DataAccess.Repository
             foreach (var order in PendingOrders)
             {
                 var OrderDetails = _context.OrdersDetails.Where(d => d.OrderId == order.OrderId);
-                bool isConfirmed = OrderDetails.All(r => r.Status == SD.Status_Confirmed);
+                var isConfirmed = true;
+                foreach (var product in OrderDetails)
+                {
+                    if (product.Status != SD.Status_Confirmed)
+                         isConfirmed = false;
+                }
+                //bool isConfirmed = OrderDetails.All(r => r.Status == SD.Status_Confirmed);
                 if(isConfirmed)
                 {
                     order.OrderStatus = SD.Status_Confirmed;
@@ -179,7 +185,7 @@ namespace Dressify.DataAccess.Repository
         public void ShipOrders()
         {
             var now = DateTime.UtcNow;
-            var confirmedProducts = _context.Orders.Where(o => o.OrderStatus == SD.Status_Confirmed && o.Date.Value.AddMinutes(1)<= now);
+            var confirmedProducts = _context.Orders.Where(o => o.OrderStatus == SD.Status_Confirmed && o.Date.Value.AddMinutes(1)<= now).ToList();
             foreach (var order in confirmedProducts)
             {
                 order.OrderStatus = SD.Status_Shipped;
