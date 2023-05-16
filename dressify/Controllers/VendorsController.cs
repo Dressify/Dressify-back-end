@@ -32,16 +32,16 @@ namespace dressify.Controllers
             var product = new Product
             {
                 VendorId = _unitOfWork.getUID(),
-                ProductName = dto.ProductName,
-                Description = dto.Description,
+                ProductName = dto.ProductName.Trim(),
+                Description = dto.Description.Trim(),
                 Price = dto.Price,
                 Quantity = dto.Quantity,
                 Sale = dto.Sale,
                 Rentable = dto.Rentable,
-                Color = dto.Color,
-                Category = dto.Category,
-                SubCategory = dto.SubCategory,
-                Type = dto.Type,
+                Color = dto.Color.Trim(),
+                Category = dto.Category.Trim(),
+                SubCategory = dto.SubCategory.Trim(),
+                Type = dto.Type.Trim(),
             };
             await _unitOfWork.Product.AddAsync(product);
             _unitOfWork.Save();
@@ -227,7 +227,7 @@ namespace dressify.Controllers
             var vendorProductsQuery = await _unitOfWork.Product.FindAllAsync(p => p.VendorId == vendorId, new[] { "ProductImages" });
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                vendorProductsQuery = vendorProductsQuery.Where(p => p.ProductName.Contains(SearchTerm) || ( p.Description!=null&&p.Description.Contains(SearchTerm)));
+                vendorProductsQuery = vendorProductsQuery.Where(p => p.ProductName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || ( p.Description!=null&&p.Description.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())));
             }
             var count = vendorProductsQuery.Count();
             var vendorProducts = vendorProductsQuery
@@ -313,7 +313,7 @@ namespace dressify.Controllers
             var vendorsQuery = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true);
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                vendorsQuery = vendorsQuery.Where(p => p.UserName.Contains(SearchTerm) || p.FName.Contains(SearchTerm) || p.LName.Contains(SearchTerm) || p.StoreName.Contains(SearchTerm));
+                vendorsQuery = vendorsQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.StoreName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
             }
             var count = vendorsQuery.Count();
             var vendors = vendorsQuery

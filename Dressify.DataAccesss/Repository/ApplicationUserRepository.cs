@@ -50,8 +50,8 @@ namespace Dressify.DataAccess.Repository
                 return new AuthDto { Message = "Username is already registered!" };
             var user = new ApplicationUser
             {
-                UserName = dto.Username,
-                Email = dto.Email,
+                UserName = dto.Username.Trim(),
+                Email = dto.Email.Trim(),
             };
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
@@ -89,13 +89,13 @@ namespace Dressify.DataAccess.Repository
                 return new AuthDto { Message = "Store Name is already registered!" };
             var user = new ApplicationUser
             {
-                UserName = dto.UserName,
-                Email = dto.Email,
-                PhoneNumber = dto.Phone,
-                FName = dto.FName,
-                LName = dto.LName,
-                NId =dto.nId,
-                StoreName=dto.StoreName,
+                UserName = dto.UserName.Trim(),
+                Email = dto.Email.Trim(),
+                PhoneNumber = dto.Phone.Trim(),
+                FName = dto.FName.Trim(),
+                LName = dto.LName.Trim(),
+                NId =dto.nId.Trim(),
+                StoreName=dto.StoreName.Trim(),
                 Address=dto.address
             };
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -134,10 +134,10 @@ namespace Dressify.DataAccess.Repository
                 return new AuthDto { Message = "This Role not exist" };
             var user = new ApplicationUser
             {
-                UserName = dto.Username,
-                Email = dto.Email,
-                FName = dto.FName,
-                LName = dto.LName,
+                UserName = dto.Username.Trim(),
+                Email = dto.Email.Trim(),
+                FName = dto.FName.Trim(),
+                LName = dto.LName.Trim(),
             };
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)

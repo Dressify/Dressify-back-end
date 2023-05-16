@@ -52,16 +52,16 @@ namespace dressify.Controllers
             var product = new Product
             {
                 VendorId = _unitOfWork.getUID(),
-                ProductName = dto.ProductName,
-                Description = dto.Description,
+                ProductName = dto.ProductName.Trim(),
+                Description = dto.Description.Trim(),
                 Price = dto.Price,
                 Quantity = dto.Quantity,
                 Sale = dto.Sale,
                 Rentable = dto.Rentable,
-                Color = dto.Color,
-                Category = dto.Category,
-                SubCategory = dto.SubCategory,
-                Type = dto.Type,
+                Color = dto.Color.Trim(),
+                Category = dto.Category.Trim(),
+                SubCategory = dto.SubCategory.Trim(),
+                Type = dto.Type.Trim(),
             };
             await _unitOfWork.Product.AddAsync(product);
             _unitOfWork.Save();
@@ -96,7 +96,7 @@ namespace dressify.Controllers
             var salesProductsQuery = await _unitOfWork.Product.FindAllAsync(p=>p.Vendor.StoreName==SD.StoreName, skip, PageSize, new[] { "ProductImages" });
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                salesProductsQuery = salesProductsQuery.Where(p => p.ProductName.Contains(SearchTerm) || (p.Description != null && p.Description.Contains(SearchTerm)));
+                salesProductsQuery = salesProductsQuery.Where(p => p.ProductName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || (p.Description != null && p.Description.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())));
             }
             var count = salesProductsQuery.Count();
             var salesProducts = salesProductsQuery

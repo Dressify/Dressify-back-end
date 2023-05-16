@@ -67,22 +67,22 @@ namespace dressify.Controllers
 
             if (!string.IsNullOrEmpty(model.Gender))
             {
-                productsQuery = productsQuery.Where(p => p.Type == model.Gender);
+                productsQuery = productsQuery.Where(p => p.Type.Trim().ToLower() == model.Gender.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.Category))
             {
-                productsQuery = productsQuery.Where(p => p.Category == model.Category);
+                productsQuery = productsQuery.Where(p => p.Category.Trim().ToLower() == model.Category.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.SubCategory))
             {
-                productsQuery = productsQuery.Where(p => p.SubCategory == model.SubCategory);
+                productsQuery = productsQuery.Where(p => p.SubCategory.Trim().ToLower() == model.SubCategory.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.SearchTerm))
             {
-                productsQuery = productsQuery.Where(p => p.ProductName.Contains(model.SearchTerm) || p.Description.Contains(model.SearchTerm));
+                productsQuery = productsQuery.Where(p => p.ProductName.Trim().ToLower().Contains(model.SearchTerm.Trim().ToLower()) || p.Description.Trim().ToLower().Contains(model.SearchTerm.Trim().ToLower()));
             }
 
             var totalCount =  productsQuery.Count();

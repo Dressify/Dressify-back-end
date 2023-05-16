@@ -41,7 +41,7 @@ namespace dressify.Controllers
 
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                productsQuery = productsQuery.Where(p=>p.ProductName.Contains(SearchTerm)||(p.Description!=null && p.Description.Contains(SearchTerm)));
+                productsQuery = productsQuery.Where(p=>p.ProductName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) ||(p.Description!=null && p.Description.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())));
             }
 
             var count = productsQuery.Count();

@@ -62,11 +62,11 @@ namespace dressify.Controllers
                 return BadRequest("Username is already registered!");
             var user = new ApplicationUser
             {
-                UserName = dto.SalesName,
-                Email = dto.Email,
+                UserName = dto.SalesName.Trim(),
+                Email = dto.Email.Trim(),
                 NId = dto.NId,
-                FName = dto.FName,
-                LName = dto.LName,
+                FName = dto.FName.Trim(),
+                LName = dto.LName.Trim(),
                 PhoneNumber = SD.Phone,
                 Address = SD.Address,
                 ProfilePic=SD.ImgUrl,
@@ -125,7 +125,7 @@ namespace dressify.Controllers
 
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                salesQuery = salesQuery.Where(p => p.UserName.Contains(SearchTerm) || p.FName.Contains(SearchTerm) || p.LName.Contains(SearchTerm));
+                salesQuery = salesQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
             }
 
             var count = salesQuery.Count();
@@ -171,7 +171,7 @@ namespace dressify.Controllers
             var vendorsQuery = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.StoreName != null && u.StoreName != SD.StoreName);
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                vendorsQuery = vendorsQuery.Where(p => p.UserName.Contains(SearchTerm) || p.FName.Contains(SearchTerm) || p.LName.Contains(SearchTerm) || p.StoreName.Contains(SearchTerm));
+                vendorsQuery = vendorsQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.StoreName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
             }
 
             var count = vendorsQuery.Count();

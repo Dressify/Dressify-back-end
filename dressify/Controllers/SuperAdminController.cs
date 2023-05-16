@@ -78,7 +78,7 @@ namespace dressify.Controllers
             var adminsQuery = await _unitOfWork.Admin.GetAllAsync();
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                adminsQuery = adminsQuery.Where(p => p.AdminName.Contains(SearchTerm) || p.Email.Contains(SearchTerm));
+                adminsQuery = adminsQuery.Where(p => p.AdminName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.Email.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
             }
 
             var count = adminsQuery.Count();

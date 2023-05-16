@@ -34,10 +34,10 @@ namespace Dressify.DataAccess.Repository
             CreatePasswordHash(adminDto.Password, out passwordHash, out passwordSalt);
             var admin = new Admin
             {
-                AdminName = adminDto.AdminName,
+                AdminName = adminDto.AdminName.Trim(),
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                Email = adminDto.Email,
+                Email = adminDto.Email.Trim(),
                 ProfilePic=adminDto.ProfilePic,
                 PublicId = adminDto.PublicId,
 
