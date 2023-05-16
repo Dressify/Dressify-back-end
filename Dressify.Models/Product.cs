@@ -25,7 +25,6 @@ namespace Dressify.Models
         public int NumberOfSales { get; set; }
         public float Sale { get; set; }
         public int Purchases { get; set; }
-        public bool Rentable { get; set; }
         public bool IsSuspended { get; set; }
         public DateTime? SuspendedUntil { get; set; }
         public string? Color { get; set; }

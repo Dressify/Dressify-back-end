@@ -37,7 +37,6 @@ namespace dressify.Controllers
                 Price = dto.Price,
                 Quantity = dto.Quantity,
                 Sale = dto.Sale,
-                Rentable = dto.Rentable,
                 Color = dto.Color.Trim(),
                 Category = dto.Category.Trim(),
                 SubCategory = dto.SubCategory.Trim(),

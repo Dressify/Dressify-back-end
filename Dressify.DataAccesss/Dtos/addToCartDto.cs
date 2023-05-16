@@ -13,6 +13,5 @@ namespace Dressify.DataAccess.Dtos
         public string? CustomerId { get; set; }
         public int ProductId { get; set; }
         public int? quantity { get; set; }
-        public bool IsRent { get; set; }
     }
 }

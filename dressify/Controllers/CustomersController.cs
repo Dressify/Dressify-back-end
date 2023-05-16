@@ -154,7 +154,6 @@ namespace dressify.Controllers
             {
                 CustomerId = shoppingCart.CustomerId,
                 ProductId = shoppingCart.ProductId,
-                IsRent=shoppingCart.IsRent,
                 Quantity=shoppingCart.quantity
             };
             if (product.Quantity <= 0)

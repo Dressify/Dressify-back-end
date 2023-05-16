@@ -54,7 +54,6 @@ namespace dressify.Controllers
                     var obj = new CartDto
                     {
                         Product = product,
-                        IsRent = item.IsRent,
                         quantity = item.Quantity,
                         price = _unitOfWork.CalculatePrice(item.Quantity.Value, product.Price,product.Sale)
                     };
@@ -93,7 +92,6 @@ namespace dressify.Controllers
             {
                 var productDetail = new SummaryDetailsListDto()
                 {
-                    IsRent = item.IsRent,
                     Quantity = item.Quantity.Value,
                     ProductName = item.Product.ProductName,
                     Price = _unitOfWork.CalculatePrice(item.Quantity.Value, item.Product.Price, item.Product.Sale),
