@@ -123,8 +123,8 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
         }) }
 });
 RecurringJob.AddOrUpdate<IUnitOfWork>(x => x.Unsuspend(), Cron.Daily(0));
-RecurringJob.AddOrUpdate<IUnitOfWork>(x => x.ConfirmOredrs(), Cron.Daily(0));
-RecurringJob.AddOrUpdate<IUnitOfWork>(x => x.ShipOrders(), Cron.Daily(0));
+RecurringJob.AddOrUpdate<IUnitOfWork>(x => x.ConfirmOrders(), Cron.Daily(0));
+RecurringJob.AddOrUpdate<IUnitOfWork>(x => x.ShippOrders(), Cron.Daily(0));
 RecurringJob.AddOrUpdate<IUnitOfWork>(x => x.DeliverOrders(), Cron.Daily(0));
 app.MapControllers();
 app.Run();

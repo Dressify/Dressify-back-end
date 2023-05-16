@@ -151,7 +151,7 @@ namespace Dressify.DataAccess.Repository
             }
              _context.SaveChanges();
         }
-        public void ConfirmOredrs()
+        public void ConfirmOrders()
         {   //orderDetails
             var now = DateTime.UtcNow;
             var PendingProducts = _context.OrdersDetails.Where(p => p.Status == SD.Status_Pending &&p.Date.AddMinutes(1)<= now );
@@ -182,7 +182,7 @@ namespace Dressify.DataAccess.Repository
             }
             _context.SaveChanges();
         }
-        public void ShipOrders()
+        public void ShippOrders()
         {
             var now = DateTime.UtcNow;
             var confirmedProducts = _context.Orders.Where(o => o.OrderStatus == SD.Status_Confirmed && o.Date.Value.AddMinutes(1)<= now).ToList();
@@ -282,6 +282,16 @@ namespace Dressify.DataAccess.Repository
                 Status = intent.Status,
             };
             return model;
+        }
+        public void refund(string id)
+        {
+            var options = new RefundCreateOptions
+            {
+                Reason = RefundReasons.RequestedByCustomer,
+                PaymentIntent = id,
+            };
+            var service = new RefundService();
+           
         }
     }
 }
