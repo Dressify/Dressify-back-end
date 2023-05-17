@@ -22,7 +22,6 @@ namespace Dressify.Models
         public float Price { get; set; }
         public int Quantity { get; set; }
         [DisplayName("Number of sales")]
-        public int NumberOfSales { get; set; }
         public float Sale { get; set; }
         public int Purchases { get; set; }
         public bool IsSuspended { get; set; }
