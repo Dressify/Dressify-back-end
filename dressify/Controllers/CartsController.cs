@@ -26,18 +26,11 @@ namespace dressify.Controllers
 
         [Authorize]
         [HttpGet("GetCustomerCart")]
-        public async Task<IActionResult> GetAsync([FromQuery] int? PageNumber,[FromQuery] int? PageSize)
+        public async Task<IActionResult> GetAsync()
         {
             var uId = _unitOfWork.getUID();
-            if (PageNumber <= 0 || PageSize <= 0)
-            {
-                return BadRequest("Page number and page size must be positive integers.");
-            }
-
-            var skip = (PageNumber - 1) * PageSize;
             var result = await _unitOfWork.ShoppingCart.FindAllAsync(C => C.CustomerId == uId);
             var count = await _unitOfWork.ShoppingCart.CountAsync();
-
             if (!result.Any())
                 return BadRequest("There are no products in the Cart ");
             List<CartDto> cart = new List<CartDto>();
@@ -66,7 +59,6 @@ namespace dressify.Controllers
             {
                 return BadRequest("There are no products in the Cart ");
             }
-            cart.Skip(skip.Value).Take(PageSize.Value);
             return Ok(new { Count = count, Carts = cart });
         }
 
