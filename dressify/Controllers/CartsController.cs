@@ -151,7 +151,7 @@ namespace dressify.Controllers
             order.PaymentDate = DateTime.Now;
             order.Address = dto.Address;
             order.Phone = dto.Phone;
-            order.OrderStatus = SD.Status_not_paid;
+            order.OrderStatus = SD.Status_Pending;
             order.TotalPrice = 0;
             _unitOfWork.Order.Add(order);
             _unitOfWork.Save();
@@ -183,10 +183,11 @@ namespace dressify.Controllers
             var bill = new PayBill()
             {
                 PaymentIntentId = payment.paymentIntentId,
-                Status = payment.Status,
+                Status = SD.PaymentStatus_Succeded,
                 OrderId= order.OrderId,
             };           
             _unitOfWork.PayBill.Add(bill);
+            _unitOfWork.ShoppingCart.DeleteRange(cartList);
             _unitOfWork.Save();
             return Ok(clientSecret);
         }
@@ -298,6 +299,8 @@ namespace dressify.Controllers
             if (order.OrderStatus == SD.Status_Pending && order.payementMethod == SD.PaymentMethod_Cash  )
             {
                 order.OrderStatus = SD.Status_Cancelled;
+                order.Date = DateTime.UtcNow;
+                _unitOfWork.OrderDetails.returnProductQuantity(order.OrderId);
                 _unitOfWork.Order.Update(order);
                 _unitOfWork.Save();
                 return Ok();
@@ -307,14 +310,10 @@ namespace dressify.Controllers
                 var payBill = await _unitOfWork.PayBill.FindAsync(p => p.OrderId == order.OrderId);
                 if (payBill.Status == SD.PaymentStatus_Succeded)
                 {
-                    var options = new RefundCreateOptions
-                    {
-                        Reason = RefundReasons.RequestedByCustomer,
-                        PaymentIntent = payBill.PaymentIntentId,
-                    };
-                    var service = new RefundService();
-                    Refund refund = service.Create(options);
+                    _unitOfWork.refund(payBill.PaymentIntentId);
+                    _unitOfWork.OrderDetails.returnProductQuantity(order.OrderId);
                     order.OrderStatus = SD.Status_Cancelled;
+                    order.Date = DateTime.UtcNow;
                     _unitOfWork.Order.Update(order);
                     _unitOfWork.Save();
                     return Ok();
@@ -373,8 +372,8 @@ namespace dressify.Controllers
         {
             var refundOptions = new RefundCreateOptions
             {
-                PaymentIntent = "pi_3N8B03Dz65k2SKUd1gOOojch"
-
+                PaymentIntent = "pi_3N8OxdDz65k2SKUd2VI2AqhI",
+                Amount = 2000
             };
             var refundService = new RefundService();
             var refund = await refundService.CreateAsync(refundOptions);

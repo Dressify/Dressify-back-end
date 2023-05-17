@@ -78,6 +78,10 @@ namespace dressify.Controllers
             var skip = (PageNumber - 1) * PageSize;
 
             var questions = await _unitOfWork.ProductQuestion.FindAllAsync(u => u.Product.VendorId == uId && u.Answer == null,skip,PageSize, new[] { "Product" });
+            foreach (var question in questions)
+            {
+                question.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == question.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.ProductQuestion.CountAsync(u => u.Product.VendorId == uId && u.Answer == null);
 
             if (!questions.Any())
@@ -96,7 +100,8 @@ namespace dressify.Controllers
                 return NotFound("vendor does not exist");
             }
             var question = await _unitOfWork.ProductQuestion.FindAsync(u => u.QuestionID==questionId&&u.Product.VendorId == uId, new[] { "Product" });
-           
+            question.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == question.ProductId, new[] { "ProductImages" });
+
             if (question==null)
             {
                 return NoContent();

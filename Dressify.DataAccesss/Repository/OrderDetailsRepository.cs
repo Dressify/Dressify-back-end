@@ -28,5 +28,16 @@ namespace Dressify.DataAccess.Repository
             }
             return sum;
         }
+        public  void returnProductQuantity(int orderid)
+        {
+            var OrderDetails = _context.OrdersDetails.Where(o => o.OrderId == orderid);
+            foreach(var item in OrderDetails)
+            {
+               var  product= _context.Products.Find(item.ProductId);
+                product.Quantity +=item.Quantity.Value;
+                _context.Update(product);
+            }
+
+        }
     }
 }

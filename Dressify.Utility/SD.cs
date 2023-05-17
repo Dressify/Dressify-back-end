@@ -27,7 +27,6 @@ namespace Dressify.Utility
 
         //only for Order 
         public const string Status_Cancelled = "Cancelled";
-        public const string Status_not_paid  = "not paid";
 
         //Payment Methods 
         public const string PaymentMethod_Cash = "Cash";
