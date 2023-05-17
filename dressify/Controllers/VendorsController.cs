@@ -155,7 +155,7 @@ namespace dressify.Controllers
                 return BadRequest("Page number and page size must be positive integers.");
             }
             var skip = (PageNumber - 1) * PageSize;
-            var pendingOrders = _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize );
+            var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize );
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId);
             return Ok(new { Count = count, PendingOrders = pendingOrders });
         }
@@ -171,7 +171,7 @@ namespace dressify.Controllers
                 return BadRequest("Page number and page size must be positive integers.");
             }
             var skip = (PageNumber - 1) * PageSize;
-            var orders = _unitOfWork.OrderDetails.FindAllAsync(od =>  od.VendorId == uId, skip, PageSize);
+            var orders = await _unitOfWork.OrderDetails.FindAllAsync(od =>  od.VendorId == uId, skip, PageSize);
             var count = await _unitOfWork.OrderDetails.CountAsync(od =>  od.VendorId == uId);
             return Ok(new { Count = count, Orders = orders });
         }
