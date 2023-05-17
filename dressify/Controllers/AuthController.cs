@@ -2,6 +2,7 @@
 using Dressify.DataAccess.Helpers;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Utility;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Newtonsoft.Json.Linq;
@@ -113,7 +114,7 @@ namespace dressify.Controllers
             return BadRequest("User Name or Password Wrong");
         }
 
-
+        [Authorize]
         //Modify Photo For Vendor ,and Customer 
         [HttpPut("ModifyPhoto")]
         public async Task<IActionResult> ModifyPhoto(IFormFile photo)
@@ -139,7 +140,7 @@ namespace dressify.Controllers
             }
         return Unauthorized();
         }
-
+        [Authorize]
         //Delete Photo For Vendor ,and Customer 
         [HttpDelete("DeletePhoto")]
         public async Task<IActionResult> DelePhoto()

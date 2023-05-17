@@ -25,6 +25,7 @@ namespace dressify.Controllers
         }
 
         [HttpPost("AddProduct")]
+        [Authorize(Roles =SD.Role_Vendor)]
         public async Task<IActionResult> AddProduct([FromForm] CreateProductDto dto)
         {
             if (!ModelState.IsValid)
@@ -91,7 +92,9 @@ namespace dressify.Controllers
             }
             return Ok(new { Count = count, Questions = questions });
         }
+
         [HttpGet("GetQuestionById")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<ActionResult> GetQuestionById([FromQuery]int questionId)
         {
             var uId = _unitOfWork.getUID();
@@ -109,6 +112,8 @@ namespace dressify.Controllers
             }
             return Ok(question);
         }
+
+        [Authorize(Roles = SD.Role_Vendor)]
         [HttpPut("AnswerQuestion")]
         public async Task<IActionResult> AnswerQuestion(AnswerDto obj)
         {
@@ -143,6 +148,8 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok(question);
         }
+
+        [Authorize(Roles = SD.Role_Vendor)]
         [HttpGet("GetPendingOrders")]
         public async Task<IActionResult> GetPendingOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
@@ -159,7 +166,10 @@ namespace dressify.Controllers
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId);
             return Ok(new { Count = count, PendingOrders = pendingOrders });
         }
+
+
         [HttpGet("GetOrders")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> GetOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
@@ -176,6 +186,7 @@ namespace dressify.Controllers
             return Ok(new { Count = count, Orders = orders });
         }
         [HttpGet("GetOrderById")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> GetOrderById(int orderId)
         {
             var uId = _unitOfWork.getUID();
@@ -187,6 +198,7 @@ namespace dressify.Controllers
             return Ok(Order);
         }
         [HttpPut("ConfirmtPendingOrders")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> ConfirmtPendingOrders(int orderId , int productId)
         {
             var uId = _unitOfWork.getUID();
@@ -219,6 +231,7 @@ namespace dressify.Controllers
             return Ok();
         }
         [HttpGet("ViewOwnProducts")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> ViewOwnProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm)
         {
             var vendorId = _unitOfWork.getUID();
@@ -259,6 +272,7 @@ namespace dressify.Controllers
             return Ok(product);
         }
         [HttpGet("ViewVendorProfile")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<VendorProfileDto> ViewVendorProfile()
         {
             var uId = _unitOfWork.getUID();
@@ -276,6 +290,7 @@ namespace dressify.Controllers
             return VendorProfile;
         }
         [HttpPut("EditVendorProfile")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> EditVendorProfile(VendorProfileDto vendorProfile)
         {
             var uId = _unitOfWork.getUID();

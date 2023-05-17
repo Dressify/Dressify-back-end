@@ -194,62 +194,6 @@ namespace dressify.Controllers
             return Ok(clientSecret);
         }
 
-        //[HttpPost("Payment")]
-        //public async Task<IActionResult> payment(SummaryDto Summary)
-        //{
-        //    var uId = _unitOfWork.getUID();
-        //    Summary.ListCart = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
-        //    Summary.Order.CustomerId = uId;
-        //    foreach (var cart in Summary.ListCart)
-        //    {
-        //        var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == cart.ProductId);
-        //        OrderDetails orderDetail = new()
-        //        {
-        //            ProductId = cart.ProductId,
-        //            Price =  ,
-        //            OrderId = Summary.Order.OrderId,
-        //            Quantity = cart.Quantity,
-        //            VendorId = product.VendorId,
-        //        };
-        //        _unitOfWork.OrderDetails.Add(orderDetail);
-        //        _unitOfWork.Save();
-        //    }
-        //    //if (Summary.Order.payementMethod == SD.PaymentMethod_Credit)
-        //    //{
-        //    //    Summary.Order.payementMethod = SD.PaymentMethod_Credit;
-        //    //    // Stripe
-        //    //    var paymentIntentService = new PaymentIntentService();
-        //    //    var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
-        //    //    {
-        //    //        Amount = (long?)(Summary.Order.TotalPrice * 100),
-        //    //        Currency = "usd",
-        //    //        AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
-        //    //        {
-        //    //            Enabled = true,
-        //    //        },
-        //    //    });
-        //    //    var clientSecret = paymentIntent.ClientSecret;
-
-        //    //    var bill = new PayBill()
-        //    //    {
-        //    //        PaymentIntentId = paymentIntent.Id,
-        //    //        Status = paymentIntent.Status,
-        //    //    };
-        //    //    _unitOfWork.Order.Add(Summary.Order);
-        //    //    _unitOfWork.PayBill.Add(bill);
-        //    //    _unitOfWork.Save();
-        //    //    return Ok(clientSecret);
-        //    //}
-        //    Summary.Order.PaymentDate = DateTime.Now;
-        //    Summary.Order.payementMethod = SD.PaymentMethod_Cash;
-        //    Summary.Order.OrderStatus = SD.Status_Confirmed;
-        //    _unitOfWork.Order.Add(Summary.Order);
-        //    _unitOfWork.Save();
-
-        //    return Ok();
-        //}
-
-
         [HttpPut("IncrementQuantity")]
         public async Task<IActionResult> Plus(int productId)
         {
@@ -280,7 +224,7 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
-
+        [Authorize]
         [HttpDelete("RemoveFromCart")]
         public async Task<IActionResult> Remove(int productId)
         {
@@ -290,7 +234,7 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
-
+        [Authorize]
         [HttpPut("CancelOrder")]
         public async Task<IActionResult> CancelOrder(int orderId)
         {
@@ -325,21 +269,7 @@ namespace dressify.Controllers
             else return BadRequest("Order Can not be Canceled");
         }
 
-        //[HttpPut("OrderConfirmation")]
-        //public async Task<IActionResult> OrderConfirmation(int orderId , string orderStatus)
-        //{
-        //    var payBill = await _unitOfWork.PayBill.FindAsync(p => p.OrderId == orderId);
-        //    if (payBill == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    if(payBill.Status == null || payBill.Status == SD.PaymentStatus_Failed)
-        //    {
-
-        //    }
-            
-        //}
-
+        [Authorize]
         [HttpPost("testPay")]
         public async Task<IActionResult> TestPay()
         {
@@ -358,29 +288,5 @@ namespace dressify.Controllers
             var clientSecret = paymentIntent.ClientSecret;
             return Ok(clientSecret);
         }
-        //[HttpPost("TestRefund")]
-        //public async Task<IActionResult> TestRefund() 
-        //{
-        //    var options = new RefundCreateOptions
-        //    {
-        //        Reason = RefundReasons.RequestedByCustomer,
-        //        PaymentIntent = ,
-        //    };
-        //    var service = new RefundService();
-        //    Refund refund = service.Create(options);
-        //}
-        [HttpPost("testrefund")]
-        public async Task<IActionResult> RefundPayment(string paymentIntentId)
-        {
-            var refundOptions = new RefundCreateOptions
-            {
-                PaymentIntent = "pi_3N8OxdDz65k2SKUd2VI2AqhI",
-                Amount = 2000
-            };
-            var refundService = new RefundService();
-            var refund = await refundService.CreateAsync(refundOptions);
-            return Ok();    
-        }
-
     }
 }
