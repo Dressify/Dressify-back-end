@@ -206,11 +206,19 @@ namespace dressify.Controllers
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
-            var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.Vendor.StoreName==SD.StoreName, skip, PageSize);
+            var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.Vendor.StoreName==SD.StoreName, skip, PageSize, new[] { "Product" });
+            
             if(!pendingOrders.Any())
             {
                 return NoContent();
+            }
+            foreach (var order in pendingOrders)
+            {
+                order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == order.ProductId, new[] { "ProductImages" });
             }
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.Vendor.StoreName == SD.StoreName);
             return Ok(new { Count = count, PendingSalesOrders = pendingOrders });
@@ -223,21 +231,28 @@ namespace dressify.Controllers
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
-            var orders = await _unitOfWork.OrderDetails.FindAllAsync(od =>  od.Vendor.StoreName == SD.StoreName, skip, PageSize);
+            var orders = await _unitOfWork.OrderDetails.FindAllAsync(od =>  od.Vendor.StoreName == SD.StoreName, skip, PageSize, new[] { "Product" });
             if (!orders.Any())
             {
                 return NoContent();
+            }
+            foreach (var order in orders)
+            {
+                order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == order.ProductId, new[] { "ProductImages" });
             }
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Vendor.StoreName == SD.StoreName);
             return Ok(new { Count = count, Orders = orders });
         }
         [HttpGet("GetOrderById")]
         [Authorize(Roles = SD.Role_Sales)]
-        public async Task<IActionResult> GetOrderById(int orderId)
+        public async Task<IActionResult> GetOrderById([FromQuery]int orderId,[FromQuery]int productId)
         {
-            var Order = _unitOfWork.OrderDetails.FindAsync(od => od.OrderId == orderId && od.Vendor.StoreName==SD.StoreName);
+            var Order =await _unitOfWork.OrderDetails.FindAsync(od => od.OrderId == orderId && od.Vendor.StoreName==SD.StoreName&&od.ProductId==productId);
             if (Order == null) return NotFound();
+            Order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == productId, new[] { "ProductImages" });
             return Ok(Order);
         }
         [HttpPut("ConfirmPendingOrders")]
