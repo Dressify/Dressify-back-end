@@ -27,7 +27,7 @@ namespace dressify.Controllers
             _userManager = userManager;
         }
 
-
+        [Authorize]
         [HttpPost("RateProduct")]
         public async Task<IActionResult> RateProduct(RateDto obj)
         {
@@ -69,6 +69,7 @@ namespace dressify.Controllers
             return Ok(obj);
         }
 
+        [Authorize]
         [HttpPost("addToWishList")]
         public async Task<IActionResult> AddToWishList(WishListDto obj)
         {
@@ -91,7 +92,7 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok(obj);
         }
-
+        [Authorize]
         [HttpDelete("DeleteFromWishList")]
         public async Task<IActionResult> DeleteFromWishList([FromQuery]int ProductId)
         {
@@ -113,7 +114,7 @@ namespace dressify.Controllers
             return Ok(ProductId);
         }
 
-
+        [Authorize]
         [HttpPost("AskQuestion")]
         public async Task<IActionResult> AskQuestion(QuestionDto obj)
         {
@@ -195,7 +196,7 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
-
+        [Authorize]
         [HttpGet("ViewCustomerProfile")]
         public async Task<CustomerProfileDto> ViewCustomerProfile()
         {
@@ -214,6 +215,7 @@ namespace dressify.Controllers
             return customerProfile;
         }
 
+        [Authorize]
         [HttpPut("EditCustomerProfile")]
         public async Task<IActionResult> EditCustomerProfile(CustomerEditProfileDto customerProfile)
         {
@@ -238,9 +240,9 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok();
         }
-        
 
 
+        [Authorize]
         [HttpDelete("DeleteCustomerCart")]
         public async Task<IActionResult> Clear()
         {
@@ -253,6 +255,8 @@ namespace dressify.Controllers
             return Ok();
         }
 
+
+        [Authorize]
         [HttpGet("GetCustomerOrders")]
         public async Task<IActionResult> getCusOrders([FromQuery] GetOrdersDto model)
         {
@@ -293,7 +297,7 @@ namespace dressify.Controllers
             return Ok(new { Count = totalCount, ProductsWithAvgRates = customerOrders });
         }
 
-
+        [Authorize]
         [HttpGet("getOrderDetails")]
         public async Task<IActionResult> getOrderDetails([FromQuery]int OrderId)
         {

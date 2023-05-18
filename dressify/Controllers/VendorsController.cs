@@ -25,6 +25,7 @@ namespace dressify.Controllers
         }
 
         [HttpPost("AddProduct")]
+        [Authorize(Roles =SD.Role_Vendor)]
         public async Task<IActionResult> AddProduct([FromForm] CreateProductDto dto)
         {
             if (!ModelState.IsValid)
@@ -90,7 +91,9 @@ namespace dressify.Controllers
             }
             return Ok(new { Count = count, Questions = questions });
         }
+
         [HttpGet("GetQuestionById")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<ActionResult> GetQuestionById([FromQuery]int questionId)
         {
             var uId = _unitOfWork.getUID();
@@ -108,6 +111,8 @@ namespace dressify.Controllers
             }
             return Ok(question);
         }
+
+        [Authorize(Roles = SD.Role_Vendor)]
         [HttpPut("AnswerQuestion")]
         public async Task<IActionResult> AnswerQuestion(AnswerDto obj)
         {
@@ -142,6 +147,8 @@ namespace dressify.Controllers
             _unitOfWork.Save();
             return Ok(question);
         }
+
+        [Authorize(Roles = SD.Role_Vendor)]
         [HttpGet("GetPendingOrders")]
         public async Task<IActionResult> GetPendingOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
@@ -154,11 +161,18 @@ namespace dressify.Controllers
                 return BadRequest("Page number and page size must be positive integers.");
             }
             var skip = (PageNumber - 1) * PageSize;
-            var pendingOrders = _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize );
+            var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize, new[] { "Product" });
+            foreach(var order in pendingOrders)
+            {
+                order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == order.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId);
             return Ok(new { Count = count, PendingOrders = pendingOrders });
         }
+
+
         [HttpGet("GetOrders")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> GetOrders([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
             var uId = _unitOfWork.getUID();
@@ -170,22 +184,29 @@ namespace dressify.Controllers
                 return BadRequest("Page number and page size must be positive integers.");
             }
             var skip = (PageNumber - 1) * PageSize;
-            var orders = _unitOfWork.OrderDetails.FindAllAsync(od =>  od.VendorId == uId, skip, PageSize);
+            var orders = await _unitOfWork.OrderDetails.FindAllAsync(od =>  od.VendorId == uId, skip, PageSize , new[] { "Product" });
+            foreach (var order in orders)
+            {
+                order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == order.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.OrderDetails.CountAsync(od =>  od.VendorId == uId);
             return Ok(new { Count = count, Orders = orders });
         }
         [HttpGet("GetOrderById")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> GetOrderById(int orderId)
         {
             var uId = _unitOfWork.getUID();
             var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
             if (vendor.IsSuspended == true)
                 return BadRequest("Vendor is Suspended");
-            var Order = _unitOfWork.OrderDetails.FindAsync(od => od.OrderId== orderId&&od.VendorId==uId);
+            var Order = await _unitOfWork.OrderDetails.FindAsync(od => od.OrderId== orderId&&od.VendorId==uId);
             if (Order == null) return NotFound();
+            Order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == Order.ProductId, new[] { "ProductImages" });
             return Ok(Order);
         }
         [HttpPut("ConfirmtPendingOrders")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> ConfirmtPendingOrders(int orderId , int productId)
         {
             var uId = _unitOfWork.getUID();
@@ -218,6 +239,7 @@ namespace dressify.Controllers
             return Ok();
         }
         [HttpGet("ViewOwnProducts")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> ViewOwnProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize, [FromQuery] string? SearchTerm)
         {
             var vendorId = _unitOfWork.getUID();
@@ -258,6 +280,7 @@ namespace dressify.Controllers
             return Ok(product);
         }
         [HttpGet("ViewVendorProfile")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<VendorProfileDto> ViewVendorProfile()
         {
             var uId = _unitOfWork.getUID();
@@ -275,6 +298,7 @@ namespace dressify.Controllers
             return VendorProfile;
         }
         [HttpPut("EditVendorProfile")]
+        [Authorize(Roles = SD.Role_Vendor)]
         public async Task<IActionResult> EditVendorProfile(VendorProfileDto vendorProfile)
         {
             var uId = _unitOfWork.getUID();

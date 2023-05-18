@@ -1,6 +1,7 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,7 @@ namespace dressify.Controllers
             _unitOfWork = unitOfWork;
         }
 
-
+        [Authorize]
         [HttpGet("GetCustomerWishList")]
         public async Task<IActionResult> GetAsync([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
         {
