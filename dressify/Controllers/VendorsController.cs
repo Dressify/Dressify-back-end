@@ -194,15 +194,15 @@ namespace dressify.Controllers
         }
         [HttpGet("GetOrderById")]
         [Authorize(Roles = SD.Role_Vendor)]
-        public async Task<IActionResult> GetOrderById(int orderId)
+        public async Task<IActionResult> GetOrderById([FromQuery] int orderId, [FromQuery] int productId)
         {
             var uId = _unitOfWork.getUID();
             var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
             if (vendor.IsSuspended == true)
                 return BadRequest("Vendor is Suspended");
-            var Order = await _unitOfWork.OrderDetails.FindAsync(od => od.OrderId== orderId&&od.VendorId==uId);
+            var Order = await _unitOfWork.OrderDetails.FindAsync(od => od.OrderId== orderId && od.VendorId==uId && od.ProductId == productId);
             if (Order == null) return NotFound();
-            Order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == Order.ProductId, new[] { "ProductImages" });
+            Order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == productId, new[] { "ProductImages" });
             return Ok(Order);
         }
         [HttpPut("ConfirmtPendingOrders")]
