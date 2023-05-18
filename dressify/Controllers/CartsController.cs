@@ -238,6 +238,12 @@ namespace dressify.Controllers
                 order.Date = DateTime.UtcNow;
                 _unitOfWork.OrderDetails.returnProductQuantity(order.OrderId);
                 _unitOfWork.Order.Update(order);
+                var orders = await _unitOfWork.OrderDetails.FindAllAsync(o => o.OrderId==order.OrderId);
+                foreach( var o in orders)
+                {
+                    o.Status = SD.Status_Cancelled;
+                    _unitOfWork.OrderDetails.Update(o);
+                }
                 _unitOfWork.Save();
                 return Ok();
             }
@@ -251,6 +257,12 @@ namespace dressify.Controllers
                     order.OrderStatus = SD.Status_Cancelled;
                     order.Date = DateTime.UtcNow;
                     _unitOfWork.Order.Update(order);
+                    var orders = await _unitOfWork.OrderDetails.FindAllAsync(o => o.OrderId == order.OrderId);
+                    foreach (var o in orders)
+                    {
+                        o.Status = SD.Status_Cancelled;
+                        _unitOfWork.OrderDetails.Update(o);
+                    }
                     _unitOfWork.Save();
                     return Ok();
                 }
