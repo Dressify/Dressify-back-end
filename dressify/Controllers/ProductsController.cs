@@ -36,12 +36,12 @@ namespace dressify.Controllers
 
             if (model.MinPrice.HasValue)
             {
-                productsQuery = productsQuery.Where(p => p.Price >= model.MinPrice.Value);
+                productsQuery = productsQuery.Where(p => p.Price >= (p.Sale!=null? model.MinPrice.Value / (1 - p.Sale / 100): model.MinPrice.Value) );
             }
 
             if (model.MaxPrice.HasValue)
             {
-                productsQuery = productsQuery.Where(p => p.Price <= model.MaxPrice.Value);
+                productsQuery = productsQuery.Where(p => p.Price <= (p.Sale != null ? model.MaxPrice.Value / (1 - p.Sale / 100) : model.MaxPrice.Value));
             }
 
             if (!string.IsNullOrEmpty(model.Gender))
@@ -65,10 +65,15 @@ namespace dressify.Controllers
             }
 
             var totalCount =  productsQuery.Count();
+            if (!productsQuery.Any())
+            {
+                NoContent();
+            }
             var products =  productsQuery
                 .Skip(skip.Value)
                 .Take(model.PageSize.Value)
                 .ToList();
+
             if (!products.Any())
             {
                 NoContent();
