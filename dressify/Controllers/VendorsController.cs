@@ -163,6 +163,10 @@ namespace dressify.Controllers
             }
             var skip = (PageNumber - 1) * PageSize;
             var pendingOrders = await _unitOfWork.OrderDetails.FindAllAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId, skip, PageSize, new[] { "Product" });
+            foreach(var order in pendingOrders)
+            {
+                order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == order.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.OrderDetails.CountAsync(od => od.Status == SD.Status_Pending && od.VendorId == uId);
             return Ok(new { Count = count, PendingOrders = pendingOrders });
         }
@@ -182,6 +186,10 @@ namespace dressify.Controllers
             }
             var skip = (PageNumber - 1) * PageSize;
             var orders = await _unitOfWork.OrderDetails.FindAllAsync(od =>  od.VendorId == uId, skip, PageSize , new[] { "Product" });
+            foreach (var order in orders)
+            {
+                order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == order.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.OrderDetails.CountAsync(od =>  od.VendorId == uId);
             return Ok(new { Count = count, Orders = orders });
         }
@@ -193,8 +201,9 @@ namespace dressify.Controllers
             var vendor = await _unitOfWork.ApplicationUser.FindAsync(a => a.Id == uId);
             if (vendor.IsSuspended == true)
                 return BadRequest("Vendor is Suspended");
-            var Order = _unitOfWork.OrderDetails.FindAsync(od => od.OrderId== orderId&&od.VendorId==uId);
+            var Order = await _unitOfWork.OrderDetails.FindAsync(od => od.OrderId== orderId&&od.VendorId==uId);
             if (Order == null) return NotFound();
+            Order.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == Order.ProductId, new[] { "ProductImages" });
             return Ok(Order);
         }
         [HttpPut("ConfirmtPendingOrders")]
