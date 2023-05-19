@@ -136,6 +136,10 @@ namespace dressify.Controllers
                 return NoContent();
             }
             var questions = await _unitOfWork.ProductQuestion.FindAllAsync(p => p.Product.Vendor.StoreName == SD.StoreName, skip, PageSize, new[] { "Product" });
+            foreach (var question in questions)
+            {
+                question.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == question.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.ProductQuestion.CountAsync(p => p.Product.Vendor.StoreName == SD.StoreName);
 
             if (!questions.Any())
