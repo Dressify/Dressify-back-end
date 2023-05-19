@@ -25,9 +25,12 @@ namespace dressify.Controllers
     {
  
         private readonly IUnitOfWork _unitOfWork;
-        public SuperAdminController(IUnitOfWork unitOfWork)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public SuperAdminController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
         [HttpPost("CreateAdmin")]
@@ -41,10 +44,10 @@ namespace dressify.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (await _unitOfWork.Admin.FindAsync(u => u.Email == dto.Email) is not null)
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _unitOfWork.Admin.FindAsync(u => u.Email == dto.Email) is not null)
                 return BadRequest("Email is already registered");
 
-            if (await _unitOfWork.Admin.FindAsync(u => u.AdminName == dto.AdminName) is not null)
+            if (await _userManager.FindByNameAsync(dto.AdminName) is not null || await _unitOfWork.Admin.FindAsync(u => u.AdminName == dto.AdminName) is not null)
                 return BadRequest("Username is already registered!");
 
             CreatePhotoDto photodto = await _unitOfWork.Admin.AddPhoto(Photo);
@@ -153,12 +156,12 @@ namespace dressify.Controllers
             }
             if (admin.Email != adminPorfile.Email)
             {
-                if (await _unitOfWork.Admin.FindAsync(u=>u.Email== adminPorfile.Email) != null)
+                if (await _userManager.FindByEmailAsync(adminPorfile.Email) is not null || await _unitOfWork.Admin.FindAsync(u=>u.Email== adminPorfile.Email) != null)
                     return BadRequest("Email is already registered!");
             }
             if (admin.AdminName != adminPorfile.AdminName)
             {
-                if (await _unitOfWork.Admin.FindAsync(u => u.AdminName == adminPorfile.AdminName) != null)
+                if (await _userManager.FindByNameAsync(adminPorfile.AdminName) is not null || await _unitOfWork.Admin.FindAsync(u => u.AdminName == adminPorfile.AdminName) != null)
                     return BadRequest("Admin Name is already registered!");
             }
             admin.AdminName = adminPorfile.AdminName;

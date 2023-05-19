@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Xml.Linq;
 
 namespace dressify.Controllers
 {
@@ -55,18 +56,18 @@ namespace dressify.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (await _userManager.FindByEmailAsync(dto.Email) is not null)
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _unitOfWork.Admin.FindAsync(p => p.Email == dto.Email) is not null)
                 return BadRequest("Email is already registered!");
 
-            if (await _userManager.FindByNameAsync(dto.SalesName) is not null)
+            if (await _userManager.FindByNameAsync(dto.SalesName) is not null || await _unitOfWork.Admin.FindAsync(p => p.AdminName == dto.SalesName) is not null)
                 return BadRequest("Username is already registered!");
             var user = new ApplicationUser
             {
                 UserName = dto.SalesName.Trim(),
                 Email = dto.Email.Trim(),
                 NId = dto.NId,
-                FName = dto.FName.Trim(),
-                LName = dto.LName.Trim(),
+                FName = dto.FName != null ? dto.FName.Trim() : null,
+                LName = dto.LName != null ? dto.LName.Trim() : null,
                 PhoneNumber = SD.Phone,
                 Address = SD.Address,
                 ProfilePic=SD.ImgUrl,
@@ -254,18 +255,18 @@ namespace dressify.Controllers
             }
             if (sales.Email != dto.Email)
             {
-                if (await _unitOfWork.ApplicationUser.FindAsync(u => u.Email == dto.Email) != null)
+                if (await _unitOfWork.ApplicationUser.FindAsync(u => u.Email == dto.Email) != null || await _unitOfWork.Admin.FindAsync(p => p.Email == dto.Email) is not null)
                     return BadRequest("Email is already registered!");
             }
             if (sales.UserName != dto.SalesName)
             {
-                if (await _unitOfWork.ApplicationUser.FindAsync(u => u.UserName == dto.SalesName) != null)
+                if (await _unitOfWork.ApplicationUser.FindAsync(u => u.UserName == dto.SalesName) != null || await _unitOfWork.Admin.FindAsync(p => p.AdminName == dto.SalesName) is not null)
                     return BadRequest("Admin Name is already registered!");
             }
             sales.UserName = dto.SalesName;
             sales.Email = dto.Email;
-            sales.FName = dto.FName;
-            sales.LName=dto.LName;
+            sales.FName = dto.FName != null ? dto.FName.Trim() : null;
+            sales.LName = dto.LName != null ? dto.LName.Trim() : null;
             sales.NId = dto.NId;
 
             _unitOfWork.ApplicationUser.Update(sales);

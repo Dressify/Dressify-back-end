@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing.Printing;
+using System.Xml.Linq;
 
 namespace dressify.Controllers
 {
@@ -309,12 +310,12 @@ namespace dressify.Controllers
             }
             if (user.Email != vendorProfile.Email)
             {
-                if (await _userManager.FindByEmailAsync(vendorProfile.Email) is not null)
+                if (await _userManager.FindByEmailAsync(vendorProfile.Email) is not null || await _unitOfWork.Admin.FindAsync(u => u.Email == vendorProfile.Email) is not null)
                     return BadRequest("Email is already registered!");
             }
             user.Address = vendorProfile.Address;
-            user.FName = vendorProfile.FName;
-            user.LName = vendorProfile.LName;
+            user.FName = vendorProfile.FName != null ? vendorProfile.FName.Trim() : null;
+            user.LName = vendorProfile.LName != null ? vendorProfile.LName.Trim() : null;
             user.Email = vendorProfile.Email;
             user.PhoneNumber = vendorProfile.PhoneNumber;
 

@@ -43,10 +43,10 @@ namespace Dressify.DataAccess.Repository
         }
         public async Task<AuthDto> CustomerRegisterAsync(CustRegisterDto dto)
         {
-            if (await _userManager.FindByEmailAsync(dto.Email) is not null)
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.Email == dto.Email) is not null)
                 return new AuthDto { Message = "Email is already registered!" };
 
-            if (await _userManager.FindByNameAsync(dto.Username) is not null)
+            if (await _userManager.FindByNameAsync(dto.Username) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.AdminName == dto.Username) is not null)
                 return new AuthDto { Message = "Username is already registered!" };
             var user = new ApplicationUser
             {
@@ -80,10 +80,10 @@ namespace Dressify.DataAccess.Repository
         }
         public async Task<AuthDto> VendorRegisterAsync(VendorRegisterDto dto)
         {
-            if (await _userManager.FindByEmailAsync(dto.Email) is not null)
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.Email == dto.Email) is not null)
                 return new AuthDto { Message = "Email is already registered!" };
 
-            if (await _userManager.FindByNameAsync(dto.UserName) is not null)
+            if (await _userManager.FindByNameAsync(dto.UserName) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.AdminName == dto.UserName) is not null)
                 return new AuthDto { Message = "Username is already registered!" };
             if(dto.StoreName==SD.StoreName)
                 return new AuthDto { Message = "Store Name is already registered!" };
@@ -92,8 +92,8 @@ namespace Dressify.DataAccess.Repository
                 UserName = dto.UserName.Trim(),
                 Email = dto.Email.Trim(),
                 PhoneNumber = dto.Phone.Trim(),
-                FName = dto.FName.Trim(),
-                LName = dto.LName.Trim(),
+                FName = dto.FName != null ? dto.FName.Trim() : null,
+                LName = dto.LName != null ? dto.LName.Trim() : null,
                 NId =dto.nId.Trim(),
                 StoreName=dto.StoreName.Trim(),
                 Address=dto.address
@@ -125,10 +125,10 @@ namespace Dressify.DataAccess.Repository
         }
         public async Task<AuthDto> RegisterAsync(RegisterDto dto)
         {
-            if (await _userManager.FindByEmailAsync(dto.Email) is not null)
+            if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.Email == dto.Email) is not null)
                 return new AuthDto { Message = "Email is already registered!" };
 
-            if (await _userManager.FindByNameAsync(dto.Username) is not null)
+            if (await _userManager.FindByNameAsync(dto.Username) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.AdminName == dto.Username) is not null)
                 return new AuthDto { Message = "Username is already registered!" };
             if(! await _roleManager.RoleExistsAsync(dto.Role))
                 return new AuthDto { Message = "This Role not exist" };
@@ -136,8 +136,8 @@ namespace Dressify.DataAccess.Repository
             {
                 UserName = dto.Username.Trim(),
                 Email = dto.Email.Trim(),
-                FName = dto.FName.Trim(),
-                LName = dto.LName.Trim(),
+                FName = dto.FName != null ? dto.FName.Trim() : null,
+                LName = dto.LName != null ? dto.LName.Trim() : null,
             };
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
