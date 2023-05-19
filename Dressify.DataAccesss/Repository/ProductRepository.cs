@@ -102,7 +102,7 @@ namespace Dressify.DataAccess.Repository
         public async Task<List<Product>> newArrivals()
         {
             var products = _context.Products.OrderByDescending(p => p.ProductId)
-            .Take(6)
+            .Take(8)
             .Include(p =>p.ProductImages)
             .ToList();
             return products;
