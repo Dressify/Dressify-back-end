@@ -126,7 +126,7 @@ namespace dressify.Controllers
 
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                salesQuery = salesQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
+                salesQuery = salesQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || (p.FName!=null && p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())) || (p.LName != null && p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())));
             }
 
             var count = salesQuery.Count();
@@ -172,7 +172,7 @@ namespace dressify.Controllers
             var vendorsQuery = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.StoreName != null && u.StoreName != SD.StoreName);
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                vendorsQuery = vendorsQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.StoreName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
+                vendorsQuery = vendorsQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || (p.FName != null && p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())) || (p.LName != null && p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())) || p.StoreName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
             }
 
             var count = vendorsQuery.Count();

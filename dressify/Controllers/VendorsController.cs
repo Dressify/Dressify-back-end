@@ -342,7 +342,7 @@ namespace dressify.Controllers
             var vendorsQuery = await _unitOfWork.ApplicationUser.FindAllAsync(u => u.IsSuspended == true);
             if (!string.IsNullOrEmpty(SearchTerm))
             {
-                vendorsQuery = vendorsQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || p.StoreName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()));
+                vendorsQuery = vendorsQuery.Where(p => p.UserName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || (p.FName != null && p.FName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())) || p.LName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || (p.StoreName != null && p.StoreName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())));
             }
             var count = vendorsQuery.Count();
             var vendors = vendorsQuery
