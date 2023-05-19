@@ -303,6 +303,9 @@ namespace dressify.Controllers
         {
             var uId = _unitOfWork.getUID();
             var order = await _unitOfWork.Order.FindAsync(o => o.OrderId == OrderId);
+            if (order == null)
+                return NoContent();
+            var details = await _unitOfWork.OrderDetails.FindAllAsync(d => d.OrderId ==OrderId, new[] { "Product" });
             var orderDetails = new ViewOrderDto()
             {
                 orderId = order.OrderId,
@@ -310,8 +313,20 @@ namespace dressify.Controllers
                 Status = order.OrderStatus,
                 paymentMethod = order.payementMethod,
                 dateTime = order.PaymentDate.Value,
+                ProductDetails= new List<OrderProductDetailsDto>()
             };
-            var details = await _unitOfWork.OrderDetails.FindAllAsync(d => d.OrderId == OrderId);
+            foreach (var item in details)
+            {
+                item.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId, new[] { "ProductImages" });
+                var productDetails = new OrderProductDetailsDto()
+                {
+                    img = item.Product.ProductImages.ToList()[0].ImageUrl,
+                    ProductPrice = item.Price.Value,
+                    Quantity = item.Quantity.Value,
+                    ProductName = item.ProductName,
+                };
+                orderDetails.ProductDetails.Add(productDetails);
+            }
             var sum = _unitOfWork.OrderDetails.OrdersQuantity(details);
             orderDetails.Quantity = sum;
             return Ok(orderDetails);

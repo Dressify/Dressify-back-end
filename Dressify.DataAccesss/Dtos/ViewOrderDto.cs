@@ -16,5 +16,6 @@ namespace Dressify.DataAccess.Dtos
         public DateTime dateTime { get; set; }
         public string paymentMethod { get; set; }
         public int Quantity { get; set; }
+        public List<OrderProductDetailsDto> ProductDetails { get; set; }
      }
 }
