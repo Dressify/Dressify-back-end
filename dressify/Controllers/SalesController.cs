@@ -159,6 +159,7 @@ namespace dressify.Controllers
                 return NotFound("vendor does not exist");
             }
             var question = await _unitOfWork.ProductQuestion.FindAsync(u => u.QuestionID == questionId && u.Product.Vendor.StoreName == SD.StoreName, new[] { "Product" });
+            question.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == question.ProductId, new[] { "ProductImages" });
 
             if (question == null)
             {
