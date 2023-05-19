@@ -92,7 +92,7 @@ namespace dressify.Controllers
             PageNumber ??= 1;
             PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
-            var salesProductsQuery = await _unitOfWork.Product.FindAllAsync(p=>p.Vendor.StoreName==SD.StoreName, skip, PageSize, new[] { "ProductImages" });
+            var salesProductsQuery = await _unitOfWork.Product.FindAllAsync(p=>p.Vendor.StoreName==SD.StoreName, new[] { "ProductImages" });
             if (!string.IsNullOrEmpty(SearchTerm))
             {
                 salesProductsQuery = salesProductsQuery.Where(p => p.ProductName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || (p.Description != null && p.Description.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())));
