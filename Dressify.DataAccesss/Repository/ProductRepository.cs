@@ -1,5 +1,6 @@
 ﻿using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using System;
@@ -98,7 +99,14 @@ namespace Dressify.DataAccess.Repository
         //    return await query.ToListAsync();
         //}
 
-
+        public async Task<List<Product>> newArrivals()
+        {
+            var products = _context.Products.OrderByDescending(p => p.ProductId)
+            .Take(6)
+            .Include(p =>p.ProductImages)
+            .ToList();
+            return products;
+        }
 
     }
 }

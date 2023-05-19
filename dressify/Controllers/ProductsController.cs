@@ -187,6 +187,14 @@ namespace dressify.Controllers
             return Ok(new { Count = count, Products = products });
         }
 
+        [HttpGet("GetNewArrivals")]
+        public async Task<IActionResult> GetNewArrivals()
+        {
+            var products = await _unitOfWork.Product.newArrivals();
+            if (products == null)
+                return NotFound();
+            return Ok(products);
+        }
 
     }
 }

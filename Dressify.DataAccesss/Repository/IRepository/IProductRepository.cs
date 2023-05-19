@@ -12,6 +12,7 @@ namespace Dressify.DataAccess.Repository.IRepository
     public interface IProductRepository : IRepository<Product>
     {
         IEnumerable<Product> GetProducts(int? reportCountThreshold);
+        Task<List<Product>> newArrivals();
         //IEnumerable<Product> FindAll(Expression<Func<Product, bool>> criteria, int? take, int? skip,
         // double? minPrice, double? maxPrice, string? gender, string? category,
         // string[] includes = null);
