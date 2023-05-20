@@ -146,7 +146,8 @@ namespace dressify.Controllers
                 FName=sales.FName,
                 LName=sales.LName,
                 Email = sales.Email,
-                ProfilePic = sales.ProfilePic
+                ProfilePic = sales.ProfilePic,
+                StoreName = sales.StoreName
             }).ToList();
             return Ok(new { Count = count, Sales = SalesDtos });
         }
@@ -191,8 +192,9 @@ namespace dressify.Controllers
                 SalesName = sales.UserName,
                 FName = sales.FName,
                 LName = sales.LName,
+                StoreName= sales.StoreName,
                 Email = sales.Email,
-                ProfilePic = sales.ProfilePic
+                ProfilePic = sales.ProfilePic,
             }).ToList();
             return Ok(new { Count = count, Vendors = vendorsDtos });
         }
@@ -321,8 +323,8 @@ namespace dressify.Controllers
                 var productAction = new ProductActionDto()
                 {
                     ProductId = report.ProductId,
-                    Reasson= "because report ID : "+report.ReportId.ToString(),
-                    SuspendedUntil=reportDto.SuspendedUntil,
+                    Reasson = reportDto.Reasson == null ? "because report ID : " + report.ReportId.ToString() : reportDto.Reasson,
+                    SuspendedUntil = reportDto.SuspendedUntil,
                 };
                 return await SuspendProduct(productAction);
             }
@@ -331,7 +333,7 @@ namespace dressify.Controllers
                 var vendorAction = new VendorActionDto()
                 {
                     VendorId = report.VendorId,
-                    Reasson = "because report ID : " + report.ReportId.ToString(),
+                    Reasson = reportDto.Reasson == null ? "because report ID : " + report.ReportId.ToString() : reportDto.Reasson,
                     SuspendedUntil = reportDto.SuspendedUntil,
                 };
                 return await SuspendVendor(vendorAction);
@@ -417,6 +419,10 @@ namespace dressify.Controllers
             if (vendor == null)
             {
                 return NotFound(actionDto.VendorId);
+            }
+            if(vendor.StoreName==SD.StoreName)
+            {
+                return BadRequest("you can't suspend Sales");
             }
             vendor.IsSuspended = true;
             if (actionDto.SuspendedUntil == null)
