@@ -15,5 +15,7 @@ namespace Dressify.DataAccess.Dtos
         public string ProfilePic { get; set; }
         public string FName { get; set; }
         public string LName { get; set; }
+        public bool? IsSuspended { get; set; }
+        public DateTime? SuspednedUntil { get; set; }
     }
 }

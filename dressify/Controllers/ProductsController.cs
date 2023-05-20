@@ -1,6 +1,7 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -169,7 +170,7 @@ namespace dressify.Controllers
        
         [HttpGet("GetSuspendedProducts")]
         [Authorize]
-        public async Task<IActionResult> GetSuspendedProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize)
+        public async Task<IActionResult> GetSuspendedProducts([FromQuery] int? PageNumber, [FromQuery] int? PageSize,[FromQuery] string? SearchTerm)
         {
             var uId = _unitOfWork.getUID();
             if (await _unitOfWork.Admin.FindAsync(u => u.AdminId == uId) == null)
@@ -180,11 +181,35 @@ namespace dressify.Controllers
             {
                 return BadRequest("Page number and page size must be positive integers.");
             }
+            PageNumber ??= 1;
+            PageSize ??= 10;
             var skip = (PageNumber - 1) * PageSize;
-            var products = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == true, skip, PageSize);
-            var count = await _unitOfWork.Product.CountAsync(u => u.IsSuspended == true);
+            var productsQuery = await _unitOfWork.Product.FindAllAsync(u => u.IsSuspended == true, new[] { "ProductImages", "ProductRates" });
+            if (!string.IsNullOrEmpty(SearchTerm))
+            {
+                productsQuery = productsQuery.Where(p => p.ProductName.Trim().ToLower().Contains(SearchTerm.Trim().ToLower()) || (p.Description != null && p.Description.Trim().ToLower().Contains(SearchTerm.Trim().ToLower())));
+            }
 
-            return Ok(new { Count = count, Products = products });
+            var totalCount = productsQuery.Count();
+            if (!productsQuery.Any())
+            {
+                NoContent();
+            }
+            var products = productsQuery
+                .Skip(skip.Value)
+                .Take(PageSize.Value)
+                .ToList();
+
+            if (!products.Any())
+            {
+                NoContent();
+            }
+            var productsWithAvgRates = products.Select(p => new
+            {
+                Product = p,
+                AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
+            }).ToList();
+            return Ok(new { Count = totalCount, ProductsWithAvgRates = productsWithAvgRates });
         }
 
         [HttpGet("GetNewArrivals")]

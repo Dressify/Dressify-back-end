@@ -195,6 +195,8 @@ namespace dressify.Controllers
                 StoreName= sales.StoreName,
                 Email = sales.Email,
                 ProfilePic = sales.ProfilePic,
+                IsSuspended = sales.IsSuspended,
+                SuspednedUntil=sales.SuspendedUntil
             }).ToList();
             return Ok(new { Count = count, Vendors = vendorsDtos });
         }
