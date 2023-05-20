@@ -104,6 +104,7 @@ namespace Dressify.DataAccess.Repository
             var products = _context.Products.OrderByDescending(p => p.ProductId)
             .Take(8)
             .Include(p =>p.ProductImages)
+            .Include(p => p.ProductRates)
             .ToList();
             return products;
         }

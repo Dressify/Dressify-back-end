@@ -218,7 +218,12 @@ namespace dressify.Controllers
             var products = await _unitOfWork.Product.newArrivals();
             if (products == null)
                 return NotFound();
-            return Ok(products);
+            var productsWithAvgRates = products.Select(p => new
+            {
+                Product = p,
+                AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
+            }).ToList();
+            return Ok(new { ProductsWithAvgRates = productsWithAvgRates });
         }
 
     }
