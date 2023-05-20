@@ -1,4 +1,5 @@
 ﻿using Dressify.DataAccess.Repository.IRepository;
+using Dressify.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,10 @@ namespace dressify.Controllers
             var skip = (PageNumber - 1) * PageSize;
 
             var productReports = await _unitOfWork.ProductReport.GetAllAsync(PageSize,skip, new[] { "Product", "Customer","Vendor" });
+            foreach (var productReport in productReports)
+            {
+                productReport.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == productReport.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.ProductReport.CountAsync();
 
             return Ok(new { Count = count, ProductReports = productReports });
@@ -54,6 +59,10 @@ namespace dressify.Controllers
             var skip = (PageNumber - 1) * PageSize;
 
             var productReports = await _unitOfWork.ProductReport.FindAllAsync(u=>u.ReportStatus==false,skip, PageSize, new[] { "Product", "Customer", "Vendor" });
+            foreach (var productReport in productReports)
+            {
+                productReport.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == productReport.ProductId, new[] { "ProductImages" });
+            }
             var count = await _unitOfWork.ProductReport.CountAsync();
 
             return Ok(new { Count = count, ProductReports = productReports });
@@ -70,6 +79,7 @@ namespace dressify.Controllers
             }
 
             var productReport = await _unitOfWork.ProductReport.FindAsync(u => u.ReportId==reportId, new[] { "Product", "Customer", "Vendor" });
+                productReport.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == productReport.ProductId, new[] { "ProductImages" });
 
             return Ok(productReport);
         }

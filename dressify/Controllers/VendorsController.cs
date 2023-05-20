@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Drawing.Printing;
 using System.Xml.Linq;
 
@@ -295,6 +296,7 @@ namespace dressify.Controllers
                 Email = user.Email,
                 imgUrl = user.ProfilePic,
                 PhoneNumber = user.PhoneNumber,
+                StoreName=user.StoreName
             };
             return VendorProfile;
         }
@@ -313,11 +315,14 @@ namespace dressify.Controllers
                 if (await _userManager.FindByEmailAsync(vendorProfile.Email) is not null || await _unitOfWork.Admin.FindAsync(u => u.Email == vendorProfile.Email) is not null)
                     return BadRequest("Email is already registered!");
             }
+            if (vendorProfile.StoreName == SD.StoreName || await _unitOfWork.ApplicationUser.FindAsync(p => p.StoreName == vendorProfile.StoreName) is not null)
+                return BadRequest("StoreName is already registered!");
             user.Address = vendorProfile.Address;
             user.FName = vendorProfile.FName != null ? vendorProfile.FName.Trim() : null;
             user.LName = vendorProfile.LName != null ? vendorProfile.LName.Trim() : null;
             user.Email = vendorProfile.Email;
             user.PhoneNumber = vendorProfile.PhoneNumber;
+            user.StoreName = vendorProfile.StoreName;
 
             _unitOfWork.ApplicationUser.Update(user);
             _unitOfWork.Save();
