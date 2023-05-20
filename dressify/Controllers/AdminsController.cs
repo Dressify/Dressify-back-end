@@ -215,7 +215,7 @@ namespace dressify.Controllers
             var sales = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == SalesId);
             if (sales == null)
             {
-                return NoContent();
+                return NotFound();
             }
             var salesProfile = new SalesProfileDto()
             {
@@ -232,6 +232,43 @@ namespace dressify.Controllers
             };
             return Ok(salesProfile);
         }
+
+        [HttpGet("GetVendorProfile")]
+        [Authorize]
+        public async Task<IActionResult> GetVendorProfile([FromHeader] string VendorId)
+        {
+            var uId = _unitOfWork.getUID();
+            if (await _unitOfWork.Admin.FindAllAsync(u => u.AdminId == uId) == null)
+            {
+                return Unauthorized();
+            }
+            if (VendorId == null)
+            {
+                return BadRequest("Enter an VendorId");
+            }
+            var vendor = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == VendorId);
+            if (vendor == null)
+            {
+                return NotFound();
+            }
+            var vendorProfile = new VendorProfileDto()
+            {
+                VendorID = vendor.Id,
+                UserName = vendor.UserName,
+                imgUrl = vendor.ProfilePic,
+                Email = vendor.Email,
+                PhoneNumber = vendor.PhoneNumber,
+                FName = vendor.FName,
+                LName = vendor.LName,
+                Address = vendor.Address,
+                NId = vendor.NId,
+                StoreName = vendor.StoreName,
+                IsSuspended = vendor.IsSuspended,
+                SuspednedUntil = vendor.SuspendedUntil
+            };
+            return Ok(vendorProfile);
+        }
+
 
         [HttpPut("EditSalesProfile")]
         [Authorize]

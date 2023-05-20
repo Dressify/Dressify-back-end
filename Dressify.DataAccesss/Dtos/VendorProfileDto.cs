@@ -8,6 +8,7 @@ namespace Dressify.DataAccess.Dtos
 {
     public class VendorProfileDto
     {
+        public string? VendorID { get; set; }
         public string? Address { get; set; }
         public string? FName { get; set; }
         public string? LName { get; set; }
@@ -16,5 +17,9 @@ namespace Dressify.DataAccess.Dtos
         public string? imgUrl { get; set; }
         public string? PhoneNumber { get; set;}
         public string? StoreName { get; set;}
+        public bool? IsSuspended { get; set;}
+        public DateTime? SuspednedUntil { get; set; }
+        public string? NId { get; set; }
+
     }
 }
