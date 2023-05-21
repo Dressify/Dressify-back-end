@@ -27,7 +27,7 @@ namespace dressify.Controllers
 
             var result = await _unitOfWork.ApplicationUser.CustomerRegisterAsync(model);
             if(!result.IsAuthenticated)
-                return BadRequest(result.Message);
+                return BadRequest(result.Messages);
             return Ok(result);
         }
         [HttpPost("VendorRegister")]
@@ -37,7 +37,7 @@ namespace dressify.Controllers
                 return BadRequest(ModelState);
             var result = await _unitOfWork.ApplicationUser.VendorRegisterAsync(model);
             if (!result.IsAuthenticated)
-                return BadRequest(result.Message);
+                return BadRequest(result.Messages);
             return Ok(result);
         }
 
