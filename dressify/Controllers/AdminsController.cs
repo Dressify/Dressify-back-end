@@ -283,7 +283,7 @@ namespace dressify.Controllers
                 NId = vendor.NId,
                 StoreName = vendor.StoreName,
                 IsSuspended = vendor.IsSuspended,
-                SuspednedUntil = vendor.SuspendedUntil
+                SuspendedUntil = vendor.SuspendedUntil
             };
             return Ok(vendorProfile);
         }
@@ -554,6 +554,12 @@ namespace dressify.Controllers
                     }
                 }
             }
+            var Penalty = await _unitOfWork.Penalty.FindAsync(u => u.VendorId==VendorId);
+            if (Penalty == null)
+            {
+                BadRequest();
+            }
+            _unitOfWork.Penalty.Delete(Penalty);
             Vendor.IsSuspended = false;
             Vendor.SuspendedUntil = null;
             _unitOfWork.ApplicationUser.Update(Vendor);
