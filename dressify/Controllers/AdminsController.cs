@@ -432,10 +432,11 @@ namespace dressify.Controllers
                 VendorId = Product.VendorId,
                 Reasson = actionDto.Reasson,
                 Date = DateTime.UtcNow,
+                SuspendedUntil = (DateTime)Product.SuspendedUntil
             };
 
             _unitOfWork.Product.Update(Product);
-            _unitOfWork.ProductAction.AddAsync(productAction);
+            await _unitOfWork.ProductAction.AddAsync(productAction);
             _unitOfWork.Save();
             return Ok(productAction);
 
@@ -456,11 +457,10 @@ namespace dressify.Controllers
                 return NotFound(productId);
             }
             var action = await _unitOfWork.ProductAction.FindAsync(u => u.ProductId == productId);
-            if (action == null)
+            if (action != null)
             {
-                BadRequest();
+                _unitOfWork.ProductAction.Delete(action);
             }
-            _unitOfWork.ProductAction.Delete(action);
             Product.IsSuspended = false;
             Product.SuspendedUntil = null;
             _unitOfWork.Product.Update(Product);
@@ -547,25 +547,34 @@ namespace dressify.Controllers
             {
                 return NotFound(VendorId);
             }
-            if(Vendor.SuspendedUntil>= DateTime.UtcNow.AddYears(90))
+
+            var products = await _unitOfWork.Product.FindAllAsync(u => u.VendorId == VendorId);
+            if (products.Any())
             {
-                var products = await _unitOfWork.Product.FindAllAsync(u => u.VendorId == VendorId);
-                if (products.Any())
+                foreach (var product in products)
                 {
-                    foreach (var product in products)
+                    if (Vendor.SuspendedUntil >= product.SuspendedUntil)
                     {
-                        product.IsSuspended = false;
-                        product.SuspendedUntil = null;
-                        _unitOfWork.Product.Update(product);
+                        var action = await _unitOfWork.ProductAction.FindAsync(p => p.ProductId == product.ProductId);
+                        if (action == null)
+                        {
+                            product.SuspendedUntil = null;
+                            product.IsSuspended = false;
+                        }
+                        else
+                        {
+                            product.SuspendedUntil=action.SuspendedUntil;
+                        }
+                            _unitOfWork.Product.Update(product);
                     }
                 }
             }
+
             var Penalty = await _unitOfWork.Penalty.FindAsync(u => u.VendorId==VendorId);
-            if (Penalty == null)
+            if (Penalty != null)
             {
-                BadRequest();
+                _unitOfWork.Penalty.Delete(Penalty);
             }
-            _unitOfWork.Penalty.Delete(Penalty);
             Vendor.IsSuspended = false;
             Vendor.SuspendedUntil = null;
             _unitOfWork.ApplicationUser.Update(Vendor);
