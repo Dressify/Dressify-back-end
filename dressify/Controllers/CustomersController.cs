@@ -303,7 +303,7 @@ namespace dressify.Controllers
         {
             var uId = _unitOfWork.getUID();
             var order = await _unitOfWork.Order.FindAsync(o => o.OrderId == OrderId);
-            if (order == null)
+            if (order == null || order.CustomerId == uId)
                 return NoContent();
             var details = await _unitOfWork.OrderDetails.FindAllAsync(d => d.OrderId ==OrderId, new[] { "Product" });
             var orderDetails = new ViewOrderDto()
