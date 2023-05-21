@@ -455,6 +455,12 @@ namespace dressify.Controllers
             {
                 return NotFound(productId);
             }
+            var action = await _unitOfWork.ProductAction.FindAsync(u => u.ProductId == productId);
+            if (action == null)
+            {
+                BadRequest();
+            }
+            _unitOfWork.ProductAction.Delete(action);
             Product.IsSuspended = false;
             Product.SuspendedUntil = null;
             _unitOfWork.Product.Update(Product);
