@@ -25,7 +25,7 @@ namespace Dressify.DataAccess.Repository
         {
             reportCountThreshold ??= 10; // if reportCountThreshold is null, set its value to 10
 
-            var products = _context.Products.Include(p => p.Reports)
+            var products = _context.Products.Include(p => p.Reports).Include(p => p.ProductImages)
                 .Where(p => p.Reports.Count >= reportCountThreshold
                 && p.Reports.Any(pr => pr.ReportStatus == true)
                 && p.IsSuspended == false);
