@@ -235,6 +235,23 @@ namespace dressify.Controllers
             return Ok(salesProfile);
         }
 
+        [HttpGet("GetProductDetails")]
+        public async Task<IActionResult> GetProduct([FromQuery] int id)
+        {
+
+            var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == id,
+                new[] { "Vendor", "ProductImages", "Questions", "ProductRates" });
+            if (product == null)
+                return NotFound();
+            var Details = new ProductDetailsDto
+            {
+                Product = product,
+                AverageRate = _unitOfWork.ProductRate.CalculateAverageRate(product.ProductRates),
+                Quantity = 1,
+            };
+            return Ok(Details);
+        }
+
         [HttpGet("GetVendorProfile")]
         [Authorize]
         public async Task<IActionResult> GetVendorProfile([FromHeader] string VendorId)
