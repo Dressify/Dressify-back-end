@@ -69,6 +69,17 @@ namespace dressify.Controllers
 
             if (ListCart == null)
                 return BadRequest("No Items in Customer Cart");
+            var errors = new List<string>();
+            foreach (var item in ListCart)
+            {
+                var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId);
+                if (product.Quantity < item.Quantity)
+                    errors.Add("There is not enough quantity from" + product.ProductName);
+            }
+            if (errors.Count > 0)
+            {
+                return BadRequest(errors);
+            }
             var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Id == uId);
 
             var summary = new SummaryDto()
@@ -97,6 +108,17 @@ namespace dressify.Controllers
         {
             var uId = _unitOfWork.getUID();
             var cartList = await _unitOfWork.ShoppingCart.FindAllAsync(u => u.CustomerId == uId, new[] { "Product" });
+            var errors = new List<string>();
+            foreach (var item in cartList)
+            {
+                var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId);
+                if (product.Quantity < item.Quantity)
+                    errors.Add("There is not enough quantity from" + product.ProductName);
+            }
+            if (errors.Count > 0)
+            {
+                return BadRequest(errors);
+            }
             var order = new Order();
             order.PaymentDate = DateTime.Now;
             order.Address = dto.Address;
