@@ -7,6 +7,7 @@ using Dressify.Models;
 using Dressify.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -306,6 +307,17 @@ namespace Dressify.DataAccess.Repository
             return result.Result;
         }
 
+        public async Task<string> ResetPasswordTokenAsync(ApplicationUser user)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            return token;
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(ApplicationUser user , string token ,string password)
+        {
+            var result = await _userManager.ResetPasswordAsync(user,token,password);
+            return result;
+        }
     }
 }
     

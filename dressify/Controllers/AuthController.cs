@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Newtonsoft.Json.Linq;
+using NuGet.Common;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace dressify.Controllers
@@ -174,6 +175,21 @@ namespace dressify.Controllers
         //    _unitOfWork.SendEmail(message);
         //    return Ok("done");
         //}
+
+        [HttpPost("ForgetPassword")]
+        public async Task<IActionResult> ForgetPassword(string email)
+        {
+            var user =await _unitOfWork.ApplicationUser.FindAsync(u => u.Email == email);
+            if (user != null)
+            {
+               var token= await _unitOfWork.ApplicationUser.ResetPasswordTokenAsync(user);
+               var link = Url.Action(nameof(ResetPassword), "Auth", new { token, email = user.Email }, Request.Scheme);
+               var message = new Message(new string[] { user.Email }, "Forgot Password Link", EmailBody.ResetPasswordEmail(link),true);
+               _unitOfWork.SendEmail(message);
+               return Ok();
+            }
+            return BadRequest("Error happened while sending link or Email doesn`t exist");
+        }
 
 
     }

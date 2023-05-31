@@ -1,6 +1,7 @@
 ﻿using Dressify.DataAccess.Dtos;
 using Dressify.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,8 @@ namespace Dressify.DataAccess.Repository.IRepository
         Task<CreatePhotoDto> AddPhoto(IFormFile file);
         Task<string> DeletePhoto(string publicId);
         Task<AuthDto> VendorRegisterAsync(VendorRegisterDto dto);
+        Task<string> ResetPasswordTokenAsync(ApplicationUser user);
+        Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string token, string password);
 
     }
 }

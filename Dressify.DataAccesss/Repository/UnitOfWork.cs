@@ -225,8 +225,14 @@ namespace Dressify.DataAccess.Repository
             emailMessage.From.Add(new MailboxAddress("email", _emailConfiguration.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
-
+            if (message.IsHtml == true)
+            {
+                var bodyBuilder = new BodyBuilder();
+                bodyBuilder.HtmlBody = message.Content;
+                emailMessage.Body = bodyBuilder.ToMessageBody();
+            }
+            else
+                emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
             return emailMessage;
         }
 
