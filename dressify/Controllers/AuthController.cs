@@ -183,10 +183,30 @@ namespace dressify.Controllers
             if (user != null)
             {
                var token= await _unitOfWork.ApplicationUser.ResetPasswordTokenAsync(user);
-               var link = Url.Action(nameof(ResetPassword), "Auth", new { token, email = user.Email }, Request.Scheme);
-               var message = new Message(new string[] { user.Email }, "Forgot Password Link", EmailBody.ResetPasswordEmail(link),true);
+               //var link = Url.Action(nameof(ResetPassword), "Auth", new { token, email = user.Email }, Request.Scheme);
+               var message = new Message(new string[] { user.Email }, "Forgot Password Link", EmailBody.ResetPasswordEmail(token,email),true);
                _unitOfWork.SendEmail(message);
                return Ok();
+            }
+            return BadRequest("Error happened while sending link or Email doesn`t exist");
+        }
+
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
+        {
+            var user = await _unitOfWork.ApplicationUser.FindAsync(u => u.Email == model.Email);
+            if (user != null)
+            {
+                var ResetResult = await _unitOfWork.ApplicationUser.ResetPasswordAsync(user, model.Token, model.Password);
+                if(!ResetResult.Succeeded)
+                {
+                    foreach(var error in ResetResult.Errors)
+                    {
+                        ModelState.AddModelError(error.Code, error.Description);
+                    }
+                    return BadRequest(ModelState);
+                }
+                return Ok("Password has been changed");
             }
             return BadRequest("Error happened while sending link or Email doesn`t exist");
         }
