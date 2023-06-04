@@ -77,17 +77,24 @@ namespace Dressify.DataAccess.Repository
             }
             await _userManager.AddToRoleAsync(user, SD.Role_Customer);
 
-            var jwtSecurityToken = await CreateJwtToken(user);
-            await _userManager.UpdateAsync(user);
+            //var jwtSecurityToken = await CreateJwtToken(user);
+            //await _userManager.UpdateAsync(user);
+            //return new AuthDto
+            //{
+            //    Email = user.Email,
+            //    ExpiresOn = jwtSecurityToken.ValidTo,
+            //    IsAuthenticated = true,
+            //    Role = SD.Role_Customer,
+            //    Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+            //    Username = user.UserName,
+            //    ImgUrl = user.ProfilePic,
+            //};
+
+            var token = await EmailConfirmToken(user);
             return new AuthDto
             {
-                Email = user.Email,
-                ExpiresOn = jwtSecurityToken.ValidTo,
                 IsAuthenticated = true,
-                Role = SD.Role_Customer,
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                Username = user.UserName,
-                ImgUrl = user.ProfilePic,
+                Token = token,
             };
         }
         public async Task<AuthDto> VendorRegisterAsync(VendorRegisterDto dto)
@@ -317,6 +324,27 @@ namespace Dressify.DataAccess.Repository
         {
             var result = await _userManager.ResetPasswordAsync(user,token,password);
             return result;
+        }
+
+        public async Task<string> EmailConfirmToken(ApplicationUser user)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            return token;
+        }
+
+
+        public async Task<bool> ConfirmEmail(string token , string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user != null)
+            {
+                var result = await _userManager.ConfirmEmailAsync(user, token);
+                if (result.Succeeded)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

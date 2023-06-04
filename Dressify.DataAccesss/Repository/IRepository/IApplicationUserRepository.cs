@@ -22,6 +22,7 @@ namespace Dressify.DataAccess.Repository.IRepository
         Task<AuthDto> VendorRegisterAsync(VendorRegisterDto dto);
         Task<string> ResetPasswordTokenAsync(ApplicationUser user);
         Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string token, string password);
-
+        Task<string> EmailConfirmToken(ApplicationUser user);
+        Task<bool> ConfirmEmail(string token, string email);
     }
 }

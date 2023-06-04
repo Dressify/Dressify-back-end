@@ -29,7 +29,10 @@ namespace dressify.Controllers
             var result = await _unitOfWork.ApplicationUser.CustomerRegisterAsync(model);
             if(!result.IsAuthenticated)
                 return BadRequest(result.Messages);
-            return Ok(result);
+            var confirmationLink = Url.Action(nameof(confirmEmail), "Auth", new { result.Token, email = model.Email },Request.Scheme);
+            var message = new Message(new string[] {model.Email!},"confirmation email link",confirmationLink!);
+            _unitOfWork.SendEmail(message);
+            return Ok();
         }
         [HttpPost("VendorRegister")]
         public async Task<IActionResult> VendorRegisterAsync([FromBody] VendorRegisterDto model)
@@ -209,6 +212,17 @@ namespace dressify.Controllers
                 return Ok("Password has been changed");
             }
             return BadRequest("Error happened while sending link or Email doesn`t exist");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> confirmEmail(string email , string token)
+        {
+            var res = await _unitOfWork.ApplicationUser.ConfirmEmail(token, email);
+            if (res)
+            {
+                return Ok();
+            }
+            return BadRequest("User Does not exist");
         }
 
 
