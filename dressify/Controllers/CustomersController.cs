@@ -270,8 +270,10 @@ namespace dressify.Controllers
             var skip = (model.PageNumber - 1) * model.PageSize;
             var customerOrders = new List<ViewOrderDto>() ;
             var result= await _unitOfWork.Order.FindAllAsync(o => o.CustomerId == uId);
-            var totalCount = result.Count();
-            var Orders = result
+            var orderedResult = result
+            .OrderByDescending(o => o.OrderId);
+            var totalCount = orderedResult.Count();
+            var Orders = orderedResult
                .Skip(skip.Value)
                .Take(model.PageSize.Value)
                .ToList();
