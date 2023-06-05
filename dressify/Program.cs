@@ -1,4 +1,5 @@
 using dressify;
+using dressify.Service;
 using Dressify.DataAccess;
 using Dressify.DataAccess.DbInitializer;
 using Dressify.DataAccess.Helpers;
@@ -26,6 +27,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddHttpClient<IRecommendationService, RecommendationService>();
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailConfiguration"));

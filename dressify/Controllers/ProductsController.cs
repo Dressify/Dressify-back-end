@@ -1,10 +1,13 @@
-﻿using Dressify.DataAccess.Dtos;
+﻿using dressify.Service;
+using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Dressify.Utility;
 using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Drawing.Printing;
 using System.Linq;
 
@@ -15,13 +18,24 @@ namespace dressify.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public ProductsController(IUnitOfWork unitOfWork)
+        private readonly IRecommendationService _recommendationService;
+        public ProductsController(IUnitOfWork unitOfWork ,IRecommendationService recommendationService)
         {
             _unitOfWork = unitOfWork;
+            _recommendationService = recommendationService;
         }
 
-        
+        [HttpGet("Recommended")]
+        [Authorize(Roles =SD.Role_Customer)]
+        public async Task<IActionResult> RecommendedProducts()
+        {
+            var userId=_unitOfWork.getUID();
+            var rated =await _unitOfWork.Product.ProductsRated(userId);
+            var result =await _recommendationService.GetRecommendedProducts(rated);
+            var products = await _unitOfWork.Product.FindAllAsync(p => result.Contains(p.ProductId));
+            return Ok(products);
+        }   
+
         [HttpGet("GetProductspage")]
         public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
         {

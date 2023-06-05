@@ -1,4 +1,4 @@
-﻿using Dressify.Models;
+﻿using Dressify.DataAccess.Dtos;
 using Dressify.Models;
 using System;
 using System.Collections.Generic;
@@ -13,6 +13,8 @@ namespace Dressify.DataAccess.Repository.IRepository
     {
         IEnumerable<Product> GetProducts(int? reportCountThreshold);
         Task<List<Product>> newArrivals();
+        Task<Dictionary<string, double>> ProductsRated(string customerId);
+
         //IEnumerable<Product> FindAll(Expression<Func<Product, bool>> criteria, int? take, int? skip,
         // double? minPrice, double? maxPrice, string? gender, string? category,
         // string[] includes = null);

@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Dtos;
+﻿using dressify.Service;
+using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Dressify.Utility;
@@ -15,11 +16,15 @@ namespace dressify.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRecommendationService _recommendationService;
 
-        public SalesController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+
+        public SalesController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IRecommendationService recommendationService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _recommendationService = recommendationService;
+
         }
 
         [HttpGet("ViewSalesProfile")]
@@ -62,6 +67,10 @@ namespace dressify.Controllers
                 SubCategory = dto.SubCategory.Trim(),
                 Type = dto.Type.Trim(),
             };
+            if (await _recommendationService.SendProductToAiSystem(product) == false)
+            {
+                return BadRequest();
+            }
             await _unitOfWork.Product.AddAsync(product);
             _unitOfWork.Save();
             foreach (var img in dto.Photos)

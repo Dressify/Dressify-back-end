@@ -48,7 +48,8 @@ namespace Dressify.Utility
         public const string Phone = "01028542932";
         public const string StoreName = "Dressify";
 
-
+        //AI URLS
+        public const string AIUrl = "https//rec";
 
     }
 }

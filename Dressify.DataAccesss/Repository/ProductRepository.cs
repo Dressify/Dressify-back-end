@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Repository.IRepository;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -109,5 +110,37 @@ namespace Dressify.DataAccess.Repository
             return products;
         }
 
+        public async Task<Dictionary<string, double>> ProductsRated(string customerId)
+        {
+            var categories = new List<string>{
+             "pants", "jeans", "shirt", "t_shirt", "jacket", "coat", "hoodies", "sweatshirts",
+             "blazer", "sneaker", "boot", "oxford", "blouseClean", "skirtClean", "tie"};
+
+            var averageRatingsByCategory = new Dictionary<string, double>();
+
+            foreach (var category in categories)
+            {
+                var averageRating = await _context.Products
+                    .Where(p => (p.Category == category || p.SubCategory == category) && p.ProductRates.Any(pr => pr.CustomerId == customerId))
+                    .SelectMany(p => p.ProductRates)
+                    .Where(pr => pr.CustomerId == customerId)
+                    .AverageAsync(pr => pr.Rate);
+
+                averageRatingsByCategory[category] = averageRating??0.0;
+            }
+
+            // Replace null values with 0
+            foreach (var category in categories)
+            {
+                if (!averageRatingsByCategory.ContainsKey(category))
+                {
+                    averageRatingsByCategory[category] = 0;
+                }
+            }
+
+            return averageRatingsByCategory;
+        }
+
     }
 }
+    
