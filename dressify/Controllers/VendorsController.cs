@@ -44,19 +44,21 @@ namespace dressify.Controllers
                 Price = dto.Price,
                 Quantity = dto.Quantity,
                 Sale = dto.Sale,
-                Color = dto.Color.Trim(),
+                Color = dto.Color != null ? dto.Color.Trim() : null,
                 Category = dto.Category.Trim(),
-                SubCategory = dto.SubCategory.Trim(),
+                SubCategory = dto.SubCategory != null ? dto.SubCategory.Trim() : null,
                 Type = dto.Type.Trim(),
             };
-            if (await _recommendationService.SendProductToAiSystem(product) == false)
+            await _unitOfWork.Product.AddAsync(product);
+            _unitOfWork.Save();
+            var lastRecord = await _unitOfWork.Product.LastProduct();
+            if (lastRecord == null)
+                return BadRequest();
+            if (await _recommendationService.SendProductToAiSystem(lastRecord) == false)
             {
                 return BadRequest();
             }
-            await _unitOfWork.Product.AddAsync(product);
-            _unitOfWork.Save();
-            
-          
+
             foreach (var img in dto.Photos)
             {
                 CreatePhotoDto result = await _unitOfWork.ProductImage.AddPhoto(img);

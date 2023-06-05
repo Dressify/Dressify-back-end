@@ -49,7 +49,10 @@ namespace Dressify.Utility
         public const string StoreName = "Dressify";
 
         //AI URLS
-        public const string AIUrl = "https//rec";
+        public const string AIUrl = "http://127.0.0.1:5000/";
+        public const string AIPredict = "predict";
+        public const string AIAddProduct = "add_product";
+
 
     }
 }

@@ -13,6 +13,7 @@ namespace Dressify.DataAccess.Repository.IRepository
     {
         IEnumerable<Product> GetProducts(int? reportCountThreshold);
         Task<List<Product>> newArrivals();
+        Task<Product> LastProduct();
         Task<Dictionary<string, double>> ProductsRated(string customerId);
 
         //IEnumerable<Product> FindAll(Expression<Func<Product, bool>> criteria, int? take, int? skip,

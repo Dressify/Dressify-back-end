@@ -110,6 +110,14 @@ namespace Dressify.DataAccess.Repository
             return products;
         }
 
+        public async Task<Product> LastProduct()
+        {
+            var lastRecord = await _context.Products
+            .OrderByDescending(p => p.ProductId)
+            .FirstOrDefaultAsync();
+            return lastRecord;
+        }
+
         public async Task<Dictionary<string, double>> ProductsRated(string customerId)
         {
             var categories = new List<string>{

@@ -19,7 +19,7 @@ namespace dressify.Service
 
         public async Task<List<int>> GetRecommendedProducts(Dictionary<string, double> averageRatings)
         {
-            var apiUrl = $"{SD.AIUrl}/recommendations";
+            var apiUrl = $"{SD.AIUrl}{SD.AIPredict}";
             var json = JsonConvert.SerializeObject(averageRatings);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -45,7 +45,7 @@ namespace dressify.Service
             {
                 ProductId = product.ProductId,
                 category = product.Category,
-                subCategory = product.SubCategory,
+                subCategory = product.SubCategory??null,
                 ratingAvg = 0,
                 ratingCount = 0
             };
@@ -54,7 +54,7 @@ namespace dressify.Service
             var jsonPayload = JsonConvert.SerializeObject(payload);
 
             // Send the JSON payload to the AI system
-            var apiUrl = $"{SD.AIUrl}/addProduct"; // Replace with the actual API URL
+            var apiUrl = $"{SD.AIUrl}{SD.AIAddProduct}"; // Replace with the actual API URL
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(apiUrl, content);
 
