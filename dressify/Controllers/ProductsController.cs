@@ -32,7 +32,7 @@ namespace dressify.Controllers
             var userId=_unitOfWork.getUID();
             var rated =await _unitOfWork.Product.ProductsRated(userId);
             var result =await _recommendationService.GetRecommendedProducts(rated);
-            var products = await _unitOfWork.Product.FindAllAsync(p => result.Contains(p.ProductId));
+            var products = await _unitOfWork.Product.GetProductsOnOrder(result);
             return Ok(products);
         }   
 
@@ -61,17 +61,17 @@ namespace dressify.Controllers
 
             if (!string.IsNullOrEmpty(model.Gender))
             {
-                productsQuery = productsQuery.Where(p => p.Type.Trim().ToLower() == model.Gender.Trim().ToLower());
+                productsQuery = productsQuery.Where(p => p.Type != null && p.Type.Trim().ToLower() == model.Gender.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.Category))
             {
-                productsQuery = productsQuery.Where(p => p.Category.Trim().ToLower() == model.Category.Trim().ToLower());
+                productsQuery = productsQuery.Where(p => p.Category != null && p.Category.Trim().ToLower() == model.Category.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.SubCategory))
             {
-                productsQuery = productsQuery.Where(p => p.SubCategory.Trim().ToLower() == model.SubCategory.Trim().ToLower());
+                productsQuery = productsQuery.Where(p => p.SubCategory != null && p.SubCategory.Trim().ToLower() == model.SubCategory.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.SearchTerm))
