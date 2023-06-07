@@ -174,9 +174,9 @@ namespace dressify.Controllers
                 return NoContent();
             }
     
-            var categories = distinctValues.Where(p => p.Category != null).Select(p => p.Category).Distinct().ToList();
-            var subCategories = distinctValues.Where(p => p.SubCategory != null).Select(p => p.SubCategory).Distinct().ToList();
-            var types = distinctValues.Where(p => p.Type != null).Select(p => p.Type).Distinct().ToList();
+            var categories = distinctValues.Where(p => p.Category != null && p.Category != "").Select(p => p.Category).Distinct().ToList();
+            var subCategories = distinctValues.Where(p => p.SubCategory != null && p.SubCategory != "").Select(p => p.SubCategory).Distinct().ToList();
+            var types = distinctValues.Where(p => p.Type != null && p.Type != "").Select(p => p.Type).Distinct().ToList();
 
             return Ok(new { categories, subCategories, types });
         }
