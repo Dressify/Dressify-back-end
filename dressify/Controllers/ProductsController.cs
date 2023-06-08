@@ -33,7 +33,14 @@ namespace dressify.Controllers
             var rated =await _unitOfWork.Product.ProductsRated(userId);
             var result =await _recommendationService.GetRecommendedProducts(rated);
             var products = await _unitOfWork.Product.GetProductsOnOrder(result);
-            return Ok(products);
+            var productsWithAvgRates = products.Select(p => new
+            {
+                Product = p,
+                AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
+            }).ToList();
+
+
+            return Ok(new { Count = products.Count(), ProductsWithAvgRates = productsWithAvgRates });
         }   
 
         [HttpGet("GetProductspage")]
