@@ -121,8 +121,9 @@ namespace Dressify.DataAccess.Repository
         public async Task<List<Product>> GetProductsOnOrder(List<int> productsIds)
         {
             var products = await _context.Products.Where(p => productsIds.Contains(p.ProductId))
-            .OrderBy(p => productsIds.IndexOf(p.ProductId))
-            .ToListAsync();
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductRates).ToListAsync();
+            products = products.OrderBy(p => productsIds.IndexOf(p.ProductId)).ToList();
             return products;
         }
 

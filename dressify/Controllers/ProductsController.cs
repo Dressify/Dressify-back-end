@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using System.Drawing.Printing;
 using System.Linq;
 
@@ -38,9 +39,7 @@ namespace dressify.Controllers
                 Product = p,
                 AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
             }).ToList();
-
-
-            return Ok(new { Count = products.Count(), ProductsWithAvgRates = productsWithAvgRates });
+            return Ok(productsWithAvgRates);
         }   
 
         [HttpGet("GetProductspage")]
