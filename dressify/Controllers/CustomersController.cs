@@ -322,11 +322,14 @@ namespace dressify.Controllers
                 item.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId, new[] { "ProductImages" });
                 var productDetails = new OrderProductDetailsDto()
                 {
-                    img = item.Product.ProductImages.ToList()[0].ImageUrl,
                     ProductPrice = item.Price.Value,
                     Quantity = item.Quantity.Value,
                     ProductName = item.ProductName,
                 };
+                if (item.Product.ProductImages != null && item.Product.ProductImages.Any())
+                {
+                    productDetails.img = item.Product.ProductImages.First().ImageUrl;
+                }
                 orderDetails.ProductDetails.Add(productDetails);
             }
             var sum = _unitOfWork.OrderDetails.OrdersQuantity(details);
