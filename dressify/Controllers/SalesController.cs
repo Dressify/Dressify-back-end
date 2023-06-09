@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Dtos;
+﻿using dressify.Service;
+using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Dressify.Utility;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace dressify.Controllers
 {
@@ -15,11 +17,15 @@ namespace dressify.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRecommendationService _recommendationService;
 
-        public SalesController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+
+        public SalesController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IRecommendationService recommendationService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _recommendationService = recommendationService;
+
         }
 
         [HttpGet("ViewSalesProfile")]
@@ -57,13 +63,20 @@ namespace dressify.Controllers
                 Price = dto.Price,
                 Quantity = dto.Quantity,
                 Sale = dto.Sale,
-                Color = dto.Color.Trim(),
+                Color =dto.Color!=null?dto.Color.Trim():null,
                 Category = dto.Category.Trim(),
-                SubCategory = dto.SubCategory.Trim(),
+                SubCategory = dto.SubCategory != null ? dto.SubCategory.Trim() : null,
                 Type = dto.Type.Trim(),
             };
             await _unitOfWork.Product.AddAsync(product);
             _unitOfWork.Save();
+            var lastRecord = await _unitOfWork.Product.LastProduct();
+            if (lastRecord == null)
+                return BadRequest();
+            if (await _recommendationService.SendProductToAiSystem(lastRecord) == false)
+            {
+                return BadRequest();
+            }
             foreach (var img in dto.Photos)
             {
                 CreatePhotoDto result = await _unitOfWork.ProductImage.AddPhoto(img);

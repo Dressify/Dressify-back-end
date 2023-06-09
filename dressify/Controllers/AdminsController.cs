@@ -235,6 +235,23 @@ namespace dressify.Controllers
             return Ok(salesProfile);
         }
 
+        [HttpGet("GetProductDetails")]
+        public async Task<IActionResult> GetProduct([FromQuery] int id)
+        {
+
+            var product = await _unitOfWork.Product.FindAsync(p => p.ProductId == id,
+                new[] { "Vendor", "ProductImages", "Questions", "ProductRates" });
+            if (product == null)
+                return NotFound();
+            var Details = new ProductDetailsDto
+            {
+                Product = product,
+                AverageRate = _unitOfWork.ProductRate.CalculateAverageRate(product.ProductRates),
+                Quantity = 1,
+            };
+            return Ok(Details);
+        }
+
         [HttpGet("GetVendorProfile")]
         [Authorize]
         public async Task<IActionResult> GetVendorProfile([FromHeader] string VendorId)
@@ -266,7 +283,7 @@ namespace dressify.Controllers
                 NId = vendor.NId,
                 StoreName = vendor.StoreName,
                 IsSuspended = vendor.IsSuspended,
-                SuspednedUntil = vendor.SuspendedUntil
+                SuspendedUntil = vendor.SuspendedUntil
             };
             return Ok(vendorProfile);
         }
@@ -415,10 +432,11 @@ namespace dressify.Controllers
                 VendorId = Product.VendorId,
                 Reasson = actionDto.Reasson,
                 Date = DateTime.UtcNow,
+                SuspendedUntil = (DateTime)Product.SuspendedUntil
             };
 
             _unitOfWork.Product.Update(Product);
-            _unitOfWork.ProductAction.AddAsync(productAction);
+            await _unitOfWork.ProductAction.AddAsync(productAction);
             _unitOfWork.Save();
             return Ok(productAction);
 
@@ -437,6 +455,11 @@ namespace dressify.Controllers
             if (Product == null)
             {
                 return NotFound(productId);
+            }
+            var action = await _unitOfWork.ProductAction.FindAsync(u => u.ProductId == productId);
+            if (action != null)
+            {
+                _unitOfWork.ProductAction.Delete(action);
             }
             Product.IsSuspended = false;
             Product.SuspendedUntil = null;
@@ -524,18 +547,33 @@ namespace dressify.Controllers
             {
                 return NotFound(VendorId);
             }
-            if(Vendor.SuspendedUntil>= DateTime.UtcNow.AddYears(90))
+
+            var products = await _unitOfWork.Product.FindAllAsync(u => u.VendorId == VendorId);
+            if (products.Any())
             {
-                var products = await _unitOfWork.Product.FindAllAsync(u => u.VendorId == VendorId);
-                if (products.Any())
+                foreach (var product in products)
                 {
-                    foreach (var product in products)
+                    if (Vendor.SuspendedUntil >= product.SuspendedUntil)
                     {
-                        product.IsSuspended = false;
-                        product.SuspendedUntil = null;
-                        _unitOfWork.Product.Update(product);
+                        var action = await _unitOfWork.ProductAction.FindAsync(p => p.ProductId == product.ProductId);
+                        if (action == null)
+                        {
+                            product.SuspendedUntil = null;
+                            product.IsSuspended = false;
+                        }
+                        else
+                        {
+                            product.SuspendedUntil=action.SuspendedUntil;
+                        }
+                            _unitOfWork.Product.Update(product);
                     }
                 }
+            }
+
+            var Penalty = await _unitOfWork.Penalty.FindAsync(u => u.VendorId==VendorId);
+            if (Penalty != null)
+            {
+                _unitOfWork.Penalty.Delete(Penalty);
             }
             Vendor.IsSuspended = false;
             Vendor.SuspendedUntil = null;

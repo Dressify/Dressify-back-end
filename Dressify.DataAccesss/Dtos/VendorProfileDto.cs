@@ -18,7 +18,7 @@ namespace Dressify.DataAccess.Dtos
         public string? PhoneNumber { get; set;}
         public string? StoreName { get; set;}
         public bool? IsSuspended { get; set;}
-        public DateTime? SuspednedUntil { get; set; }
+        public DateTime? SuspendedUntil { get; set; }
         public string? NId { get; set; }
 
     }

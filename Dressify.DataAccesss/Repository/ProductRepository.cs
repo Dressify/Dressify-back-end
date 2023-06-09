@@ -1,4 +1,5 @@
-﻿using Dressify.DataAccess.Repository.IRepository;
+﻿using Dressify.DataAccess.Dtos;
+using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ namespace Dressify.DataAccess.Repository
         {
             reportCountThreshold ??= 10; // if reportCountThreshold is null, set its value to 10
 
-            var products = _context.Products.Include(p => p.Reports)
+            var products = _context.Products.Include(p => p.Reports).Include(p => p.ProductImages)
                 .Where(p => p.Reports.Count >= reportCountThreshold
                 && p.Reports.Any(pr => pr.ReportStatus == true)
                 && p.IsSuspended == false);
@@ -104,9 +105,59 @@ namespace Dressify.DataAccess.Repository
             var products = _context.Products.OrderByDescending(p => p.ProductId)
             .Take(8)
             .Include(p =>p.ProductImages)
+            .Include(p => p.ProductRates)
             .ToList();
             return products;
         }
 
+        public async Task<Product> LastProduct()
+        {
+            var lastRecord = await _context.Products
+            .OrderByDescending(p => p.ProductId)
+            .FirstOrDefaultAsync();
+            return lastRecord;
+        }
+
+        public async Task<List<Product>> GetProductsOnOrder(List<int> productsIds)
+        {
+            var products = await _context.Products.Where(p => productsIds.Contains(p.ProductId))
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductRates).ToListAsync();
+            products = products.OrderBy(p => productsIds.IndexOf(p.ProductId)).ToList();
+            return products;
+        }
+
+        public async Task<Dictionary<string, double>> ProductsRated(string customerId)
+        {
+            var categories = new List<string>{
+             "pants", "jeans", "shirt", "t_shirt", "jacket", "coat", "hoodies", "sweatshirts",
+             "blazer", "sneaker", "boot", "oxford", "blouseClean", "skirtClean", "tie"};
+
+            var averageRatingsByCategory = new Dictionary<string, double>();
+
+            foreach (var category in categories)
+            {
+                var averageRating = await _context.Products
+                    .Where(p => (p.Category == category || p.SubCategory == category) && p.ProductRates.Any(pr => pr.CustomerId == customerId))
+                    .SelectMany(p => p.ProductRates)
+                    .Where(pr => pr.CustomerId == customerId)
+                    .AverageAsync(pr => pr.Rate);
+
+                averageRatingsByCategory[category] = averageRating??0.0;
+            }
+
+            // Replace null values with 0
+            foreach (var category in categories)
+            {
+                if (!averageRatingsByCategory.ContainsKey(category))
+                {
+                    averageRatingsByCategory[category] = 0;
+                }
+            }
+
+            return averageRatingsByCategory;
+        }
+
     }
 }
+    

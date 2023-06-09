@@ -20,6 +20,7 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using Stripe;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dressify.DataAccess.Repository
 {
@@ -128,7 +129,7 @@ namespace Dressify.DataAccess.Repository
 
         }
 
-        public void Unsuspend()
+        public async void Unsuspend()
         {
             var now = DateTime.UtcNow;
             var suspendedProducts =  _context.Products.Where(p => p.IsSuspended && p.SuspendedUntil.HasValue && p.SuspendedUntil.Value <= now).ToList();
@@ -138,18 +139,22 @@ namespace Dressify.DataAccess.Repository
             {
                 product.IsSuspended = false;
                 product.SuspendedUntil = null;
-
                 _context.Products.Update(product);
+                var action = await _context.ProdcutsActions.FirstOrDefaultAsync(u => u.ProductId == product.ProductId);
+                if (action != null) 
+                   _context.ProdcutsActions.Remove(action);
             }
 
             foreach (var vendor in suspendedVendors)
             {
                 vendor.IsSuspended = false;
                 vendor.SuspendedUntil = null;
-
                 _context.Users.Update(vendor);
+                var Penalty = await _context.Penalties.FirstOrDefaultAsync(u => u.VendorId == vendor.Id);
+                if (Penalty != null)
+                    _context.Penalties.Remove(Penalty);
             }
-             _context.SaveChanges();
+            _context.SaveChanges();
         }
         public void ConfirmOrders()
         {   //orderDetails

@@ -43,11 +43,21 @@ namespace Dressify.DataAccess.Repository
         }
         public async Task<AuthDto> CustomerRegisterAsync(CustRegisterDto dto)
         {
+            var auth = new AuthDto();
+            auth.Messages = new List<string>();
             if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.Email == dto.Email) is not null)
-                return new AuthDto { Message = "Email is already registered!" };
-
+            //return new AuthDto { Message = "Email is already registered!" };
+            {
+                var message = "Email is already registered!";
+                auth.Messages.Add(message);
+            }
             if (await _userManager.FindByNameAsync(dto.Username) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.AdminName == dto.Username) is not null)
-                return new AuthDto { Message = "Username is already registered!" };
+            //return new AuthDto { Message = "Username is already registered!" };
+            {
+                var message = "Username is already registered!";
+                auth.Messages.Add(message);
+                return (auth);
+            }
             var user = new ApplicationUser
             {
                 UserName = dto.Username.Trim(),
@@ -56,12 +66,13 @@ namespace Dressify.DataAccess.Repository
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
-                var errors = string.Empty;
+                //var errors = string.Empty;
 
                 foreach (var error in result.Errors)
-                    errors += $"{error.Description},";
+                    //errors += $"{error.Description},";
+                    auth.Messages.Add(error.Description);
 
-                return new AuthDto { Message = errors };
+                return (auth);
             }
             await _userManager.AddToRoleAsync(user, SD.Role_Customer);
 
@@ -80,13 +91,28 @@ namespace Dressify.DataAccess.Repository
         }
         public async Task<AuthDto> VendorRegisterAsync(VendorRegisterDto dto)
         {
+            var auth = new AuthDto();
+            auth.Messages = new List<string>();
             if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.Email == dto.Email) is not null)
-                return new AuthDto { Message = "Email is already registered!" };
+            //return new AuthDto { Message = "Email is already registered!" };
+            {
+                var message = "Email is already registered!";
+                auth.Messages.Add(message);
+            }
 
             if (await _userManager.FindByNameAsync(dto.UserName) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.AdminName == dto.UserName) is not null)
-                return new AuthDto { Message = "Username is already registered!" };
-            if(dto.StoreName==SD.StoreName || await _context.Users.FirstOrDefaultAsync(p=>p.StoreName==dto.StoreName) is not null)
-                return new AuthDto { Message = "Store Name is already registered!" };
+            //return new AuthDto { Message = "Username is already registered!" };
+            {
+                var message = "Username is already registered!";
+                auth.Messages.Add(message);
+            }
+            if (dto.StoreName==SD.StoreName || await _context.Users.FirstOrDefaultAsync(p=>p.StoreName==dto.StoreName) is not null)
+            //return new AuthDto { Message = "Store Name is already registered!" };
+            {
+                var message = "Store Name is already registered!";
+                auth.Messages.Add(message);
+                return auth;
+            }
             var user = new ApplicationUser
             {
                 UserName = dto.UserName.Trim(),
@@ -101,12 +127,13 @@ namespace Dressify.DataAccess.Repository
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
-                var errors = string.Empty;
+                //var errors = string.Empty;
 
                 foreach (var error in result.Errors)
-                    errors += $"{error.Description},";
+                    //errors += $"{error.Description},";
+                    auth.Messages.Add(error.Description);
 
-                return new AuthDto { Message = errors };
+                return (auth);
             }
             await _userManager.AddToRoleAsync(user, SD.Role_Vendor);
 
@@ -123,49 +150,49 @@ namespace Dressify.DataAccess.Repository
                 ImgUrl = user.ProfilePic,
             };
         }
-        public async Task<AuthDto> RegisterAsync(RegisterDto dto)
-        {
-            if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.Email == dto.Email) is not null)
-                return new AuthDto { Message = "Email is already registered!" };
+        //public async Task<AuthDto> RegisterAsync(RegisterDto dto)
+        //{
+        //    if (await _userManager.FindByEmailAsync(dto.Email) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.Email == dto.Email) is not null)
+        //        return new AuthDto { Message = "Email is already registered!" };
 
-            if (await _userManager.FindByNameAsync(dto.Username) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.AdminName == dto.Username) is not null)
-                return new AuthDto { Message = "Username is already registered!" };
-            if(! await _roleManager.RoleExistsAsync(dto.Role))
-                return new AuthDto { Message = "This Role not exist" };
-            var user = new ApplicationUser
-            {
-                UserName = dto.Username.Trim(),
-                Email = dto.Email.Trim(),
-                FName = dto.FName != null ? dto.FName.Trim() : null,
-                LName = dto.LName != null ? dto.LName.Trim() : null,
-            };
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-            {
-                var errors = string.Empty;
+        //    if (await _userManager.FindByNameAsync(dto.Username) is not null || await _context.Admins.FirstOrDefaultAsync(p => p.AdminName == dto.Username) is not null)
+        //        return new AuthDto { Message = "Username is already registered!" };
+        //    if(! await _roleManager.RoleExistsAsync(dto.Role))
+        //        return new AuthDto { Message = "This Role not exist" };
+        //    var user = new ApplicationUser
+        //    {
+        //        UserName = dto.Username.Trim(),
+        //        Email = dto.Email.Trim(),
+        //        FName = dto.FName != null ? dto.FName.Trim() : null,
+        //        LName = dto.LName != null ? dto.LName.Trim() : null,
+        //    };
+        //    var result = await _userManager.CreateAsync(user, dto.Password);
+        //    if (!result.Succeeded)
+        //    {
+        //        var errors = string.Empty;
 
-                foreach (var error in result.Errors)
-                    errors += $"{error.Description},";
+        //        foreach (var error in result.Errors)
+        //            errors += $"{error.Description},";
 
-                return new AuthDto { Message = errors };
-            }
+        //        return new AuthDto { Message = errors };
+        //    }
 
-            await _userManager.AddToRoleAsync(user, dto.Role);
+        //    await _userManager.AddToRoleAsync(user, dto.Role);
 
-            var jwtSecurityToken = await CreateJwtToken(user);
-            await _userManager.UpdateAsync(user);
-            return new AuthDto
-            {
-                Email = user.Email,
-                ExpiresOn = jwtSecurityToken.ValidTo,
-                IsAuthenticated = true,
-                Role = dto.Role,
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                Username = user.UserName,
-                ImgUrl=user.ProfilePic,
-            };
+        //    var jwtSecurityToken = await CreateJwtToken(user);
+        //    await _userManager.UpdateAsync(user);
+        //    return new AuthDto
+        //    {
+        //        Email = user.Email,
+        //        ExpiresOn = jwtSecurityToken.ValidTo,
+        //        IsAuthenticated = true,
+        //        Role = dto.Role,
+        //        Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+        //        Username = user.UserName,
+        //        ImgUrl=user.ProfilePic,
+        //    };
 
-        }
+        //}
         public async Task<AuthDto> GetTokenAsync(TokenRequestDto model)
         {
             var authModel = new AuthDto();

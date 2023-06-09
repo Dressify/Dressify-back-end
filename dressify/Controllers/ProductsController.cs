@@ -1,10 +1,14 @@
-﻿using Dressify.DataAccess.Dtos;
+﻿using dressify.Service;
+using Dressify.DataAccess.Dtos;
 using Dressify.DataAccess.Repository.IRepository;
 using Dressify.Models;
+using Dressify.Utility;
 using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Stripe;
 using System.Drawing.Printing;
 using System.Linq;
 
@@ -15,13 +19,29 @@ namespace dressify.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public ProductsController(IUnitOfWork unitOfWork)
+        private readonly IRecommendationService _recommendationService;
+        public ProductsController(IUnitOfWork unitOfWork ,IRecommendationService recommendationService)
         {
             _unitOfWork = unitOfWork;
+            _recommendationService = recommendationService;
         }
 
-        
+        [HttpGet("Recommended")]
+        [Authorize(Roles =SD.Role_Customer)]
+        public async Task<IActionResult> RecommendedProducts()
+        {
+            var userId=_unitOfWork.getUID();
+            var rated =await _unitOfWork.Product.ProductsRated(userId);
+            var result =await _recommendationService.GetRecommendedProducts(rated);
+            var products = await _unitOfWork.Product.GetProductsOnOrder(result);
+            var productsWithAvgRates = products.Select(p => new
+            {
+                Product = p,
+                AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
+            }).ToList();
+            return Ok(productsWithAvgRates);
+        }   
+
         [HttpGet("GetProductspage")]
         public async Task<IActionResult> GetProductsPage([FromQuery] GetProductsDto model)
         {
@@ -47,17 +67,17 @@ namespace dressify.Controllers
 
             if (!string.IsNullOrEmpty(model.Gender))
             {
-                productsQuery = productsQuery.Where(p => p.Type.Trim().ToLower() == model.Gender.Trim().ToLower());
+                productsQuery = productsQuery.Where(p => p.Type != null && p.Type.Trim().ToLower() == model.Gender.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.Category))
             {
-                productsQuery = productsQuery.Where(p => p.Category.Trim().ToLower() == model.Category.Trim().ToLower());
+                productsQuery = productsQuery.Where(p => p.Category != null && p.Category.Trim().ToLower() == model.Category.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.SubCategory))
             {
-                productsQuery = productsQuery.Where(p => p.SubCategory.Trim().ToLower() == model.SubCategory.Trim().ToLower());
+                productsQuery = productsQuery.Where(p => p.SubCategory != null && p.SubCategory.Trim().ToLower() == model.SubCategory.Trim().ToLower());
             }
 
             if (!string.IsNullOrEmpty(model.SearchTerm))
@@ -160,9 +180,9 @@ namespace dressify.Controllers
                 return NoContent();
             }
     
-            var categories = distinctValues.Select(p => p.Category).Distinct().ToList();
-            var subCategories = distinctValues.Select(p => p.SubCategory).Distinct().ToList();
-            var types = distinctValues.Select(p => p.Type).Distinct().ToList();
+            var categories = distinctValues.Where(p => p.Category != null && p.Category != "").Select(p => p.Category).Distinct().ToList();
+            var subCategories = distinctValues.Where(p => p.SubCategory != null && p.SubCategory != "").Select(p => p.SubCategory).Distinct().ToList();
+            var types = distinctValues.Where(p => p.Type != null && p.Type != "").Select(p => p.Type).Distinct().ToList();
 
             return Ok(new { categories, subCategories, types });
         }
@@ -218,7 +238,12 @@ namespace dressify.Controllers
             var products = await _unitOfWork.Product.newArrivals();
             if (products == null)
                 return NotFound();
-            return Ok(products);
+            var productsWithAvgRates = products.Select(p => new
+            {
+                Product = p,
+                AvgRate = _unitOfWork.ProductRate.CalculateAverageRate(p.ProductRates)
+            }).ToList();
+            return Ok(new { ProductsWithAvgRates = productsWithAvgRates });
         }
 
     }

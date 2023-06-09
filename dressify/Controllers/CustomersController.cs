@@ -270,8 +270,10 @@ namespace dressify.Controllers
             var skip = (model.PageNumber - 1) * model.PageSize;
             var customerOrders = new List<ViewOrderDto>() ;
             var result= await _unitOfWork.Order.FindAllAsync(o => o.CustomerId == uId);
-            var totalCount = result.Count();
-            var Orders = result
+            var orderedResult = result
+            .OrderByDescending(o => o.OrderId);
+            var totalCount = orderedResult.Count();
+            var Orders = orderedResult
                .Skip(skip.Value)
                .Take(model.PageSize.Value)
                .ToList();
@@ -303,7 +305,7 @@ namespace dressify.Controllers
         {
             var uId = _unitOfWork.getUID();
             var order = await _unitOfWork.Order.FindAsync(o => o.OrderId == OrderId);
-            if (order == null)
+            if (order == null || order.CustomerId != uId)
                 return NoContent();
             var details = await _unitOfWork.OrderDetails.FindAllAsync(d => d.OrderId ==OrderId, new[] { "Product" });
             var orderDetails = new ViewOrderDto()
@@ -320,11 +322,14 @@ namespace dressify.Controllers
                 item.Product = await _unitOfWork.Product.FindAsync(p => p.ProductId == item.ProductId, new[] { "ProductImages" });
                 var productDetails = new OrderProductDetailsDto()
                 {
-                    img = item.Product.ProductImages.ToList()[0].ImageUrl,
                     ProductPrice = item.Price.Value,
                     Quantity = item.Quantity.Value,
                     ProductName = item.ProductName,
                 };
+                if (item.Product.ProductImages != null && item.Product.ProductImages.Any())
+                {
+                    productDetails.img = item.Product.ProductImages.First().ImageUrl;
+                }
                 orderDetails.ProductDetails.Add(productDetails);
             }
             var sum = _unitOfWork.OrderDetails.OrdersQuantity(details);

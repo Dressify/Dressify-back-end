@@ -12,7 +12,7 @@ namespace Dressify.DataAccess.Repository.IRepository
     public interface IApplicationUserRepository : IRepository<ApplicationUser>
     {
         Task<AuthDto> CustomerRegisterAsync(CustRegisterDto dto);
-        Task<AuthDto> RegisterAsync(RegisterDto dto);
+        //Task<AuthDto> RegisterAsync(RegisterDto dto);
         Task<AuthDto> GetTokenAsync(TokenRequestDto dto);
         Task<ApplicationUser> GetUserAsync(string userId);
         Task<string> GetRoleAsync(ApplicationUser user);

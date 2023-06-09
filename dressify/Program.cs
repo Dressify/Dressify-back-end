@@ -1,4 +1,5 @@
 using dressify;
+using dressify.Service;
 using Dressify.DataAccess;
 using Dressify.DataAccess.DbInitializer;
 using Dressify.DataAccess.Helpers;
@@ -26,6 +27,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddHttpClient<IRecommendationService, RecommendationService>();
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("EmailConfiguration"));
@@ -95,6 +97,7 @@ builder.Services.AddHangfireServer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 // Configure the HTTP request pipeline. 
+app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -102,7 +105,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 SeedDatabase();
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 app.UseAuthentication();
