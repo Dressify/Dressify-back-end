@@ -30,7 +30,7 @@ namespace Dressify.DataAccess.Repository
         }
         public  void returnProductQuantity(int orderid)
         {
-            var OrderDetails = _context.OrdersDetails.Where(o => o.OrderId == orderid);
+            var OrderDetails = _context.OrdersDetails.Where(o => o.OrderId == orderid).ToList();
             foreach(var item in OrderDetails)
             {
                var  product= _context.Products.Find(item.ProductId);
