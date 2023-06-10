@@ -247,7 +247,7 @@ namespace dressify.Controllers
         {
             var uId = _unitOfWork.getUID();
             var  order = _unitOfWork.Order.GetById(orderId);
-            if (order == null)
+            if (order == null || order.CustomerId != uId)
                 return BadRequest("Order Does not exist");
             if (order.OrderStatus == SD.Status_Pending && order.payementMethod == SD.PaymentMethod_Cash  )
             {
