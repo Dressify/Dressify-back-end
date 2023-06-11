@@ -288,24 +288,24 @@ namespace dressify.Controllers
             else return BadRequest("Order Can not be Canceled");
         }
 
-        [Authorize]
-        [HttpPost("testPay")]
-        public async Task<IActionResult> TestPay()
-        {
-            var paymentIntentService = new PaymentIntentService();
-            var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
-            {
-                Amount = (long?)(50000 * 100),
-                Currency = "usd",
-                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
-                {
-                    Enabled = true,
-                },
-            });
-            var Status = paymentIntent.Status;
+        //[Authorize]
+        //[HttpPost("testPay")]
+        //public async Task<IActionResult> TestPay()
+        //{
+        //    var paymentIntentService = new PaymentIntentService();
+        //    var paymentIntent = paymentIntentService.Create(new PaymentIntentCreateOptions
+        //    {
+        //        Amount = (long?)(50000 * 100),
+        //        Currency = "usd",
+        //        AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
+        //        {
+        //            Enabled = true,
+        //        },
+        //    });
+        //    var Status = paymentIntent.Status;
 
-            var clientSecret = paymentIntent.ClientSecret;
-            return Ok(clientSecret);
-        }
+        //    var clientSecret = paymentIntent.ClientSecret;
+        //    return Ok(clientSecret);
+        //}
     }
 }
