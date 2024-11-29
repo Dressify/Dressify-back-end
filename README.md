@@ -1,3 +1,7 @@
+# Dressify: Revolutionizing Fashion Shopping
+
+Dressify is an innovative online clothing marketplace that revolutionizes the fashion shopping experience. With a focus on personalization, Dressify utilizes an advanced recommendation system to offer tailored product suggestions based on customers' preferences, ensuring an enjoyable and effortless shopping journey.
+
 ## Demo
 
 [View Demo](https://drive.google.com/file/d/174vVJc9FuoDatZQrzcvIgqiJrqpg81qf/view)
