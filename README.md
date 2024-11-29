@@ -1,4 +1,4 @@
-![Registeration](https://github.com/user-attachments/assets/f7d65204-d828-4b95-a8d9-52b978cd3b28)![Shop](https://github.com/user-attachments/assets/e7099ed0-7f2f-43f6-a841-c60de70da4ea)Idea
+Idea
 
   Dressify is an innovative online clothing marketplace that revolutionizes the fashion shopping experience.
   With a focus on personalization, Dressify utilizes an advanced recommendation system to offer tailored product suggestions based on customers' preferences, ensuring              an enjoyable and effortless shopping journey.
